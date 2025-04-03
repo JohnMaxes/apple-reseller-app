@@ -20,7 +20,6 @@ const HomeScreen = ({navigation}) => {
         async function init() {
             try {
                 let response = await axios.get('https://fakestoreapi.com/products?limit=8');
-                
                 const newHotDeals = response.data.slice(0, 4);
                 const newNewArrivals = response.data.slice(4, 8);
         

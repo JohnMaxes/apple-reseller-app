@@ -5,9 +5,7 @@ import CartScreen from "../pages/CartScreen";
 const CartStack = createStackNavigator();
 const Cart = () => {
     return (
-        <CartStack.Navigator initialRouteName="CartScreen" screenOptions={{
-            headerShown: false,
-        }}>
+        <CartStack.Navigator initialRouteName="CartScreen" screenOptions={{headerShown: false}}>
             <CartStack.Screen name='CartScreen' component={CartScreen}/>
         </CartStack.Navigator>
     )

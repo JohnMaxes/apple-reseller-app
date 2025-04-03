@@ -14,8 +14,6 @@ const styles = StyleSheet.create({
       padding: 10,
     },
     screen: {
-      flex: 1,
-      alignItems: 'center',
       paddingTop: 20,
     },
     header: {

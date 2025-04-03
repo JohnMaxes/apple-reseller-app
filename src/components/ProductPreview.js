@@ -18,11 +18,11 @@ const ProductPreview = ({title, image, description, price, rating, ratingCount, 
         alert('Item added to cart successfully!');
     };
 
-    const navigate = () => {
+    const navigateToItem = () => {
         navigation.navigate('ProductScreen', {title, image, description, price, rating, ratingCount})
     }
     return (
-        <TouchableOpacity onPress={navigate} style={{width: width, height: 350, borderBlock:'black', borderColor:2, marginBottom: 10, marginHorizontal: 5}}>
+        <TouchableOpacity onPress={navigateToItem} style={{width: width, height: 350, borderBlock:'black', borderColor:2, marginBottom: 10, marginHorizontal: 5}}>
             <View style={{height: 300, width: '100%'}}>
                 <Image style={{width: width, height: 225}} source={{uri: image}}/>
                 <Text numberOfLines={3} style={{fontSize: 20}}>{title}</Text>
