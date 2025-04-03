@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { View, Text, Dimensions, Image, TouchableOpacity, Modal } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
-import { MyContext } from "../context";
+import { CartContext } from "../context/CartContext";
 
 const ProductPreview = ({title, image, description, price, rating, ratingCount, navigation, id}) => {
     const width = Dimensions.get('window').width * 0.475;
-    const{cart, setCart, setCartTotal} = useContext(MyContext);
+    const{cart, setCart, setCartTotal} = useContext(CartContext);
     const addToCart = () => {
         if (cart.some(element => element.id === id)) {
             alert('Item is already in cart');

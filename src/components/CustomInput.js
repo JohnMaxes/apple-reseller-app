@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Image, TextInput, StyleSheet, useState} from 'react-native';
-import styles from '../styles';
-
+import styles from '../../styles';
 const CustomInput = ({ placeholder, placeholderTextColor, secureTextEntry, iconUri, onChangeText, value, keyboardType, minLength, maxLength }) => {
   return (
     <View style={styles.inputContainer}>

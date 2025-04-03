@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Dimensions, Image, FlatList, ScrollView } from "react-native";
+import { View, ActivityIndicator, FlatList, ScrollView } from "react-native";
 import axios from "axios";
 import Icon from 'react-native-vector-icons/Ionicons';
 import ProductPreview from "../components/ProductPreview";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { createStackNavigator } from "@react-navigation/stack";
-import ProductScreen from "./ProductScreen";
-
-
-const CStack = createStackNavigator();
-const Categories = () => {
-    return (
-        <CStack.Navigator initialRouteName="CategoriesScreen">
-            <CStack.Screen name='CategoriesScreen' component={CategoriesScreen}/>
-            <CStack.Screen name='ProductScreen' component={ProductScreen}/>
-        </CStack.Navigator>
-    )
-}
 
 const CTopTab = createMaterialTopTabNavigator();
 const CategoriesScreen = () => {
@@ -151,4 +138,4 @@ const CategoriesRender = ({navigation, products, setProducts, url}) => {
     );
 }
 
-export default Categories;
+export default CategoriesScreen;

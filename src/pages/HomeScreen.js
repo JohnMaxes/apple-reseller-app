@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, Dimensions, Image, FlatList, ScrollView } from "react-native";
 import axios from "axios";
-import styles from "../styles";
 import Carousel from "react-native-reanimated-carousel";
 import ProductPreview from "../components/ProductPreview";
-import { createStackNavigator } from "@react-navigation/stack";
-import ProductScreen from "./ProductScreen";
-
-
-const HStack = createStackNavigator();
-const Home = () => {
-    return (
-        <HStack.Navigator initialRouteName="HomeScreen">
-            <HStack.Screen name='HomeScreen' component={HomeScreen}/>
-            <HStack.Screen name='ProductScreen' component={ProductScreen}/>
-        </HStack.Navigator>
-    )
-}
 
 const HomeScreen = ({navigation}) => {
     const [loading, setLoading] = useState(true);
@@ -105,7 +91,7 @@ const HomeScreen = ({navigation}) => {
                 data={hotDeals}
                 renderItem={renderProduct}
                 keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
+                numColumns={1}
                 scrollEnabled={false}
                 contentContainerStyle={{ paddingBottom: 20, alignItems: 'center' }}
             />
@@ -125,4 +111,4 @@ const HomeScreen = ({navigation}) => {
     );
 }
 
-export default Home;
+export default HomeScreen;

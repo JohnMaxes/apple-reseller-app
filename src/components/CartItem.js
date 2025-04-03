@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, Dimensions, Image, TouchableOpacity, Modal, Button } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
-import styles from "../styles";
-import { MyContext } from "../context";
+import styles from "../../styles";
+import { CartContext } from "../context/CartContext";
 
 const CartItem = ({title, image, price, id, quantity}) => {
     const [itemQuantity, setQuantity] = useState(quantity);
     const [modalVisible, setModalVisible] = useState(false);
-    const {cart, setCart, cartTotal, setCartTotal} = useContext(MyContext);
+    const {cart, setCart, cartTotal, setCartTotal} = useContext(CartContext);
     const handleChangeQuantity = (operation) => {
         console.log(id);
         if(operation == 'x' || (operation == '-' && itemQuantity == 1)) {
@@ -69,6 +69,7 @@ const CartItem = ({title, image, price, id, quantity}) => {
                 </View>
             </View>
         </Modal>
+        
         <View style={{width: Dimensions.get('window').width * 0.93, borderColor:'grey', borderWidth: 1, height: 135, marginBottom: 15, padding: 7, borderRadius: 10}}>
             <View style ={{height: '25%'}}>
                 <Text numberOfLines={1} style={{fontSize: 17}}>{title}</Text>
@@ -77,7 +78,6 @@ const CartItem = ({title, image, price, id, quantity}) => {
                 <View style={{flex: 1, height: 'auto', width: 100}}>
                     <Image source={{uri: image}} style={{height:'100%', width:'100%'}}/>
                 </View>
-
                 <View style={{flex: 1.3, flexDirection:'column', alignItems:'center', justifyContent:'center', paddingLeft: 10}}>
                     <View style={{justifyContent:'center'}}>
                         <Text style={{fontSize: 19}}>{price}$</Text>

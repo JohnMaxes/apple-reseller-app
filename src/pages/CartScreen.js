@@ -1,25 +1,18 @@
 import React, { useContext, useEffect } from "react";
 import { View, Text, FlatList, Dimensions, Button } from "react-native";
-import styles from "../styles";
-import { MyContext } from "../context";
+import styles from "../../styles";
 import CartItem from "../components/CartItem";
+import { CartContext } from "../context/CartContext";
 
-const renderItem = ({ item }) => (
-    <CartItem id={item.id} image={item.image} title={item.title} price={item.price} quantity={item.quantity}/>
-);
-
-const Cart = () => {
-    const { cart, setCart, cartTotal, setCartTotal } = useContext(MyContext);
+const CartScreen = () => {
+    const { cart, setCart, cartTotal, setCartTotal } = useContext(CartContext);
     
     useEffect(() => console.log(cart), []);
-    
-    if (cart.length === 0) {
-        return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 30 }}>Cart empty!</Text>
-            </View>
-        );
-    }
+    if (cart.length === 0) return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 30 }}>Cart empty!</Text>
+        </View>
+    );
 
     return (
         <View style={styles.screen}>
@@ -27,7 +20,7 @@ const Cart = () => {
                 <FlatList
                     data={cart}
                     keyExtractor={item => item.id.toString()}
-                    renderItem={renderItem}
+                    renderItem={({item}) => (<CartItem id={item.id} image={item.image} title={item.title} price={item.price} quantity={item.quantity}/>)}
                     contentContainerStyle={{ alignItems: 'center' }}
                 />
             </View>
@@ -42,5 +35,4 @@ const Cart = () => {
         </View>
     );
 }
-
-export default Cart;
+export default CartScreen;

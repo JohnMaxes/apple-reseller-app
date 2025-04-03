@@ -1,14 +1,20 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Text, Image, View, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import { MyContext } from '../context';
 import axios from 'axios';
-import styles from '../styles';
-import CustomInput from '../components/customInput';
+import styles from '../../styles';
+import CustomInput from '../components/CustomInput';
+import { AuthContext } from '../context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({togglePage}) => {
+    useEffect(() => { // sử dụng data và API mẫu
+        setEmail('mor_2314');
+        setPassword('83r5^_');
+    }, [])
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {setLoggedIn, setToken, decodeForId} = useContext(MyContext);
+    const {setLoggedIn, setToken, decodeForId} = useContext(AuthContext);
 
     const onLoginPress = async () => {
         if (!email || !password) {
@@ -26,21 +32,17 @@ const LoginScreen = ({togglePage}) => {
                 console.log(response.data);
                 setToken(response.data.token);
                 await decodeForId();
+                await AsyncStorage.setItem('token', response.data.token);
                 setLoggedIn(true);
             }
             catch (error) {
                 console.log(error);
             }
         }
-    };
-
-    useEffect(() => {
-        setEmail('mor_2314');
-        setPassword('83r5^_');
-    }, [])
+    };    
 
     return (
-        <ScrollView>
+        <ScrollView scrollEnabled={false}>
             <View style={styles.header}>
                 <Text style={styles.heading}>Welcome</Text>
             </View>
@@ -82,7 +84,7 @@ const LoginScreen = ({togglePage}) => {
                 <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
                     Don't have an account?{" "}
                 </Text>
-                <TouchableOpacity onPress={togglePage}>
+                <TouchableOpacity onPress={() => togglePage()}>
                     <Text style={styles.toggleText}>Sign up here!</Text>
                 </TouchableOpacity>
             </View>

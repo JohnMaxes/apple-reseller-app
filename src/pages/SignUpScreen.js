@@ -1,8 +1,8 @@
 import { React, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
-import CustomInput from '../components/customInput';
-import styles from '../styles';
-const SignUpScreen = ({ togglePage }) => {
+import CustomInput from '../components/CustomInput';
+import styles from '../../styles';
+const SignUpScreen = ({togglePage}) => {
     
     const [registUsername, setRUsername] = useState('');
     const [registEmail, setREmail] = useState('');
@@ -13,14 +13,8 @@ const SignUpScreen = ({ togglePage }) => {
     };
 
     return (
-        <ScrollView>
+        <ScrollView scrollEnabled={false}>
             <View style={styles.header}>
-                <Image
-                    style={styles.headerImg}
-                    source={{
-                        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlt-TGjHVh4qzymsShj8a9dkNKBG7rfq2wTg&s",
-                    }}
-                />
                 <Text style={styles.heading}>Create New Account</Text>
             </View>
             <CustomInput
@@ -55,14 +49,14 @@ const SignUpScreen = ({ togglePage }) => {
                 required
                 iconUri="https://img.icons8.com/?id=94&format=png"
             />
-            <TouchableOpacity style={styles.button} onPress={processRequest}>
+            <TouchableOpacity style={styles.button} onPress={() => processRequest()}>
                 <Text style={styles.buttonText}>CREATE</Text>
             </TouchableOpacity>
             <View style={styles.toogleTextContainer}>
                 <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
                     Already have an account?{" "}
                 </Text>
-                <TouchableOpacity onPress={togglePage}>
+                <TouchableOpacity onPress={() => togglePage()}>
                     <Text style={styles.toggleText}>Login now!</Text>
                 </TouchableOpacity>
             </View>
