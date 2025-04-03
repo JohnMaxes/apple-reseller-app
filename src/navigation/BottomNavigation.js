@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from './Home';
@@ -7,25 +8,48 @@ import User from './User';
 import Cart from './Cart';
 
 const BottomTab = createBottomTabNavigator();
+const CustomTabIcon = ({ name, focused }) => {
+    return (
+        <View style={{ alignItems: "center", justifyContent: "center"}}>
+            {focused && (
+                <View style={{
+                    position: "absolute",
+                    width: 55,
+                    height: 55,
+                    backgroundColor: "black",
+                    borderRadius: 55/2,
+                    alignItems: "center",
+                    justifyContent: "center",
+                }} />
+            )}
+            <Icon name={name} color={focused ? "white" : "black"} size={26} style={{ position: "absolute" }} />
+        </View>
+    );
+};
 const BottomTabNavigation = () => {
     return (
         <BottomTab.Navigator
             initialRouteName='Home'
             screenOptions={{
                 tabBarStyle: {
-                    height: 70,
-                    paddingBottom: 10,
+                    height: 60,
+                    width: '80%',
+                    marginBottom: 25,
+                    marginHorizontal: '10%',
+                    paddingTop: 10,
+                    backgroundColor: '#ddd',
+                    borderRadius: 40,
+                    position: 'absolute',
                 },
-                tabBarLabelStyle: {
-                    fontSize: 15
-                }
+                tabBarShowLabel: false,
+                headerShown: false,
             }}
         >
             <BottomTab.Screen 
                 name='Home' 
                 component={Home}
                 options={{
-                    tabBarIcon: () => (<Icon name="home-outline" color="black" size={30} />), 
+                    tabBarIcon: ({ focused }) => <CustomTabIcon name="home-outline" focused={focused}/>,
                     headerShown: false,
                 }} 
             />
@@ -33,7 +57,7 @@ const BottomTabNavigation = () => {
                 name='Categories' 
                 component={Categories} 
                 options={{
-                    tabBarIcon: () => (<Icon name="grid-outline" color="black" size={30} />), 
+                    tabBarIcon: ({ focused }) => <CustomTabIcon name="phone-portrait-outline" focused={focused} />,
                     headerShown: false,
                 }} 
             />
@@ -41,14 +65,14 @@ const BottomTabNavigation = () => {
                 name='Cart' 
                 component={Cart} 
                 options={{
-                    tabBarIcon: () => (<Icon name="cart-outline" color="black" size={30} />)
+                    tabBarIcon: ({ focused }) => <CustomTabIcon name="cart-outline" focused={focused} />,
                 }} 
             />
             <BottomTab.Screen 
                 name='User' 
                 component={User} 
                 options={{
-                    tabBarIcon: () => (<Icon name="person-outline" color="black" size={30} />),
+                    tabBarIcon: ({ focused }) => <CustomTabIcon name="person-circle-outline" focused={focused} />,
                     headerShown: false,
                 }} 
             />
