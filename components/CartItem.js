@@ -36,7 +36,7 @@ const CartItem = ({title, image, price, id, quantity}) => {
         <Modal
             animationType="slide"
             transparent={true}
-            visible={modalVisible}
+            visible={modalVisible}  //gồm 2 giá trị: true/false
             onRequestClose={() => setModalVisible(false)}
         >
             <View style={styles.modalContainer}>
