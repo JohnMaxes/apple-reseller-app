@@ -42,14 +42,14 @@ const BottomTab = createBottomTabNavigator();
 
 const CustomTabIcon = ({ name, focused }) => {
     return (
-        <View style={{ alignItems: "center", justifyContent: "center" }}>
+        <View style={{ alignItems: "center", justifyContent: "center"}}>
             {focused && (
                 <View style={{
                     position: "absolute",
-                    width: 50,
-                    height: 50,
+                    width: 55,
+                    height: 55,
                     backgroundColor: "black",
-                    borderRadius: 25,
+                    borderRadius: 55/2,
                     alignItems: "center",
                     justifyContent: "center",
                 }} />
@@ -65,12 +65,13 @@ const BottomTabNav = () => {
             initialRouteName="HomeStack"
             screenOptions={{
                 tabBarStyle: {
-                    height: 80,
-                    paddingBottom: 10,
+                    height: 60,
+                    width: '80%',
+                    marginBottom: 25,
+                    marginHorizontal: '10%',
                     paddingTop: 10,
                     backgroundColor: '#ddd',
-                    borderTopLeftRadius: 40,
-                    borderTopRightRadius: 40,
+                    borderRadius: 40,
                     position: 'absolute',
                 },
                 tabBarShowLabel: false,
