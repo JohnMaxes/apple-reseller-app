@@ -7,6 +7,12 @@ import Categories from './Categories';
 import User from './User';
 import Cart from './Cart';
 
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+configureReanimatedLogger({
+    level: ReanimatedLogLevel.warn,
+    strict: false,
+});
+
 const BottomTab = createBottomTabNavigator();
 const CustomTabIcon = ({ name, focused }) => {
     return (

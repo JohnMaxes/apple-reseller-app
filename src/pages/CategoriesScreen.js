@@ -1,99 +1,122 @@
-import React, { useState } from "react";
-import { View, ActivityIndicator, FlatList } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { View, ActivityIndicator, FlatList, ScrollView } from "react-native";
 import axios from "axios";
+import Icon from 'react-native-vector-icons/Ionicons';
 import ProductPreview from "../components/ProductPreview";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 const CTopTab = createMaterialTopTabNavigator();
-
 const CategoriesScreen = () => {
     const url = 'https://fakestoreapi.com';
     return (
-        <CTopTab.Navigator initialRouteName="All" screenOptions={{ swipeEnabled: true }}>
-            <CTopTab.Screen name="All">
-                {({ navigation }) => <CategoriesRender url={`${url}/products`} navigation={navigation} />}
+        <CTopTab.Navigator 
+            initialRouteName="All" 
+            screenOptions={{
+                scrollEnabled: true,
+            }}
+        >
+            <CTopTab.Screen 
+                name="All" 
+                options={{ tabBarIcon: ({ color }) => <Icon name="list" size={20} color={color} /> }}
+            >
+                { ({ navigation, route }) => <CategoriesAll url={url} navigation={navigation} route={route} /> }
             </CTopTab.Screen>
-            <CTopTab.Screen name="Electronics">
-                {({ navigation }) => <CategoriesRender url={`${url}/products/category/electronics`} navigation={navigation} />}
+
+            <CTopTab.Screen 
+                name="Electronics" 
+                options={{ tabBarIcon: ({ color }) => <Icon name="laptop" size={20} color={color} /> }}
+            >
+                { ({ navigation, route }) => <CategoriesElectronics url={url} navigation={navigation} route={route} /> }
             </CTopTab.Screen>
-            <CTopTab.Screen name="Jewelery">
-                {({ navigation }) => <CategoriesRender url={`${url}/products/category/jewelery`} navigation={navigation} />}
+
+            <CTopTab.Screen 
+                name="Jewelery" 
+                options={{ tabBarIcon: ({ color }) => <Icon name="diamond" size={20} color={color} /> }}
+            >
+                { ({ navigation, route }) => <CategoriesJewelery url={url} navigation={navigation} route={route} /> }
             </CTopTab.Screen>
-            <CTopTab.Screen name="Men's Clothing">
-                {({ navigation }) => <CategoriesRender url={`${url}/products/category/${encodeURIComponent("men's clothing")}`} navigation={navigation} />}
+
+            <CTopTab.Screen 
+                name="Men's Clothing" 
+                options={{ tabBarIcon: ({ color }) => <Icon name="shirt" size={20} color={color} /> }}
+            >
+                { ({ navigation, route }) => <CategoriesMen url={url} navigation={navigation} route={route} /> }
             </CTopTab.Screen>
         </CTopTab.Navigator>
     );
 };
 
-const CategoriesRender = ({ url, navigation }) => {
-    const [loading, setLoading] = useState(true);
+const CategoriesAll = ({navigation, url}) => {
     const [products, setProducts] = useState([]);
-    const [error, setError] = useState(null);
+    const newUrl = url + '/products';
+    return (<CategoriesRender products={products} setProducts={setProducts} url={newUrl} navigation={navigation}/>)
+}
 
-    const fetchProducts = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.get(url);
-            setProducts(response.data);
-        } catch (err) {
-            console.error(err);
-            setError("Failed to fetch products");
-        } finally {
-            setLoading(false);
+const CategoriesElectronics = ({navigation, url}) => {
+    const [products, setProducts] = useState([]);
+    const newUrl = url + '/products/category/electronics';
+    return (<CategoriesRender products={products} setProducts={setProducts} url={newUrl} navigation={navigation}/>)
+}
+
+const CategoriesJewelery = ({navigation, url}) => {
+    const [products, setProducts] = useState([]);
+    const newUrl = url + '/products/category/jewelery';
+    return (<CategoriesRender products={products} setProducts={setProducts} url={newUrl} navigation={navigation}/>)
+}
+
+const CategoriesMen = ({navigation, url}) => {
+    const [products, setProducts] = useState([]);
+    const newUrl = url + "/products/category/men's%20clothing";
+    return (<CategoriesRender products={products} setProducts={setProducts} url={newUrl} navigation={navigation}/>)
+}
+
+const CategoriesWomen = ({navigation, url}) => {
+    const [products, setProducts] = useState([]);
+    const newUrl = url + "/products/category/women's%20clothing";
+    return (<CategoriesRender products={products} setProducts={setProducts} url={newUrl} navigation={navigation}/>)
+}
+
+const CategoriesRender = ({navigation, products, setProducts, url}) => {
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        async function init() {
+            try {
+                let response = await axios.get(url);
+                setProducts(response.data);
+                setLoading(false);    
+            } catch (error) {
+                console.log(error);
+            }
         }
-    };
-    
-    useFocusEffect(
-        React.useCallback(() => {
-            let isActive = true;
-            const fetchData = async () => {
-                if (isActive) await fetchProducts();
-            };
-            fetchData();
-            return () => { isActive = false; };
-        }, [url])
-    );
-
-    if (error) {
-        return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: 'red' }}>{error}</Text>
-            </View>
-        );
-    }
-
+        init();
+    }, []);
     if (loading) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <ActivityIndicator size="large" color="#0000ff" />
         </View>
-    );    
+    );
 
     const renderProduct = ({ item }) => {
         return (
-            <ProductPreview
-                title={item.title}
-                image={item.image}
-                price={item.price}
-                description={item.description}
-                rating={item.rating.rate}
-                ratingCount={item.rating.count}
-                navigation={navigation}
-                id={item.id}
-            />
-        );
+            <ProductPreview title={item.title} image={item.image} price={item.price} description={item.description}
+            rating={item.rating.rate} ratingCount={item.rating.count} navigation={navigation} id={item.id}/>    
+        )
     };
 
     return (
-        <FlatList
-            data={products}
-            renderItem={renderProduct}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingBottom: 20, alignItems: 'center' }}
-        />
+    <>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <FlatList
+                data={products}
+                renderItem={renderProduct}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                scrollEnabled={false}
+                contentContainerStyle={{ paddingBottom: 20, alignItems: 'center' }}
+            />
+        </ScrollView>
+    </>
     );
-};
+}
 
 export default CategoriesScreen;
