@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Text, Image, View, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { Text, Image, View, ScrollView, Alert, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import styles from '../../styles';
 import CustomInput from '../components/CustomInput';
@@ -91,5 +91,11 @@ const LoginScreen = ({togglePage}) => {
         </ScrollView>
     );
 };
+
+const newStyles = StyleSheet.create({
+
+})
+
+
 
 export default LoginScreen;

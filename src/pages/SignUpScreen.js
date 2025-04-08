@@ -1,5 +1,5 @@
 import { React, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import styles from '../../styles';
 const SignUpScreen = ({togglePage}) => {
@@ -63,5 +63,9 @@ const SignUpScreen = ({togglePage}) => {
         </ScrollView>
     );
 };
+
+const newStyles = StyleSheet.create({
+
+})
 
 export default SignUpScreen;

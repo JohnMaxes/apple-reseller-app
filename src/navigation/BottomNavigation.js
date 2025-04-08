@@ -82,8 +82,20 @@ const BottomTabNavigation = () => {
                     headerShown: false,
                 }} 
             />
+            <BottomTab.Screen 
+                name='Test' 
+                component={Test} 
+                options={{
+                    tabBarIcon: ({ focused }) => <CustomTabIcon name="cart-outline" focused={focused} />,
+                    headerShown: false,
+                }} 
+            />
         </BottomTab.Navigator>
     )
+}
+
+const Test = () => {
+    return(<View></View>)
 }
 
 export default BottomTabNavigation;
