@@ -10,6 +10,9 @@ import Cart from './Cart';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import ProductCatalogPreview from '../components/ProductCatalogPreview';
 import ForgetPassword1 from '../pages/ForgetPassword1';
+import ForgetPassword2 from '../pages/ForgetPassword2';
+import ForgetPassword3 from '../pages/ForgetPassword3';
+
 
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
@@ -101,9 +104,14 @@ const BottomTabNavigation = () => {
 //     return(<View><ProductCatalogPreview image='https://i.imgur.com/g3nyNsZ.png' 
 //         title='Iphone 16 Pro Max Titan Sa Mạc 1TB' price='45.590.000'></ProductCatalogPreview></View>)
 // }
+// const Test = () => {
+//     return(<ForgetPassword1></ForgetPassword1>)
+// }
+// const Test = () => {
+//     return(<ForgetPassword2></ForgetPassword2>)
+// }
 const Test = () => {
-    return(<ForgetPassword1></ForgetPassword1>)
+    return(<ForgetPassword3></ForgetPassword3>)
 }
-
 
 export default BottomTabNavigation;
