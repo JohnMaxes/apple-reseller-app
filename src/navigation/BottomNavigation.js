@@ -102,7 +102,7 @@ const BottomTabNavigation = () => {
 //         title='Iphone 16 Pro Max Titan Sa Mạc 1TB' price='45.590.000'></ProductCatalogPreview></View>)
 // }
 const Test = () => {
-    return(<View><ForgetPassword1></ForgetPassword1></View>)
+    return(<ForgetPassword1></ForgetPassword1>)
 }
 
 
