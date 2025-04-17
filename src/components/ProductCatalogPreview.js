@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { CartContext } from "../context/CartContext";
 import { StyleSheet } from 'react-native';
 
-const width = Dimensions.get('window').width * 0.475;
+const width = Dimensions.get('window').width * 0.45;
 
 const ProductCatalogPreview = ({ title, image, description, price, rating, ratingCount, navigation, id }) => {
   const { cart, setCart, setCartTotal } = useContext(CartContext);
@@ -37,14 +37,11 @@ const ProductCatalogPreview = ({ title, image, description, price, rating, ratin
     <TouchableOpacity onPress={navigateToItem}
       style={{
         width: width,
-        height: 280, // Giảm chiều cao để giống hình
-        marginBottom: 10,
-        marginHorizontal: 5,
+        height: 240,
         justifyContent: 'center',   
         alignItems: 'center',       
         alignSelf: 'center',  
-        marginTop: 200, 
-        marginBottom: 10,    
+        transform: [{ scale: 0.95 }], marginLeft: 5, marginRight: 5, marginBottom: 5
       }}
     >
       <View style={styles.card}>
@@ -94,7 +91,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 110, 
-    height: 150,
+    height: 130,
     resizeMode: 'contain',
     marginTop: 10,
   },

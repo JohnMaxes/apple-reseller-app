@@ -1,9 +1,8 @@
 import React, { useContext } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Modal } from "react-native";
-import Icon from 'react-native-vector-icons/Ionicons';
+import { View, Text, Dimensions, Image, TouchableOpacity } from "react-native";
 import { CartContext } from "../context/CartContext";
 import { StyleSheet } from 'react-native';
-const width = Dimensions.get('window').width * 0.475;
+const width = Dimensions.get('window').width * 0.45;
 const ProductPreview = ({title, image, description, price, rating, ratingCount, navigation, id}) => {
   
     const{cart, setCart, setCartTotal} = useContext(CartContext);
@@ -22,23 +21,15 @@ const ProductPreview = ({title, image, description, price, rating, ratingCount, 
         navigation.navigate('ProductScreen', {title, image, description, price, rating, ratingCount})
     }
     return (
-        <TouchableOpacity onPress={navigateToItem} style={{width: width, height: 350, borderBlock:'black', borderColor:2, marginBottom: 10, marginHorizontal: 5}}>
+        <TouchableOpacity onPress={navigateToItem} style={{width: width, transform: [{ scale: 0.95 }], marginLeft: 5, marginRight: 5, marginBottom: 5 }}>
             <View style={styles.card}>
                 <View style={styles.imageContainer}>
-                    <Image 
-                        source={{ uri: image }} 
-                        style={styles.image} 
-                    />
+                    <Image source={{ uri: image }} style={styles.image} />
                 </View>
                 <View style={styles.titleContainer}>
-                    <Text style={styles.title} numberOfLines={3} ellipsizeMode="tail">
-                        {title}
-                    </Text>
+                    <Text style={styles.title} numberOfLines={3} ellipsizeMode="tail">{title}</Text>
                 </View>
                 <Text style={styles.price}>{price}₫</Text>
-                <TouchableOpacity onPress={addToCart}>
-                    <Text style={styles.addToCartText}>Thêm vào giỏ hàng</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.buyButton} onPress={addToCart}>
                     <Text style={styles.buyButtonText}>Mua</Text>
                 </TouchableOpacity>
@@ -58,7 +49,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 5,
         elevation: 6,
-        margin: 10,
     },
     imageContainer: {
         backgroundColor: '#fff', 
@@ -104,7 +94,7 @@ const styles = StyleSheet.create({
     buyButtonText: {
         color: '#fff',
         fontSize: 16,
-        // fontWeight: 'bold',
+        fontWeight: 'bold',
     },
 })
 

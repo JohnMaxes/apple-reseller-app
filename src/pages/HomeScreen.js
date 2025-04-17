@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, Dimensions, Image, FlatList, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, Dimensions, Image, FlatList, ScrollView, TouchableOpacity } from "react-native";
 import axios from "axios";
 import Carousel from "react-native-reanimated-carousel";
 import ProductPreview from "../components/ProductPreview";
@@ -20,15 +20,11 @@ const HomeScreen = ({navigation}) => {
         async function init() {
             try {
                 let response = await axios.get('https://fakestoreapi.com/products?limit=8');
-                const newHotDeals = response.data.slice(0, 4);
-                const newNewArrivals = response.data.slice(4, 8);
-        
+                const newHotDeals = response.data.slice(0, 4), newNewArrivals = response.data.slice(4, 8);
                 setHotDeals(newHotDeals);
                 setNewArrivals(newNewArrivals);
                 setLoading(false);    
-            } catch (error) {
-                console.log(error);
-            }
+            } catch (error) { console.log(error); }
         }
         init();
     }, []);
@@ -39,25 +35,21 @@ const HomeScreen = ({navigation}) => {
         </View>
     );
 
-    const renderCarousel = () => {
-        return (
-            <View style={{ height: 300 }}>
-                <Carousel
-                    loop
-                    width={carouselWidth}
-                    height={300}
-                    data={carouselData}
-                    autoPlay={true}
-                    scrollAnimationDuration={1000}
-                    renderItem={({ item }) => (
-                        <View style={{ backgroundColor: item.color }}>
-                            <Image source={{ uri: item.uri }} style={{ height: '100%', width: '100%' }} />
-                        </View>
-                    )}
-                />
-            </View>
-        )
-    };
+    const renderCarousel = () => { return (
+        <View style={{ height: 300 }}>
+            <Carousel loop
+            width={carouselWidth} height={300}
+            data={carouselData}
+            autoPlay={true}
+            scrollAnimationDuration={1000}
+            renderItem={({ item }) => (
+                <View style={{ backgroundColor: item.color }}>
+                    <Image source={{ uri: item.uri }} style={{ height: '100%', width: '100%' }} />
+                </View>
+            )}
+            />
+        </View>
+    )};
 
     const renderProduct = ({ item }) => {
         return (
@@ -68,7 +60,7 @@ const HomeScreen = ({navigation}) => {
 
     return (
     <>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView style={{margin: 0, padding: 0}} contentContainerStyle={{ flexGrow: 1, margin: 0, paddingBottom: 75, paddingTop: 50 }}>
             <View style={{ padding: 16 }}>
                 <Text style={{
                     fontSize: 30,
@@ -83,19 +75,23 @@ const HomeScreen = ({navigation}) => {
                 </Text>
                 {renderCarousel()}
             </View>
-            <View style={{ padding: 5 }}>
-                <Text style={{ color: 'red', fontSize: 20, fontWeight: 'bold' }}>Hot Deals 🔥</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', paddingHorizontal: 20, paddingBottom: 7, borderColor: 'black' }}>
+                <Text style={{ flex: 5, fontSize: 21, fontWeight: '600', fontFamily: 'Inter' }}>SẢN PHẨM MỚI</Text>
+                <TouchableOpacity><Text style={{ flex: 1.5, fontSize: 15, fontWeight: '600', fontFamily: 'Inter',  }}>Xem tất cả</Text></TouchableOpacity>
             </View>
             <FlatList
                 data={hotDeals}
                 renderItem={renderProduct}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={1}
+                // ItemSeparatorComponent={() => <View style={{width: 10}}></View>}
+                numColumns={2}
+                centerContent={true}
                 scrollEnabled={false}
-                contentContainerStyle={{ paddingBottom: 20, alignItems: 'center' }}
+                keyExtractor={(item) => item.id.toString()}
+                contentContainerStyle={{ alignItems: 'center' }}
             />
-            <View style={{ padding: 5 }}>
-                <Text style={{ color: 'red', fontSize: 20, fontWeight: 'bold' }}>New Arrivals 🔥</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', paddingHorizontal: 20, paddingBottom: 7, paddingTop: 7, borderColor: 'black' }}>
+                <Text style={{ flex: 5, fontSize: 21, fontWeight: '600', fontFamily: 'Inter' }}>SẢN PHẨM ƯU ĐÃI</Text>
+                <Text style={{ flex: 1.5, fontSize: 15, fontWeight: '600', fontFamily: 'Inter' }}>Xem tất cả</Text>
             </View>
             <FlatList
                 data={newArrivals}
@@ -103,7 +99,7 @@ const HomeScreen = ({navigation}) => {
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 scrollEnabled={false}
-                contentContainerStyle={{ paddingBottom: 20, alignItems: 'center' }}
+                contentContainerStyle={{ alignItems: 'center' }}
             />
         </ScrollView>
     </>

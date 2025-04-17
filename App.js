@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { CartContext, CartProvider } from './src/context/CartContext';
+import { CartProvider } from './src/context/CartContext';
 import { AuthContext, AuthProvider } from './src/context/AuthContext';
 import { NavigationContainer } from '@react-navigation/native';
 import BottomTabNavigation from './src/navigation/BottomNavigation';

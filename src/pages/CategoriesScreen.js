@@ -4,6 +4,7 @@ import axios from "axios";
 import Icon from 'react-native-vector-icons/Ionicons';
 import ProductPreview from "../components/ProductPreview";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import ProductCatalogPreview from "../components/ProductCatalogPreview";
 
 const CTopTab = createMaterialTopTabNavigator();
 const CategoriesScreen = () => {
@@ -98,8 +99,8 @@ const CategoriesRender = ({navigation, products, setProducts, url}) => {
 
     const renderProduct = ({ item }) => {
         return (
-            <ProductPreview title={item.title} image={item.image} price={item.price} description={item.description}
-            rating={item.rating.rate} ratingCount={item.rating.count} navigation={navigation} id={item.id}/>    
+            <ProductCatalogPreview title={item.title} image={item.image} price={item.price} description={item.description}
+            rating={item.rating.rate} ratingCount={item.rating.count} navigation={navigation} id={item.id}/>
         )
     };
 
@@ -112,7 +113,7 @@ const CategoriesRender = ({navigation, products, setProducts, url}) => {
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 scrollEnabled={false}
-                contentContainerStyle={{ paddingBottom: 20, alignItems: 'center' }}
+                contentContainerStyle={{ alignItems: 'center' }}
             />
         </ScrollView>
     </>

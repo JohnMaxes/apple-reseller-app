@@ -1,6 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useFonts } from 'expo-font';
+
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from './Home';
 import Categories from './Categories';
@@ -28,7 +30,7 @@ const CustomTabIcon = ({ name, focused }) => {
                     position: "absolute",
                     width: 55,
                     height: 55,
-                    backgroundColor: "black",
+                    backgroundColor: "#0073FF",
                     borderRadius: 55/2,
                     alignItems: "center",
                     justifyContent: "center",
@@ -39,6 +41,9 @@ const CustomTabIcon = ({ name, focused }) => {
     );
 };
 const BottomTabNavigation = () => {
+    const [fontsLoaded] = useFonts({
+        'Inter': require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'), 
+    });
     return (
         <BottomTab.Navigator
             initialRouteName='Home'
