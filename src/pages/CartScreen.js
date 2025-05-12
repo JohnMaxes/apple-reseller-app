@@ -1,38 +1,71 @@
 import React, { useContext, useEffect } from "react";
-import { View, Text, FlatList, Dimensions, Button } from "react-native";
-import styles from "../../styles";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import CartItem from "../components/CartItem";
 import { CartContext } from "../context/CartContext";
+import { CartIcon } from "../assets/icons/cart-icon";
 
 const CartScreen = () => {
-    const { cart, setCart, cartTotal, setCartTotal } = useContext(CartContext);
+    const { cart } = useContext(CartContext);
     
     useEffect(() => console.log(cart), []);
     if (cart.length === 0) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 30 }}>Cart empty!</Text>
+            <CartIcon width={150} height={150}></CartIcon>
+            <Text style={cartStyle.emptyCartText1}>Giỏ hàng của bạn đang trống.</Text>
+            <Text style={cartStyle.emptyCartText2}>Hãy duyệt thêm các sản phẩm hoặc mua{"\n"}các sản phẩm bạn đã lưu trước đó.</Text>
+            <TouchableOpacity style={cartStyle.exploreButton}><Text style={{color: 'black', fontSize: 16, fontFamily: 'Inter'}}>Khám phá ngay</Text></TouchableOpacity>
         </View>
     );
 
     return (
-        <View style={styles.screen}>
-            <View style={{alignItems: 'center', height: Dimensions.get('window').height * 0.725}}>
-                <FlatList
-                    data={cart}
-                    keyExtractor={item => item.id.toString()}
-                    renderItem={({item}) => (<CartItem id={item.id} image={item.image} title={item.title} price={item.price} quantity={item.quantity}/>)}
-                    contentContainerStyle={{ alignItems: 'center' }}
-                />
-            </View>
-            <View style={{justifyContent:'center', flexDirection:'row', height: Dimensions.get('window').height*0.05, marginTop: Dimensions.get('window').height*0.02}}>
-                <View style={{flex: 2, justifyContent:'center', paddingLeft: 20}}>
-                    <Text style={{fontSize: 20, fontWeight:'bold'}}>Total amount: {cartTotal}$</Text>
-                </View>
-                <View style={{flex: 1, justifyContent:'center', alignItems:'center', paddingRight: 10}}>
-                <Button title="CHECKOUT"></Button>
+        <>
+            <View style={{ marginTop: 60, marginBottom: 10, alignItems: 'center', paddingHorizontal: 15 }}>
+                <View style={{flexDirection: 'row', marginBottom: 10}}>
+                    <View style={{flex: 6, justifyContent: 'center'}}> 
+                        <Text style={{fontWeight: 600, fontSize: 20}}>Tất cả sản phẩm</Text>
+                    </View>
+                    <TouchableOpacity style={{ justifyContent: 'center', flex: 5, backgroundColor: '#007bff', paddingVertical: 10, borderRadius: 10, width: '90%' }}>
+                        <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>Thanh toán</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
-        </View>
+            <FlatList 
+                data={cart}
+                renderItem={({item}) => {return <CartItem title={item.title} image={item.image} price={item.price} id={item.id} quantity={item.quantity}/>}}
+                keyExtractor={(item) => (item.id.toString())}
+                scrollEnabled={true}
+                style={{paddingBottom: 60}}
+                contentContainerStyle={{paddingBottom: 100}}
+            />
+        </>
     );
 }
 export default CartScreen;
+
+const cartStyle = StyleSheet.create({
+    emptyCartText1: {
+        fontFamily: 'Inter',
+        fontSize: 20,
+        fontWeight: 600,
+        marginBottom: 10
+    },
+    emptyCartText2: {
+        textAlign: 'center',
+        fontSize: 15,
+        fontFamily: 'Inter',
+        color: 'grey'
+    },
+    exploreButton: {
+        borderRadius: 20,
+        marginTop: 20,
+        width: 190,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 45,
+        backgroundColor: '#e0e0e0',
+        shadowColor: 'rgba(0, 0, 0, 0.25)',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 2,
+    }
+})

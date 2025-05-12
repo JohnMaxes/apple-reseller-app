@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
 
@@ -14,6 +14,7 @@ import ProductCatalogPreview from '../components/ProductCatalogPreview';
 import ForgetPassword1 from '../pages/ForgetPassword1';
 import ForgetPassword2 from '../pages/ForgetPassword2';
 import ForgetPassword3 from '../pages/ForgetPassword3';
+import { BlurView } from 'expo-blur';
 
 
 configureReanimatedLogger({
@@ -56,10 +57,15 @@ const BottomTabNavigation = () => {
                     paddingTop: 10,
                     backgroundColor: '#ddd',
                     borderRadius: 40,
-                    position: 'absolute',
+                    position: 'absolute'
                 },
+                
+                tabBarBackground: () => (
+                    <BlurView tint="light" intensity={50} style={StyleSheet.absoluteFill} />
+                ),
                 tabBarShowLabel: false,
                 headerShown: false,
+                animation: 'shift',
             }}
         >
             <BottomTab.Screen 
@@ -75,7 +81,6 @@ const BottomTabNavigation = () => {
                 component={Categories} 
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="phone-portrait-outline" focused={focused} />,
-                    headerShown: false,
                 }} 
             />
             <BottomTab.Screen 

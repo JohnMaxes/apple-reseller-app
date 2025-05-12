@@ -82,7 +82,6 @@ const HomeScreen = ({navigation}) => {
             <FlatList
                 data={hotDeals}
                 renderItem={renderProduct}
-                // ItemSeparatorComponent={() => <View style={{width: 10}}></View>}
                 numColumns={2}
                 centerContent={true}
                 scrollEnabled={false}

@@ -7,7 +7,7 @@ const CategoriesStack = createStackNavigator();
 const Categories = () => {
     return (
         <CategoriesStack.Navigator initialRouteName="CategoriesScreen">
-            <CategoriesStack.Screen name='CategoriesScreen' component={CategoriesScreen} options={{headerTitle: ''}}/>
+            <CategoriesStack.Screen name='CategoriesScreen' component={CategoriesScreen} options={{headerShown: false}}/>
             <CategoriesStack.Screen name='ProductScreen' component={ProductScreen}/>
         </CategoriesStack.Navigator>
     )

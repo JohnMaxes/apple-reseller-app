@@ -28,7 +28,6 @@ const ProductCatalogPreview = ({ title, image, description, price, rating, ratin
     navigation.navigate('ProductScreen', { title, image, description, price, rating, ratingCount });
   };
 
-  // Hàm định dạng giá tiền
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
