@@ -15,7 +15,7 @@ import ProductCatalogPreview from "../../components/ProductCatalogPreview";
 import axios from "axios";
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const AllAccessoryScreen = ({ navigation }) => {
+const ClickFilter = ({ navigation }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -225,4 +225,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AllAccessoryScreen;
+export default ClickFilter;

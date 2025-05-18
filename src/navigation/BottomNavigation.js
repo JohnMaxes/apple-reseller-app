@@ -15,6 +15,7 @@ import ForgetPassword1 from '../pages/ForgetPassword1';
 import ForgetPassword2 from '../pages/ForgetPassword2';
 import ForgetPassword3 from '../pages/ForgetPassword3';
 import { BlurView } from 'expo-blur';
+import AllAccessoryScreen from '../pages/Dat/AllAccessoryScreen';
 
 
 configureReanimatedLogger({
@@ -120,8 +121,10 @@ const BottomTabNavigation = () => {
 // const Test = () => {
 //     return(<ForgetPassword2></ForgetPassword2>)
 // }
+// const Test = () => {
+//     return(<ForgetPassword3></ForgetPassword3>)
+// }
 const Test = () => {
-    return(<ForgetPassword3></ForgetPassword3>)
+  return(<ClickFilter></ClickFilter>)
 }
-
 export default BottomTabNavigation;
