@@ -1,133 +1,76 @@
-import React, { useState, useEffect } from "react";
-import { 
-    View, 
-    Text, 
-    FlatList, 
-    StyleSheet, 
-    ActivityIndicator, 
-    TextInput, 
-    TouchableOpacity, 
-    ScrollView, 
-    KeyboardAvoidingView, 
-    Platform 
-} from "react-native";
-import ProductCatalogPreview from "../../components/ProductCatalogPreview";
-import axios from "axios";
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { Checkbox } from "react-native-paper";
 
-const ClickFilter = ({ navigation }) => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedFilters, setSelectedFilters] = useState([]);
+const FilterScreen = ({ navigation }) => {
+    const [selectedFilters, setSelectedFilters] = useState({
+        price: [],
+        memory: [],
+        release: []
+    });
 
-    const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt"];
+    const priceOptions = ["2 - 4 Triệu", "4 - 10 Triệu", "10 - 16 Triệu", "Trên 20 Triệu"];
+    const memoryOptions = ["128GB", "256GB", "512GB", "1T"];
+    const releaseOptions = ["Mới nhất trước", "Cũ nhất trước", "Ra mắt năm 2025", "Ra mắt từ 2025 về trước"];
 
-    useEffect(() => {
-        axios.get('https://fakestoreapi.com/products')
-            .then(response => setProducts(response.data))
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }, []);
-
-    const toggleFilter = (filter) => {
-        if (filter === "Filter") {
-            console.log("Mở trang bộ lọc"); 
-        } else {
-            setSelectedFilters((prev) => 
-                prev.includes(filter) 
-                ? prev.filter(f => f !== filter) 
-                : [...prev, filter]
-            );
-        }
+    const resetFilters = () => {
+        setSelectedFilters({
+            price: [],
+            memory: [],
+            release: []
+        });
     };
 
-    const renderFilterButton = (filter) => {
-        const isSelected = selectedFilters.includes(filter);
-        const isFilterButton = filter === "Filter";
-        const showIcon = selectedFilters.length === 0;
-
-        return (
-            <TouchableOpacity 
-                key={filter} 
-                style={[
-                    styles.filterButton, 
-                    isSelected && !isFilterButton && styles.selectedFilterButton
-                ]} 
-                onPress={() => toggleFilter(filter)}
-            >
-                {/* Biểu tượng 3 dấu gạch */}
-                {isFilterButton && showIcon && (
-                    <Icon name="options-outline" size={18} color="#000" style={styles.filterIcon} />
-                )}
-                
-                {/* Badge số lượng filter */}
-                {isFilterButton && selectedFilters.length > 0 && (
-                    <View style={styles.filterBadge}>
-                        <Text style={styles.filterBadgeText}>{selectedFilters.length}</Text>
-                    </View>
-                )}
-                
-                <Text style={isSelected ? styles.filterButtonTextSelected : styles.filterButtonText}>
-                    {filter}
-                </Text>
-            </TouchableOpacity>
-        );
+    const toggleFilter = (category, option) => {
+        setSelectedFilters((prev) => {
+            const newSelection = prev[category].includes(option)
+                ? prev[category].filter(item => item !== option)
+                : [...prev[category], option];
+            return {
+                ...prev,
+                [category]: newSelection
+            };
+        });
     };
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007bff" />
-            </View>
-        );
-    }
+    const renderOptions = (title, category, options) => (
+        <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{title}</Text>
+            {options.map(option => (
+                <TouchableOpacity 
+                    key={option} 
+                    style={styles.optionContainer} 
+                    onPress={() => toggleFilter(category, option)}
+                >
+                    <Text style={styles.optionText}>{option}</Text>
+                    <Checkbox
+                        status={selectedFilters[category].includes(option) ? 'checked' : 'unchecked'}
+                        onPress={() => toggleFilter(category, option)}
+                        color="#007bff"
+                        uncheckedColor="#ccc"
+                        style={styles.checkbox}
+                    />
+                </TouchableOpacity>
+            ))}
+        </View>
+    );
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.container}
-        >
-            <ScrollView 
-                keyboardShouldPersistTaps="handled" 
-                contentContainerStyle={styles.scrollViewContainer}
-            >
-                <Text style={styles.header}>TẤT CẢ PHỤ KIỆN</Text>
-                
-                <View style={styles.searchContainer}>
-                    <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon} />
-                    <TextInput
-                        placeholder="Tìm sản phẩm..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        style={styles.searchBar}
-                    />
-                </View>
-
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-                    {["Filter", ...filterOptions].map(renderFilterButton)}
-                </ScrollView>
-
-                <FlatList
-                    data={products.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
-                    renderItem={({ item }) => (
-                        <ProductCatalogPreview
-                            title={item.title}
-                            image={item.image}
-                            price={item.price}
-                            description={item.description}
-                            rating={item.rating?.rate || 0}
-                            ratingCount={item.rating?.count || 0}
-                            navigation={navigation}
-                            id={item.id}
-                        />
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={2}
-                    contentContainerStyle={styles.productList}
-                />
-            </ScrollView>
-        </KeyboardAvoidingView>
+        <ScrollView style={styles.container}>
+            {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Icon name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity> */}
+            <Text style={styles.header}>LỌC</Text>
+            <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
+                <Text style={styles.resetText}>Đặt lại</Text>
+            </TouchableOpacity>
+            {renderOptions("Sắp xếp theo giá", "price", priceOptions)}
+            {renderOptions("Sắp xếp theo bộ nhớ", "memory", memoryOptions)}
+            {renderOptions("Sắp thêm theo thời gian ra mắt", "release", releaseOptions)}
+            <TouchableOpacity style={styles.applyButton}>
+                <Text style={styles.applyText}>Áp dụng</Text>
+            </TouchableOpacity>
+        </ScrollView>
     );
 };
 
@@ -135,94 +78,64 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f9f9f9',
+        paddingHorizontal: 20,
+        paddingTop: 20,
     },
-    scrollViewContainer: {
-        paddingHorizontal: 15,
-        paddingBottom: 20,
+    backButton: {
+        marginBottom: 10,
     },
     header: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginVertical: 15,
-        marginTop: 50,
+        marginBottom: 10,
+        marginTop: 30
     },
-    searchContainer: {
+    resetButton: {
+        alignSelf: 'flex-start',
+        marginBottom: 5
+    },
+    resetText: {
+        color: '#007bff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    section: {
+        marginBottom:0,
+        paddingHorizontal: 15,
+    },
+    sectionTitle: {
+        fontSize: 15,
+        fontWeight: 'bold',
+    },
+    optionContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         width: '95%',
         alignSelf: 'center',
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#ffffff',
-        borderRadius: 40,
-        paddingHorizontal: 15,
-        marginBottom: 20,
-        height: 40,
     },
-    searchIcon: {
-        marginRight: 5,
-    },
-    searchBar: {
+    optionText: {
         flex: 1,
-        fontSize: 14,
-        height: '100%',
-        textAlignVertical: 'center',
+        fontSize: 15,
     },
-    filterContainer: {
-        flexDirection: 'row',
-        marginBottom: 6,
-        paddingHorizontal: 10,
+    checkbox: {
+        width: 25,
+        height: 25,
     },
-    filterButton: {
-        backgroundColor: '#f0f0f0',
-        paddingHorizontal: 15,
-        paddingVertical: 6,
-        borderRadius: 20,
-        marginRight: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        minHeight: 35,
-        marginBottom: 15,
-    },
-    selectedFilterButton: {
-        backgroundColor: '#e0f0ff',
-        borderColor: '#007bff',
-        borderWidth: 2,
-    },
-    filterBadge: {
+    applyButton: {
         backgroundColor: '#007bff',
-        borderRadius: 50,
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        marginRight: 8,
-    },
-    filterBadgeText: {
-        color: '#ffffff',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    filterIcon: {
-        marginRight: 8,
-    },
-    filterButtonText: {
-        fontSize: 14,
-        color: '#555',
-        fontWeight: 'normal',
-    },
-    filterButtonTextSelected: {
-        fontSize: 14,
-        color: '#000',
-        fontWeight: 'bold',
-    },
-    productList: {
-        paddingBottom: 20,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
+        paddingVertical: 5,
+        borderRadius: 30,
         alignItems: 'center',
+        width: '30%',
+        alignSelf: 'center',
     },
+    applyText: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    }
 });
 
-export default ClickFilter;
+export default FilterScreen;

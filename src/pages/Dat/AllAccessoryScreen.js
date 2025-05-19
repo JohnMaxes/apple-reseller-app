@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { 
-    View, 
-    Text, 
-    FlatList, 
-    StyleSheet, 
-    ActivityIndicator, 
-    TextInput, 
-    TouchableOpacity, 
-    ScrollView, 
-    KeyboardAvoidingView, 
-    Platform 
+import {
+    View,
+    Text,
+    FlatList,
+    StyleSheet,
+    ActivityIndicator,
+    TextInput,
+    TouchableOpacity,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView
 } from "react-native";
 import ProductCatalogPreview from "../../components/ProductCatalogPreview";
 import axios from "axios";
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/Ionicons";
 
 const AllAccessoryScreen = ({ navigation }) => {
     const [products, setProducts] = useState([]);
@@ -24,8 +24,9 @@ const AllAccessoryScreen = ({ navigation }) => {
     const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt"];
 
     useEffect(() => {
-        axios.get('https://fakestoreapi.com/products')
-            .then(response => setProducts(response.data))
+        axios
+            .get("https://fakestoreapi.com/products")
+            .then((response) => setProducts(response.data))
             .catch(console.error)
             .finally(() => setLoading(false));
     }, []);
@@ -34,10 +35,10 @@ const AllAccessoryScreen = ({ navigation }) => {
         if (filter === "Filter") {
             console.log("Mở trang bộ lọc"); 
         } else {
-            setSelectedFilters((prev) => 
-                prev.includes(filter) 
-                ? prev.filter(f => f !== filter) 
-                : [...prev, filter]
+            setSelectedFilters((prev) =>
+                prev.includes(filter)
+                    ? prev.filter((f) => f !== filter)
+                    : [...prev, filter]
             );
         }
     };
@@ -48,27 +49,38 @@ const AllAccessoryScreen = ({ navigation }) => {
         const showIcon = selectedFilters.length === 0;
 
         return (
-            <TouchableOpacity 
-                key={filter} 
+            <TouchableOpacity
+                key={filter}
                 style={[
-                    styles.filterButton, 
-                    isSelected && !isFilterButton && styles.selectedFilterButton
-                ]} 
+                    styles.filterButton,
+                    isSelected && !isFilterButton && styles.selectedFilterButton,
+                ]}
                 onPress={() => toggleFilter(filter)}
             >
-                {/* Biểu tượng 3 dấu gạch */}
                 {isFilterButton && showIcon && (
-                    <Icon name="options-outline" size={18} color="#000" style={styles.filterIcon} />
+                    <Icon
+                        name="options-outline"
+                        size={18}
+                        color="#000"
+                        style={styles.filterIcon}
+                    />
                 )}
-                
-                {/* Badge số lượng filter */}
+
                 {isFilterButton && selectedFilters.length > 0 && (
                     <View style={styles.filterBadge}>
-                        <Text style={styles.filterBadgeText}>{selectedFilters.length}</Text>
+                        <Text style={styles.filterBadgeText}>
+                            {selectedFilters.length}
+                        </Text>
                     </View>
                 )}
-                
-                <Text style={isSelected ? styles.filterButtonTextSelected : styles.filterButtonText}>
+
+                <Text
+                    style={
+                        isSelected
+                            ? styles.filterButtonTextSelected
+                            : styles.filterButtonText
+                    }
+                >
                     {filter}
                 </Text>
             </TouchableOpacity>
@@ -88,45 +100,54 @@ const AllAccessoryScreen = ({ navigation }) => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.container}
         >
-            <ScrollView 
-                keyboardShouldPersistTaps="handled" 
-                contentContainerStyle={styles.scrollViewContainer}
-            >
-                <Text style={styles.header}>TẤT CẢ PHỤ KIỆN</Text>
-                
-                <View style={styles.searchContainer}>
-                    <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon} />
-                    <TextInput
-                        placeholder="Tìm sản phẩm..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        style={styles.searchBar}
+            <FlatList
+                data={products.filter((item) =>
+                    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+                )}
+                renderItem={({ item }) => (
+                    <ProductCatalogPreview
+                        title={item.title}
+                        image={item.image}
+                        price={item.price}
+                        description={item.description}
+                        rating={item.rating?.rate || 0}
+                        ratingCount={item.rating?.count || 0}
+                        navigation={navigation}
+                        id={item.id}
                     />
-                </View>
+                )}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                contentContainerStyle={styles.scrollViewContainer}
+                ListHeaderComponent={
+                    <>
+                        <Text style={styles.header}>TẤT CẢ PHỤ KIỆN</Text>
 
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-                    {["Filter", ...filterOptions].map(renderFilterButton)}
-                </ScrollView>
+                        <View style={styles.searchContainer}>
+                            <Icon
+                                name="search-outline"
+                                size={20}
+                                color="#888"
+                                style={styles.searchIcon}
+                            />
+                            <TextInput
+                                placeholder="Tìm sản phẩm..."
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                                style={styles.searchBar}
+                            />
+                        </View>
 
-                <FlatList
-                    data={products.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
-                    renderItem={({ item }) => (
-                        <ProductCatalogPreview
-                            title={item.title}
-                            image={item.image}
-                            price={item.price}
-                            description={item.description}
-                            rating={item.rating?.rate || 0}
-                            ratingCount={item.rating?.count || 0}
-                            navigation={navigation}
-                            id={item.id}
-                        />
-                    )}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={2}
-                    contentContainerStyle={styles.productList}
-                />
-            </ScrollView>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.filterContainer}
+                        >
+                            {["Filter", ...filterOptions].map(renderFilterButton)}
+                        </ScrollView>
+                    </>
+                }
+            />
         </KeyboardAvoidingView>
     );
 };
@@ -134,7 +155,7 @@ const AllAccessoryScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9f9f9',
+        backgroundColor: "#f9f9f9",
     },
     scrollViewContainer: {
         paddingHorizontal: 15,
@@ -142,17 +163,17 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
+        fontWeight: "bold",
+        textAlign: "center",
         marginVertical: 15,
         marginTop: 50,
     },
     searchContainer: {
-        width: '95%',
-        alignSelf: 'center',
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#ffffff',
+        width: "95%",
+        alignSelf: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#ffffff",
         borderRadius: 40,
         paddingHorizontal: 15,
         marginBottom: 20,
@@ -164,64 +185,61 @@ const styles = StyleSheet.create({
     searchBar: {
         flex: 1,
         fontSize: 14,
-        height: '100%',
-        textAlignVertical: 'center',
+        height: "100%",
+        textAlignVertical: "center",
     },
     filterContainer: {
-        flexDirection: 'row',
+        flexDirection: "row",
         marginBottom: 6,
         paddingHorizontal: 10,
     },
-    filterButton: {
-        backgroundColor: '#f0f0f0',
-        paddingHorizontal: 15,
-        paddingVertical: 6,
+    filterButton: { //css cho nút lọc
+        backgroundColor: "#f0f0f0",
+        paddingHorizontal: 15,  //padding trái phảiphải
+        paddingVertical: 6, //padding trên dướidưới
         borderRadius: 20,
         marginRight: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         minHeight: 35,
         marginBottom: 15,
     },
-    selectedFilterButton: {
-        backgroundColor: '#e0f0ff',
-        borderColor: '#007bff',
+    selectedFilterButton: {   //khi bộ lọc được chọn
+        backgroundColor: "#e0f0ff",
+        borderColor: "#007bff",
         borderWidth: 2,
     },
-    filterBadge: {
-        backgroundColor: '#007bff',
+    filterBadge: {  //hiển thị số lượng bộ lọc được chọn
+        backgroundColor: "#007bff",
         borderRadius: 50,
         paddingHorizontal: 8,
         paddingVertical: 2,
         marginRight: 8,
     },
-    filterBadgeText: {
-        color: '#ffffff',
+    filterBadgeText: {  //hiển thị chữ số bên trong
+        color: "#ffffff",
         fontSize: 12,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
     filterIcon: {
         marginRight: 8,
     },
     filterButtonText: {
         fontSize: 14,
-        color: '#555',
-        fontWeight: 'normal',
+        color: "#555",
+        fontWeight: "normal",
     },
     filterButtonTextSelected: {
         fontSize: 14,
-        color: '#000',
-        fontWeight: 'bold',
-    },
-    productList: {
-        paddingBottom: 20,
+        color: "#000",
+        fontWeight: "bold",
     },
     loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
 });
 

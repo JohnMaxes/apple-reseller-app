@@ -16,6 +16,11 @@ import ForgetPassword2 from '../pages/ForgetPassword2';
 import ForgetPassword3 from '../pages/ForgetPassword3';
 import { BlurView } from 'expo-blur';
 import AllAccessoryScreen from '../pages/Dat/AllAccessoryScreen';
+import AllProductScreen from '../pages/Dat/AllProductScreen';
+import ClickFilter from '../pages/Dat/ClickFilter';
+import Search1 from '../pages/Dat/Search1';
+import Search2 from '../pages/Dat/Search2';
+
 
 
 configureReanimatedLogger({
@@ -124,7 +129,19 @@ const BottomTabNavigation = () => {
 // const Test = () => {
 //     return(<ForgetPassword3></ForgetPassword3>)
 // }
+// const Test = () => {
+//   return(<AllProductScreen></AllProductScreen>)
+// }
 const Test = () => {
-  return(<ClickFilter></ClickFilter>)
+  return(<AllAccessoryScreen></AllAccessoryScreen>)
 }
+// const Test = () => {
+//   return(<ClickFilter></ClickFilter>)
+// }
+// const Test = () => {
+//   return(<Search1></Search1>)
+// }
+// const Test = () => {
+//   return(<Search2></Search2>)
+// }
 export default BottomTabNavigation;
