@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
-import LoginScreen from "../pages/LoginScreen";
-import SignUpScreen from "../pages/SignUpScreen";
+import LoginScreen from "../pages/Vi/LoginScreen";
+import SignUpScreen from "../pages/Vi/SignUpScreen";
 import { AuthContext } from "../context/AuthContext";
 
 const AuthFragmentView = () => {
