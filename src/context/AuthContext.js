@@ -29,21 +29,15 @@ const AuthProvider = ({ children }) => {
             return;
         } else {
             try {
-                const response = await axios.post(
-                    'https://fakestoreapi.com/auth/login',
-                    {
-                        username: email,
-                        password: password,
-                    }
+                const response = await axios.post('https://fakestoreapi.com/auth/login',
+                    { username: email, password: password }
                 )
                 console.log(response.data);
                 setToken(response.data.token);
                 await decodeForId();
                 setLoggedIn(true);
             }
-            catch (error) {
-                console.log(error);
-            }
+            catch (error) { console.log(error) }
         }
     };
 

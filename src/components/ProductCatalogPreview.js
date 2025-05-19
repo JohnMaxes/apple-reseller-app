@@ -1,15 +1,15 @@
-import React, { useContext, useState } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Modal } from "react-native";
+import { useState } from "react";
+import { View, Text, Dimensions, Image, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
-import { CartContext } from "../context/CartContext";
 import { StyleSheet } from 'react-native';
 
 const width = Dimensions.get('window').width * 0.45;
 
 const ProductCatalogPreview = ({ title, image, description, price, rating, ratingCount, navigation, id }) => {
-  const { cart, setCart, setCartTotal } = useContext(CartContext);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
+  /*
+  const { cart, setCart, setCartTotal } = useContext(CartContext);
   const addToCart = () => {
     if (cart.some(element => element.id === id)) {
       alert('Item is already in cart');
@@ -21,6 +21,7 @@ const ProductCatalogPreview = ({ title, image, description, price, rating, ratin
     setCartTotal(prevTotal => prevTotal + price);
     alert('Item added to cart successfully!');
   };
+  */
 
   const handleBookmarkEvent = () => setIsBookmarked(!isBookmarked);
 
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     height: '100%', // Đảm bảo card chiếm toàn bộ chiều cao của TouchableOpacity
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#F6F6F6',
     borderRadius: 20,
     padding: 15,
     alignItems: 'center',

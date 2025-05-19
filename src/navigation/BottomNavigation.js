@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
 
@@ -20,6 +19,7 @@ import AllProductScreen from '../pages/Dat/AllProductScreen';
 import ClickFilter from '../pages/Dat/ClickFilter';
 import Search1 from '../pages/Dat/Search1';
 import Search2 from '../pages/Dat/Search2';
+import LoadingScreen from '../pages/LoadingScreen';
 
 
 
@@ -49,25 +49,24 @@ const CustomTabIcon = ({ name, focused }) => {
 };
 const BottomTabNavigation = () => {
     const [fontsLoaded] = useFonts({
-        'Inter': require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'), 
+        Inter: require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'), 
     });
+    if(!fontsLoaded) return <LoadingScreen/>
     return (
         <BottomTab.Navigator
             initialRouteName='Home'
             screenOptions={{
                 tabBarStyle: {
-                    height: 60,
-                    width: '80%',
-                    marginBottom: 25,
-                    marginHorizontal: '10%',
-                    paddingTop: 10,
-                    backgroundColor: '#ddd',
-                    borderRadius: 40,
+                    height: 80,
+                    paddingHorizontal: '10%',
+                    paddingTop: 20,
                     position: 'absolute'
                 },
-                
-                tabBarBackground: () => (
-                    <BlurView tint="light" intensity={50} style={StyleSheet.absoluteFill} />
+                tabBarButton: (props) => (
+                    <TouchableOpacity
+                        {...props}
+                        activeOpacity={1}
+                    />
                 ),
                 tabBarShowLabel: false,
                 headerShown: false,

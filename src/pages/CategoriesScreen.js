@@ -4,6 +4,7 @@ import axios from "axios";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import ProductCatalogPreview from "../components/ProductCatalogPreview";
+import LoadingScreen from "./LoadingScreen";
 
 const CTopTab = createMaterialTopTabNavigator();
 const BASE_URL = 'https://fakestoreapi.com';
@@ -17,12 +18,6 @@ const useFetchProducts = (url) => {
   }, [url]);
   return { products, loading };
 };
-
-const LoadingScreen = () => (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <ActivityIndicator size="large" color="#0000ff" />
-  </View>
-);
 
 const CategoriesRender = ({ navigation, products }) => (
   <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -50,8 +45,8 @@ const CategoriesRender = ({ navigation, products }) => (
 
 const createCategoryScreen = (endpoint) => ({ navigation }) => {
     const { products, loading } = useFetchProducts(`${BASE_URL}${endpoint}`);
-        if (loading) return <LoadingScreen />;
-        return <CategoriesRender products={products} navigation={navigation} />;
+    if (loading) return <LoadingScreen/>;
+    return <CategoriesRender products={products} navigation={navigation} />;
 };
 
 const CategoriesAll = createCategoryScreen('/products');
