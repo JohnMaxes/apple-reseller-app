@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
       paddingTop: 20,
     },
     header: {
-      marginTop: 40,
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
@@ -37,6 +36,7 @@ const styles = StyleSheet.create({
       textAlign: "center",
       padding: 20,
       fontWeight: "bold",
+      fontFamily: "Inter",
     },
     inputContainer: {
       flexDirection: "row",
@@ -128,6 +128,36 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: 'center',
     },
+    dividerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 20,
+      marginHorizontal: 20,
+    },
+    
+    line: {
+      flex: 1,
+      height: 1,
+      backgroundColor: '#ccc',
+    },
+    
+    dividerText: {
+      marginHorizontal: 10,
+      color: '#999',
+      fontSize: 14,
+    },
+    socialButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderRadius: 25,
+      paddingVertical: 15,
+      backgroundColor: "#F7F4F4",
+    },
+    socialIcon: {
+      marginRight: 10,
+    }
   });
 
 export default styles;

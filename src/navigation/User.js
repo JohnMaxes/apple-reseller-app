@@ -10,8 +10,12 @@ const User = () => {
     const { isLoggedIn } = useContext(AuthContext);
     return (
         <UserStack.Navigator initialRouteName={isLoggedIn ? 'Profile' : 'Authentication'}>
-            <UserStack.Screen name="Profile" component={Profile}/>
-            <UserStack.Screen name="Authentication" component={AuthFragmentView}/>
+            <UserStack.Screen name="Profile" component={Profile} options={{
+                headerShown: false,
+            }}/>
+            <UserStack.Screen name="Authentication" component={AuthFragmentView} options={{
+                headerShown: false,
+            }}/>
         </UserStack.Navigator>
     )
 }

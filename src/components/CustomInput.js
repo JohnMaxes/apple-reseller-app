@@ -1,10 +1,12 @@
-import React from 'react';
-import { View, Image, TextInput, StyleSheet, useState} from 'react-native';
-import styles from '../../styles';
-const CustomInput = ({ placeholder, placeholderTextColor, secureTextEntry, iconUri, onChangeText, value, keyboardType, minLength, maxLength }) => {
+import { View, TextInput, StyleSheet} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+const CustomInput = ({ placeholder, placeholderTextColor, secureTextEntry, iconName, onChangeText, value, keyboardType, minLength, maxLength }) => {
   return (
     <View style={styles.inputContainer}>
-      <Image style={styles.inputIcon} source={{ uri: iconUri }} />
+      {iconName && (
+        <Icon name={iconName} size={20} color="black" style={styles.inputIcon}/>
+      )}
       <TextInput
         style={{ flex: 1, fontFamily:'Inter-Regular' }}
         placeholder={placeholder}
@@ -18,5 +20,22 @@ const CustomInput = ({ placeholder, placeholderTextColor, secureTextEntry, iconU
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  inputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "white",
+      height: 60,
+      borderRadius: 15,
+      marginHorizontal: "5%",
+      marginVertical: 10,
+      paddingLeft: 20,
+    },
+  inputIcon: {
+    marginRight: 10,
+  },
+});
 
 export default CustomInput;

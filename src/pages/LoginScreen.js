@@ -1,12 +1,12 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Text, Image, View, ScrollView, Alert, TouchableOpacity, StyleSheet } from 'react-native';
+import { useState, useContext, useEffect } from 'react';
+import { Text, Image, View, ScrollView, Alert, TouchableOpacity, Platform } from 'react-native';
 import axios from 'axios';
 import styles from '../../styles';
 import CustomInput from '../components/CustomInput';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../context/AuthContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const LoginScreen = ({togglePage}) => {
+import CustomInputToggleable from '../components/CustomInputToggleable';
+const LoginScreen = ({ togglePage }) => {
     useEffect(() => { // sử dụng data và API mẫu
         setEmail('mor_2314');
         setPassword('83r5^_');
@@ -14,7 +14,7 @@ const LoginScreen = ({togglePage}) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {setLoggedIn, setToken, decodeForId} = useContext(AuthContext);
+    const { setLoggedIn, setToken, decodeForId } = useContext(AuthContext);
 
     const onLoginPress = async () => {
         if (!email || !password) {
@@ -22,14 +22,8 @@ const LoginScreen = ({togglePage}) => {
             return;
         } else {
             try {
-                const response = await axios.post(
-                    'https://fakestoreapi.com/auth/login',
-                    {
-                        username: email,
-                        password: password,
-                    }
-                )
-                console.log(response.data);
+                const response = await axios.post('https://fakestoreapi.com/auth/login',
+                    { username: email, password: password })
                 setToken(response.data.token);
                 await decodeForId();
                 await AsyncStorage.setItem('token', response.data.token);
@@ -39,63 +33,64 @@ const LoginScreen = ({togglePage}) => {
                 console.log(error);
             }
         }
-    };    
+    };
 
     return (
-        <ScrollView scrollEnabled={false}>
-            <View style={styles.header}>
-                <Text style={styles.heading}>Welcome</Text>
+        <ScrollView contentContainerStyle={{paddingTop: Platform.select({ ios: 50, android: 30, default: 40 })}}>
+            <View style={{paddingHorizontal: 20 }}>
+                <Image source={require('../assets/icons/reseller-upsized.png')} style={{width: 200, resizeMode: 'contain'}}/>
             </View>
-            <CustomInput 
-                placeholder="Username" 
-                placeholderTextColor="grey" 
-                iconUri="https://img.icons8.com/?id=63&format=png" 
-                value={email} 
+            <View style={[styles.header]}>
+                <Text style={styles.heading}>ĐĂNG NHẬP</Text>
+            </View>
+            <CustomInput
+                style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
+                placeholder="Tên đăng nhập"
+                placeholderTextColor="grey"
+                iconName="person"
+                value={email}
                 onChangeText={setEmail}
             />
-            <CustomInput 
-                placeholder="Password" 
-                placeholderTextColor="grey" 
-                secureTextEntry 
-                iconUri="https://img.icons8.com/?id=94&format=png" 
-                value={password} 
-                onChangeText={setPassword} 
+            <CustomInputToggleable
+                style={{ paddingLeft: 20, fontSize: 16, marginLeft: 20, marginRight: 20 }}
+                placeholder="Mật khẩu"
+                placeholderTextColor="grey"
+                iconName="lock-closed"
+                secureTextEntry
+                value={password}
+                showToggleEye={true}
+                onChangeText={setPassword}
             />
             <View style={styles.forgetContainer}>
                 <TouchableOpacity>
-                    <Text style={{ color: "#d366a4" }}>Forgot Password?</Text>
+                    <Text style={{ color: "#0171E3", fontSize: 16 }}>Quên mật khẩu?</Text>
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button} onPress={onLoginPress}>
-                <Text style={styles.buttonText}>LOG IN</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: '#000000', borderRadius: 30 }]} onPress={onLoginPress}>
+                <Text style={[styles.buttonText, { fontSize: 20, fontWeight: 'bold' }]}>Đăng nhập</Text>
             </TouchableOpacity>
-            <View>
-                <Text style={styles.loginWith}>Or login with</Text>
+            <TouchableOpacity onPress={togglePage} style={{ color: "#0171E3", alignItems: "center", marginTop: 20 }}>
+                <Text style={{ color: "#0171E3", fontSize: 16 }}>Đăng ký</Text>
+            </TouchableOpacity>
+
+            <View style={styles.dividerContainer}>
+                <View style={styles.line} />
+                <Text style={styles.dividerText}>Hoặc</Text>
+                <View style={styles.line} />
             </View>
-            <View style={styles.iconContainer}>
-                <TouchableOpacity>
-                    <Image style={styles.socialImg} source={{ uri: "https://img.icons8.com/color/512/facebook-new.png" }} />
+            <View style={{ paddingHorizontal: 20 }}>
+                <TouchableOpacity style={[styles.socialButton, { marginBottom: 20 }]}>
+                    <Icon style={styles.socialIcon} name="logo-apple" size={20} />
+                    <Text style={{ fontSize: 17.3 }}>Đăng nhập với Apple</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <Image style={[styles.socialImg, { width: 65, height: 68 }]} source={{ uri: "https://img.icons8.com/?size=512&id=17949&format=png" }} />
-                </TouchableOpacity>
-            </View>
-            <View style={[styles.toggleTextContainer, {marginTop:-10}]}>
-                <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
-                    Don't have an account?{" "}
-                </Text>
-                <TouchableOpacity onPress={() => togglePage()}>
-                    <Text style={styles.toggleText}>Sign up here!</Text>
+                <TouchableOpacity style={styles.socialButton}>
+                    <Icon style={styles.socialIcon} name="logo-google" size={20} />
+                    <Text style={{ fontSize: 17.3 }}>Đăng nhập với Google</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
     );
 };
-
-const newStyles = StyleSheet.create({
-
-})
-
 
 
 export default LoginScreen;

@@ -1,71 +1,81 @@
-import { React, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import CustomInput from '../components/CustomInput';
+import CustomInputToggleable from '../components/CustomInputToggleable';
 import styles from '../../styles';
-const SignUpScreen = ({togglePage}) => {
-    
+import Icon from 'react-native-vector-icons/Ionicons';
+const SignUpScreen = ({ togglePage }) => {
+
     const [registUsername, setRUsername] = useState('');
     const [registEmail, setREmail] = useState('');
     const [registPassword, setRPassword] = useState('');
+    const [registPhone, setRPhone] = useState('');
+    const [registConfirmPassword, setRConfirmPassword] = useState('');
 
     const processRequest = async () => {
         togglePage();
     };
 
     return (
-        <ScrollView scrollEnabled={false}>
-            <View style={styles.header}>
-                <Text style={styles.heading}>Create New Account</Text>
+        <ScrollView scrollEnabled={false} contentContainerStyle={{paddingTop: Platform.select({ ios: 50, android: 30, default: 40 })}}>
+            <View style={{paddingHorizontal: 20 }}>
+                <Image source={require('../assets/icons/reseller-upsized.png')} style={{width: 200, resizeMode: 'contain'}}/>
             </View>
+            <View style={styles.header}><Text style={styles.heading}>ĐĂNG KÝ</Text></View>
             <CustomInput
-                placeholder="Enter Username"
+                style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
+                placeholder="Tên đăng nhập"
                 placeholderTextColor="grey"
                 required
-                iconUri="https://img.icons8.com/?id=23264&format=png"
+                iconName="person"
                 onChangeText={setRUsername}
                 value={registUsername}
             />
             <CustomInput
-                placeholder="Enter Email"
+                style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
+                placeholder="Số điện thoại"
                 placeholderTextColor="grey"
                 required
-                iconUri="https://img.icons8.com/?id=63&format=png"
-                onChangeText={setREmail}
-                value={registEmail}
+                iconName="call"
+                onChangeText={setRPhone}
+                value={registPhone}
             />
-            <CustomInput
-                placeholder="Enter Password"
+            <CustomInputToggleable
+                style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
+                placeholder="Mật khẩu tối thiểu 8 ký tự"
                 placeholderTextColor="grey"
-                secureTextEntry
                 required
-                iconUri="https://img.icons8.com/?id=94&format=png"
+                iconName="lock-closed"
                 onChangeText={setRPassword}
                 value={registPassword}
+                showToggleEye={true}
+                secureTextEntry={true}
             />
-            <CustomInput
-                placeholder="Confirm Password"
+            <CustomInputToggleable
+                style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
+                placeholder="Nhập lại mật khẩu"
                 placeholderTextColor="grey"
-                secureTextEntry
                 required
-                iconUri="https://img.icons8.com/?id=94&format=png"
+                iconName="lock-closed"
+                onChangeText={setRConfirmPassword}
+                value={registConfirmPassword}
+                showToggleEye={true}
+                secureTextEntry={true}
             />
-            <TouchableOpacity style={styles.button} onPress={() => processRequest()}>
-                <Text style={styles.buttonText}>CREATE</Text>
+
+            <TouchableOpacity style={[styles.button, {borderRadius: 30, backgroundColor: '#000000'}]} onPress={processRequest}>
+                <Text style={[styles.buttonText, {fontWeight: 'bold'}]}>Đăng ký</Text>
             </TouchableOpacity>
             <View style={styles.toogleTextContainer}>
                 <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
-                    Already have an account?{" "}
+                    Bạn đã có tài khoản?{" "}
                 </Text>
-                <TouchableOpacity onPress={() => togglePage()}>
-                    <Text style={styles.toggleText}>Login now!</Text>
+                <TouchableOpacity onPress={togglePage}>
+                    <Text style={styles.toggleText}>Đăng nhập ngay!</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
     );
 };
-
-const newStyles = StyleSheet.create({
-
-})
 
 export default SignUpScreen;
