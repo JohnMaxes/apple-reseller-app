@@ -24,7 +24,7 @@ const SignUpScreen = ({ togglePage }) => {
             <View style={styles.header}><Text style={styles.heading}>ĐĂNG KÝ</Text></View>
             <CustomInput
                 style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
-                placeholder="Tên đăng nhập"
+                placeholder="Email đăng ký"
                 placeholderTextColor="grey"
                 required
                 iconName="person"

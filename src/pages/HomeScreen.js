@@ -40,7 +40,7 @@ const HomeScreen = ({navigation}) => {
     <>
         <ScrollView style={{ margin: 0, padding: 0 }} contentContainerStyle={{ flexGrow: 1, margin: 0, paddingBottom: 75, paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }), backgroundColor: '#F5F5F7' }}>
             <View style={{paddingHorizontal: 20 }}>
-                <Image source={require('../assets/icons/reseller-upsized.png')} style={{width: 200, resizeMode: 'contain'}}/>
+                <Image source={require('../assets/icons/reseller-upsized.webp')} style={{width: 200, resizeMode: 'contain'}}/>
             </View>
             <View style={{alignItems: 'center', justifyContent: 'center'}}>
                 <Text style={{fontSize: 40, width: 300, textAlign: 'center', fontFamily: "Inter", fontWeight: "bold", color: '#1B4C71', marginBottom: 30}}>Welcome to Apple Reseller!</Text>

@@ -1,23 +1,25 @@
-import { View, TextInput, StyleSheet} from 'react-native';
+import { View, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const CustomInput = ({ placeholder, placeholderTextColor, secureTextEntry, iconName, onChangeText, value, keyboardType, minLength, maxLength }) => {
   return (
-    <View style={styles.inputContainer}>
-      {iconName && (
-        <Icon name={iconName} size={20} color="black" style={styles.inputIcon}/>
-      )}
-      <TextInput
-        style={{ flex: 1, fontFamily:'Inter-Regular' }}
-        placeholder={placeholder}
-        placeholderTextColor={placeholderTextColor}
-        secureTextEntry={secureTextEntry}
-        onChangeText={onChangeText}
-        value={value}
-        keyboardType={keyboardType}
-        maxLength={maxLength}
-      />
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.inputContainer}>
+        {iconName && (
+          <Icon name={iconName} size={20} color="black" style={styles.inputIcon}/>
+        )}
+        <TextInput
+          style={{ flex: 1, fontFamily:'Inter-Regular' }}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          secureTextEntry={secureTextEntry}
+          onChangeText={onChangeText}
+          value={value}
+          keyboardType={keyboardType}
+          maxLength={maxLength}
+        />
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

@@ -5,14 +5,13 @@ import { useFonts } from 'expo-font';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from './Home';
 import Categories from './Categories';
-import User from './User';
 import Cart from './Cart';
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import ProductCatalogPreview from '../components/ProductCatalogPreview';
-import ForgetPassword1 from '../pages/ForgetPassword1';
-import ForgetPassword2 from '../pages/ForgetPassword2';
-import ForgetPassword3 from '../pages/ForgetPassword3';
+import ForgotPasswordScreen from '../pages/ForgotPasswordScreen';
+import OTPChallengeScreen from '../pages/OTPChallengeScreen';
+import PasswordChangeScreen from '../pages/PasswordChangeScreen';
 import { BlurView } from 'expo-blur';
 import AllAccessoryScreen from '../pages/Dat/AllAccessoryScreen';
 import AllProductScreen from '../pages/Dat/AllProductScreen';
@@ -20,7 +19,7 @@ import ClickFilter from '../pages/Dat/ClickFilter';
 import Search1 from '../pages/Dat/Search1';
 import Search2 from '../pages/Dat/Search2';
 import LoadingScreen from '../pages/LoadingScreen';
-
+import Profile from './Profile';
 
 
 configureReanimatedLogger({
@@ -97,7 +96,7 @@ const BottomTabNavigation = () => {
             />
             <BottomTab.Screen 
                 name='User' 
-                component={User} 
+                component={Profile} 
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="person-circle-outline" focused={focused} />,
                     headerShown: false,
@@ -132,7 +131,7 @@ const BottomTabNavigation = () => {
 //   return(<AllProductScreen></AllProductScreen>)
 // }
 const Test = () => {
-  return(<AllAccessoryScreen></AllAccessoryScreen>)
+  return(<ForgotPasswordScreen></ForgotPasswordScreen>)
 }
 // const Test = () => {
 //   return(<ClickFilter></ClickFilter>)

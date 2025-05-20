@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const CustomInputToggleable = ({ placeholder, placeholderTextColor, secureTextEntry, iconName, onChangeText, value, keyboardType, minLength, maxLength }) => {
@@ -7,22 +7,24 @@ const CustomInputToggleable = ({ placeholder, placeholderTextColor, secureTextEn
     secureTextEntry = isVisible;
     const toggle = () => setVisible((prev) => !prev);
     return (
-        <View style={styles.inputContainer}>
-            {iconName ? <Icon name={iconName} size={20} color="black" style={styles.inputIcon}/> : null }
-            <TextInput
-                style={{ flex: 1, fontFamily:'Inter-Regular' }}
-                placeholder={placeholder}
-                placeholderTextColor={placeholderTextColor}
-                secureTextEntry={secureTextEntry}
-                onChangeText={onChangeText}
-                value={value}
-                keyboardType={keyboardType}
-                maxLength={maxLength}
-            />
-            <TouchableOpacity onPress={toggle}>
-                <Icon name={ isVisible ? 'eye-off-outline' : 'eye-outline' } size={20} color="gray" style={{marginRight: 20}}/>
-            </TouchableOpacity>
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.inputContainer}>
+                {iconName ? <Icon name={iconName} size={20} color="black" style={styles.inputIcon}/> : null }
+                <TextInput
+                    style={{ flex: 1, fontFamily:'Inter-Regular' }}
+                    placeholder={placeholder}
+                    placeholderTextColor={placeholderTextColor}
+                    secureTextEntry={secureTextEntry}
+                    onChangeText={onChangeText}
+                    value={value}
+                    keyboardType={keyboardType}
+                    maxLength={maxLength}
+                />
+                <TouchableOpacity onPress={toggle}>
+                    <Icon name={ isVisible ? 'eye-off-outline' : 'eye-outline' } size={20} color="gray" style={{marginRight: 20}}/>
+                </TouchableOpacity>
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 

@@ -1,57 +1,33 @@
 import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const ForgetPassword2 = ({ route, navigation }) => {
+const OTPChallengeScreen = ({ route, navigation }) => {
 //   const { phoneNumber } = route.params || {}; // Lấy số điện thoại từ màn hình trước
-  const phoneNumber = route?.params?.phoneNumber || '';
+  const input = route?.params?.input || '';
 
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOTP] = useState(['', '', '', '']);
   const inputRefs = useRef([]);
 
-
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
-
-  const handleResendCode = () => {
-    alert(`Mã xác thực đã được gửi lại đến ${phoneNumber}`);
-  };
-
-  const handleConfirm = () => {
-    alert(`Mã xác nhận: ${otp.join('')}`);
-  };
+  const checkOTP = () => { return otp.every(digit => digit !== '') };
+  const goBack = () => navigation.goBack();
+  const handleResendCode = () => alert(`Mã xác thực đã được gửi lại đến ${input}`);
+  const submit = () => { if(checkOTP()) navigation.navigate('PasswordChange') };
 
   const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
     newOtp[index] = text;
-    setOtp(newOtp);
-    if (text && index < inputRefs.current.length - 1) {  //tự động nhảy ô khi nhập số
-        inputRefs.current[index + 1]?.focus();
-      }
-    
-      // Nếu xóa thì focus về ô trước (nếu có)
-      if (!text && index > 0) {
-        inputRefs.current[index - 1]?.focus();
-      }
+    setOTP(newOtp);
+    if (text && index < inputRefs.current.length - 1) inputRefs.current[index + 1]?.focus();
+    if (!text && index > 0) inputRefs.current[index - 1]?.focus();
   };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <KeyboardAvoidingView
         style={styles.wrapper}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+        <TouchableOpacity style={styles.backButton} onPress={goBack}>
           <View style={styles.backIconWrapper}>
             <Icon name="chevron-back" size={22} color="#000" />
           </View>
@@ -60,9 +36,9 @@ const ForgetPassword2 = ({ route, navigation }) => {
         <View style={styles.container}>
           <Text style={styles.title}>QUÊN MẬT KHẨU</Text>
           <Text style={styles.subtitle}>
-            Đã gửi mã xác thực đến số điện thoại
+            Đã gửi mã xác thực đến
           </Text>
-          <Text style={styles.phoneNumber}>{phoneNumber}</Text>
+          <Text style={styles.phoneNumber}>{input}</Text>
 
           <View style={styles.otpContainer}>
             {otp.map((value, index) => (
@@ -85,7 +61,7 @@ const ForgetPassword2 = ({ route, navigation }) => {
             </Text>
           </Text>
 
-          <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+          <TouchableOpacity style={styles.button} onPress={submit}>
             <Text style={styles.buttonText}>Xác nhận</Text>
           </TouchableOpacity>
         </View>
@@ -188,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgetPassword2;
+export default OTPChallengeScreen;

@@ -11,14 +11,12 @@ const UserViewScreen = ({navigation}) => {
         async function initUser() {
             try {
                 const response = await axios.get('https://fakestoreapi.com/users/' + id);
-                setUserInfo(response.data);
+                await setUserInfo(response.data);
                 setLoading(false);
             }
-            catch (error) {
-                console.log('Error getting user info: ' + error);
-            }
+            catch (error) { console.log('Error getting user info: ' + error) }
         }
-        if(userInfo == null) initUser();
+        initUser()
     }, []);
 
     if (loading) return (
@@ -33,7 +31,7 @@ const UserViewScreen = ({navigation}) => {
                 <Image source={{uri: 'https://images.immediate.co.uk/production/volatile/sites/3/2022/07/val-kilmer-batman-forever-cb74c7d.jpg?quality=90&fit=700,466'}}
                 style={{height: 100, width: 100, borderRadius: 50}}/>
                 <Text style={{fontWeight:'bold', fontSize: 25, paddingLeft: 10}}>{userInfo.name.firstname + ' ' + userInfo.name.lastname}</Text>
-                <TouchableOpacity style={{marginLeft: '15%'}} onPress={() => navigation.navigate('Edit User')}>
+                <TouchableOpacity style={{marginLeft: '15%'}} onPress={() => navigation.navigate('UserEdit')}>
                     <Icon name='create-outline' color='black' size={40}/>
                 </TouchableOpacity>
             </View>

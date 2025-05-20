@@ -7,17 +7,21 @@ const CartProvider = ({ children }) => {
     const [cartTotal, setCartTotal] = useState(0);
     const [checkedItems, setCheckedItems] = useState([]);
 
-    useEffect(() => { async function cartInit() {
-        try {
-            let cart_ = await AsyncStorage.getItem('cart');
-            if(cart_) setCart(JSON.parse(cart_));
-            console.log('Initiated cart.');
-        }
-        catch(err) { console.log(err) }
-    };
-    cartInit(); }, [])
+    useEffect(() => { 
+        async function cartInit() {
+            try {
+                let cart_ = await AsyncStorage.getItem('cart');
+                if(cart_) setCart(JSON.parse(cart_));
+            }
+            catch(err) { console.log(err) }
+        };
+        cartInit(); 
+    }, [])
 
-    useEffect(() => { async function saveCart() { AsyncStorage.setItem('cart', JSON.stringify(cart))}; saveCart() }, [cart])
+    useEffect(() => {
+        async function saveCart() { AsyncStorage.setItem('cart', JSON.stringify(cart)) }; 
+        saveCart() 
+    }, [cart])
 
     return (
         <CartContext.Provider value={{ cart, setCart, cartTotal, setCartTotal, checkedItems, setCheckedItems }}>

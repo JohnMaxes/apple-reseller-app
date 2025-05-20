@@ -1,16 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-    View,
-    Text,
-    FlatList,
-    StyleSheet,
-    ActivityIndicator,
-    TextInput,
-    TouchableOpacity,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView
-} from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import ProductCatalogPreview from "../../components/ProductCatalogPreview";
 import axios from "axios";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -23,13 +12,11 @@ const AllProductScreen = ({ navigation }) => {
 
     const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt"];
 
-    useEffect(() => {
-        axios
-            .get("https://fakestoreapi.com/products")
-            .then((response) => setProducts(response.data))
-            .catch(console.error)
-            .finally(() => setLoading(false));
-    }, []);
+    useEffect(() => axios.get("https://fakestoreapi.com/products")
+        .then((response) => setProducts(response.data))
+        .catch(console.error)
+        .finally(() => setLoading(false))
+    , []);
 
     const toggleFilter = (filter) => {
         if (filter === "Filter") {
@@ -49,21 +36,12 @@ const AllProductScreen = ({ navigation }) => {
         const showIcon = selectedFilters.length === 0;
 
         return (
-            <TouchableOpacity
-                key={filter}
-                style={[
-                    styles.filterButton,
-                    isSelected && !isFilterButton && styles.selectedFilterButton,
-                ]}
+            <TouchableOpacity key={filter}
+                style={[ styles.filterButton, isSelected && !isFilterButton && styles.selectedFilterButton,]}
                 onPress={() => toggleFilter(filter)}
             >
                 {isFilterButton && showIcon && (
-                    <Icon
-                        name="options-outline"
-                        size={18}
-                        color="#000"
-                        style={styles.filterIcon}
-                    />
+                    <Icon name="options-outline" size={18} color="#000" style={styles.filterIcon}/>
                 )}
 
                 {isFilterButton && selectedFilters.length > 0 && (
@@ -74,36 +52,46 @@ const AllProductScreen = ({ navigation }) => {
                     </View>
                 )}
 
-                <Text
-                    style={
-                        isSelected
-                            ? styles.filterButtonTextSelected
-                            : styles.filterButtonText
-                    }
-                >
+                <Text style={ isSelected ? styles.filterButtonTextSelected : styles.filterButtonText}>
                     {filter}
                 </Text>
             </TouchableOpacity>
         );
     };
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007bff" />
-            </View>
-        );
-    }
+    if (loading) return
+        <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#007bff" />
+        </View>
+        
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.container}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}style={styles.container}>
+            <Text style={styles.header}>TẤT CẢ SẢN PHẨM</Text>
+            <View style={styles.searchContainer}>
+                <Icon
+                    name="search-outline"
+                    size={20}
+                    color="#888"
+                    style={styles.searchIcon}
+                />
+                <TextInput
+                    placeholder="Tìm sản phẩm..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    style={styles.searchBar}
+                />
+            </View>
+
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.filterContainer}
+            >
+                {["Filter", ...filterOptions].map(renderFilterButton)}
+            </ScrollView>
             <FlatList
-                data={products.filter((item) =>
-                    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-                )}
+                data={products.filter((item) =>item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
                 renderItem={({ item }) => (
                     <ProductCatalogPreview
                         title={item.title}
@@ -119,34 +107,6 @@ const AllProductScreen = ({ navigation }) => {
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 contentContainerStyle={styles.scrollViewContainer}
-                ListHeaderComponent={
-                    <>
-                        <Text style={styles.header}>TẤT CẢ SẢN PHẨM</Text>
-
-                        <View style={styles.searchContainer}>
-                            <Icon
-                                name="search-outline"
-                                size={20}
-                                color="#888"
-                                style={styles.searchIcon}
-                            />
-                            <TextInput
-                                placeholder="Tìm sản phẩm..."
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                style={styles.searchBar}
-                            />
-                        </View>
-
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            style={styles.filterContainer}
-                        >
-                            {["Filter", ...filterOptions].map(renderFilterButton)}
-                        </ScrollView>
-                    </>
-                }
             />
         </KeyboardAvoidingView>
     );

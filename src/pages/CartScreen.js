@@ -1,19 +1,21 @@
 import React, { useContext, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import CartItem from "../components/CartItem";
 import { CartContext } from "../context/CartContext";
 import { CartIcon } from "../assets/icons/cart-icon";
+import { AuthContext } from "../context/AuthContext";
 
-const CartScreen = () => {
+const CartScreen = ({navigation}) => {
     const { cart } = useContext(CartContext);
-    
-    useEffect(() => console.log(cart), []);
-    if (cart.length === 0) return (
+    const { loggedIn } = useContext(AuthContext);
+    const navigateToProducts = () => navigation.navigate('Categories');
+    useEffect(() => { if( !loggedIn ) navigation.navigate('Authentication') }, []);
+    if ( cart.length === 0 || !loggedIn ) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <CartIcon width={150} height={150}></CartIcon>
             <Text style={cartStyle.emptyCartText1}>Giỏ hàng của bạn đang trống.</Text>
             <Text style={cartStyle.emptyCartText2}>Hãy duyệt thêm các sản phẩm hoặc mua{"\n"}các sản phẩm bạn đã lưu trước đó.</Text>
-            <TouchableOpacity style={cartStyle.exploreButton}><Text style={{color: 'black', fontSize: 16, fontFamily: 'Inter'}}>Khám phá ngay</Text></TouchableOpacity>
+            <TouchableOpacity onPress={navigateToProducts} style={cartStyle.exploreButton}><Text style={{color: 'black', fontSize: 16, fontFamily: 'Inter'}}>Khám phá ngay</Text></TouchableOpacity>
         </View>
     );
 
