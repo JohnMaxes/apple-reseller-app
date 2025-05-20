@@ -4,6 +4,7 @@ import CustomInput from '../../components/CustomInput';
 import styles from '../../../styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Logo from '../../assets/Logo/Logo-shop.jpg';
+import Reseller from '../../assets/Apple-Reseller.webp';
 const SignUpScreen = ({ togglePage }) => {
 
     const [registUsername, setRUsername] = useState('');
@@ -18,12 +19,19 @@ const SignUpScreen = ({ togglePage }) => {
 
     return (
         <ScrollView scrollEnabled={false}>
-            <View style={styles.header}>
-                <Image
-                    style={styles.headerImg}
-                    source={Logo}
-                />
-                <Text style={styles.heading}>Đăng ký</Text>
+            <View style={[styles.header, { alignItems: 'flex-start' ,marginTop: 40 }]}>
+                <View style={{ flexDirection: 'row',justifyContent: 'flex-start', alignItems: 'center', marginLeft: 20 }}>
+                    <Image
+                        source={Logo}
+                        style={{ width: 63.48, height: 63.48, borderRadius: 30, backgroundColor: 'white', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 6, }}
+                    />
+                    <View style={{ width: 1, height: 50, backgroundColor: '#ccc', marginHorizontal: 10 }} />
+                    <Image
+                        source={Reseller}
+                        style={{ width: 112.86, height: 53, resizeMode: 'contain' }}
+                    />
+                </View>
+                <Text style={[styles.heading, { marginTop: 10, fontSize: 35, fontWeight: 'bold', alignSelf: 'center' }]}>ĐĂNG KÝ</Text>
             </View>
             <CustomInput
                 style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
@@ -66,8 +74,8 @@ const SignUpScreen = ({ togglePage }) => {
                 secureTextEntry={true}
             />
 
-            <TouchableOpacity style={[styles.button, {borderRadius: 30, backgroundColor: '#000000'}]} onPress={processRequest}>
-                <Text style={[styles.buttonText, {fontWeight: 'bold'}]}>Đăng ký</Text>
+            <TouchableOpacity style={[styles.button, { borderRadius: 30, backgroundColor: '#000000', width: 288, height: 50}]} onPress={processRequest}>
+                <Text style={[styles.buttonText, { fontWeight: 'bold', alignItems: 'center'}]}>Đăng ký</Text>
             </TouchableOpacity>
             <View style={styles.toogleTextContainer}>
                 <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
