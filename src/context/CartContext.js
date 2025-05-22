@@ -19,8 +19,25 @@ const CartProvider = ({ children }) => {
 
     useEffect(() => { async function saveCart() { AsyncStorage.setItem('cart', JSON.stringify(cart))}; saveCart() }, [cart])
 
+    // Thêm hàm addToCart
+    const addToCart = (product) => {
+        setCart(prevCart => {
+            const found = prevCart.find(item => item.id === product.id);
+            if (found) {
+                // Nếu đã có thì tăng số lượng
+                return prevCart.map(item =>
+                    item.id === product.id
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                );
+            }
+            // Nếu chưa có thì thêm mới
+            return [...prevCart, { ...product, quantity: 1 }];
+        });
+    };
+
     return (
-        <CartContext.Provider value={{ cart, setCart, cartTotal, setCartTotal, checkedItems, setCheckedItems }}>
+        <CartContext.Provider value={{ cart, setCart, cartTotal, setCartTotal, checkedItems, setCheckedItems, addToCart }}>
             {children}
         </CartContext.Provider>
     );
