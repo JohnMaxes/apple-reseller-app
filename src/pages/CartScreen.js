@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import CartItem from "../components/CartItem";
 import { CartContext } from "../context/CartContext";
@@ -9,7 +9,6 @@ const CartScreen = ({navigation}) => {
     const { cart } = useContext(CartContext);
     const { loggedIn } = useContext(AuthContext);
     const navigateToProducts = () => navigation.navigate('Categories');
-    useEffect(() => { if( !loggedIn ) navigation.navigate('Authentication') }, []);
     if ( cart.length === 0 || !loggedIn ) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <CartIcon width={150} height={150}></CartIcon>

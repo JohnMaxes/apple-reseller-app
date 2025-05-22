@@ -8,19 +8,9 @@ import Categories from './Categories';
 import Cart from './Cart';
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import ProductCatalogPreview from '../components/ProductCatalogPreview';
 import ForgotPasswordScreen from '../pages/ForgotPasswordScreen';
-import OTPChallengeScreen from '../pages/OTPChallengeScreen';
-import PasswordChangeScreen from '../pages/PasswordChangeScreen';
-import { BlurView } from 'expo-blur';
-import AllAccessoryScreen from '../pages/Dat/AllAccessoryScreen';
-import AllProductScreen from '../pages/Dat/AllProductScreen';
-import ClickFilter from '../pages/Dat/ClickFilter';
-import Search1 from '../pages/Dat/Search1';
-import Search2 from '../pages/Dat/Search2';
 import LoadingScreen from '../pages/LoadingScreen';
 import Profile from './Profile';
-
 
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,

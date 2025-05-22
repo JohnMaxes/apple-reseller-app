@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
-import { CartContext } from "./CartContext";
 
 const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
@@ -10,7 +9,6 @@ const AuthProvider = ({ children }) => {
     const [token, setToken] = useState("");
     const [id, setId] = useState('');
     const [userInfo, setUserInfo] = useState(null);
-
     useEffect(() => {
         async function init() {
             let currentTime = Math.floor(Date.now() / 1000);
@@ -43,8 +41,6 @@ const AuthProvider = ({ children }) => {
         catch (error) { console.log(error) }
     };
     const logOut = () => { 
-        const { setCart } = useContext(CartContext);
-        setCart([]);
         AsyncStorage.removeItem('cart');
         AsyncStorage.removeItem('token');
         setToken(''); 

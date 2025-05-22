@@ -21,7 +21,7 @@ const LoginScreen = ({ togglePage, navigation }) => {
         setLoading(true);
         await login(email, password);
         if(!loggedIn) setLoading(false);
-        navigation.pop();
+        navigation.goBack();
     }
     const navigateToForgotPassword = () => navigation.navigate('ForgotPassword');
 

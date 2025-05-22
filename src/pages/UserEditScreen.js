@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Alert, StyleSheet } from "react-native";
+import { useContext, useEffect, useState, useRef, useLayoutEffect } from "react";
+import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Alert, StyleSheet, Platform } from "react-native";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const UserEditScreen = ({ navigation }) => {
     const { userInfo, setUserInfo } = useContext(AuthContext);
@@ -18,9 +19,9 @@ const UserEditScreen = ({ navigation }) => {
         city: userInfo.address.city,
     });
 
-    const formDataRef = useRef(formData);
+    const goBack = () => navigation.goBack();
 
-    useEffect(() => formDataRef.current = formData, [formData]);
+    const formDataRef = useRef(formData);
     useEffect(() => {
         setFormData({
             firstName: userInfo.name.firstname,
@@ -33,18 +34,6 @@ const UserEditScreen = ({ navigation }) => {
             city: userInfo.address.city,
         });
     }, [userInfo]);
-    useEffect(() => {
-        navigation.setOptions({
-            headerRight: () => (
-                <TouchableOpacity onPress={async () => await handleSubmit()} style={{ padding: 20 }}>
-                    {loading ? (
-                        <ActivityIndicator size="large" color="#0000ff" />
-                    ) : (
-                        <Text style={{ fontSize: 20 }}>Save</Text>
-                    )}
-                </TouchableOpacity>
-            ),
-        }) }, []);
 
     const handleChange = (name, value) => {
         setFormData((prevFormData) => ({
@@ -107,7 +96,12 @@ const UserEditScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={{flex: 1, paddingTop: 20, paddingHorizontal: 20}}>
+        <View style={{paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }), paddingHorizontal: 20}}>
+            <TouchableOpacity style={styles.backButton} onPress={goBack}>
+                <View style={styles.backIconWrapper}>
+                    <Icon name="chevron-back" size={22} color="#000" />
+                </View>
+            </TouchableOpacity>
             <View style={{flexDirection: 'row', width: '100%'}}>
                 <View style={{flex: 3, marginRight: 5}}>
                     <Text style={styles.label}>First Name:</Text>

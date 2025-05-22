@@ -1,17 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {
-    View,
-    Text,
-    FlatList,
-    StyleSheet,
-    ActivityIndicator,
-    TextInput,
-    TouchableOpacity,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView
-} from "react-native";
-import ProductCatalogPreview from "../../components/ProductCatalogPreview";
+import { useState, useEffect } from "react";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import ProductCatalogPreview from "../components/ProductCatalogPreview";
 import axios from "axios";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -22,50 +11,28 @@ const AllAccessoryScreen = ({ navigation }) => {
     const [selectedFilters, setSelectedFilters] = useState([]);
 
     const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt"];
-
     useEffect(() => {
-        axios
-            .get("https://fakestoreapi.com/products")
+        axios.get("https://fakestoreapi.com/products")
             .then((response) => setProducts(response.data))
             .catch(console.error)
             .finally(() => setLoading(false));
     }, []);
 
     const toggleFilter = (filter) => {
-        if (filter === "Filter") {
-            console.log("Mở trang bộ lọc"); 
-        } else {
-            setSelectedFilters((prev) =>
-                prev.includes(filter)
-                    ? prev.filter((f) => f !== filter)
-                    : [...prev, filter]
-            );
-        }
+        if (filter === "Filter") console.log("Mở trang bộ lọc"); 
+        else setSelectedFilters((prev) => prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter] );
     };
 
     const renderFilterButton = (filter) => {
         const isSelected = selectedFilters.includes(filter);
         const isFilterButton = filter === "Filter";
         const showIcon = selectedFilters.length === 0;
-
         return (
-            <TouchableOpacity
-                key={filter}
-                style={[
-                    styles.filterButton,
-                    isSelected && !isFilterButton && styles.selectedFilterButton,
-                ]}
-                onPress={() => toggleFilter(filter)}
-            >
+            <TouchableOpacity key={filter} style={[ styles.filterButton, isSelected && !isFilterButton && styles.selectedFilterButton]}
+            onPress={() => toggleFilter(filter)}>
                 {isFilterButton && showIcon && (
-                    <Icon
-                        name="options-outline"
-                        size={18}
-                        color="#000"
-                        style={styles.filterIcon}
-                    />
+                    <Icon name="options-outline" size={18} color="#000" style={styles.filterIcon}/>
                 )}
-
                 {isFilterButton && selectedFilters.length > 0 && (
                     <View style={styles.filterBadge}>
                         <Text style={styles.filterBadgeText}>
@@ -73,37 +40,23 @@ const AllAccessoryScreen = ({ navigation }) => {
                         </Text>
                     </View>
                 )}
-
-                <Text
-                    style={
-                        isSelected
-                            ? styles.filterButtonTextSelected
-                            : styles.filterButtonText
-                    }
-                >
+                <Text style={ isSelected ? styles.filterButtonTextSelected : styles.filterButtonText }>
                     {filter}
                 </Text>
             </TouchableOpacity>
         );
     };
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007bff" />
-            </View>
-        );
-    }
+    if (loading) (
+        <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#007bff" />
+        </View>
+    );
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.container}
-        >
-            <FlatList
-                data={products.filter((item) =>
-                    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-                )}
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+            <FlatList 
+                data={products.filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
                 renderItem={({ item }) => (
                     <ProductCatalogPreview
                         title={item.title}
@@ -124,12 +77,7 @@ const AllAccessoryScreen = ({ navigation }) => {
                         <Text style={styles.header}>TẤT CẢ PHỤ KIỆN</Text>
 
                         <View style={styles.searchContainer}>
-                            <Icon
-                                name="search-outline"
-                                size={20}
-                                color="#888"
-                                style={styles.searchIcon}
-                            />
+                            <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon}/>
                             <TextInput
                                 placeholder="Tìm sản phẩm..."
                                 value={searchQuery}
@@ -138,11 +86,7 @@ const AllAccessoryScreen = ({ navigation }) => {
                             />
                         </View>
 
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            style={styles.filterContainer}
-                        >
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
                             {["Filter", ...filterOptions].map(renderFilterButton)}
                         </ScrollView>
                     </>
@@ -193,10 +137,10 @@ const styles = StyleSheet.create({
         marginBottom: 6,
         paddingHorizontal: 10,
     },
-    filterButton: { //css cho nút lọc
+    filterButton: {
         backgroundColor: "#f0f0f0",
-        paddingHorizontal: 15,  //padding trái phảiphải
-        paddingVertical: 6, //padding trên dướidưới
+        paddingHorizontal: 15,
+        paddingVertical: 6,
         borderRadius: 20,
         marginRight: 10,
         flexDirection: "row",
@@ -206,19 +150,19 @@ const styles = StyleSheet.create({
         minHeight: 35,
         marginBottom: 15,
     },
-    selectedFilterButton: {   //khi bộ lọc được chọn
+    selectedFilterButton: {
         backgroundColor: "#e0f0ff",
         borderColor: "#007bff",
         borderWidth: 2,
     },
-    filterBadge: {  //hiển thị số lượng bộ lọc được chọn
+    filterBadge: {
         backgroundColor: "#007bff",
         borderRadius: 50,
         paddingHorizontal: 8,
         paddingVertical: 2,
         marginRight: 8,
     },
-    filterBadgeText: {  //hiển thị chữ số bên trong
+    filterBadgeText: {
         color: "#ffffff",
         fontSize: 12,
         fontWeight: "bold",

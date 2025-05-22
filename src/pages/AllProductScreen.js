@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import ProductCatalogPreview from "../../components/ProductCatalogPreview";
+import ProductCatalogPreview from "../components/ProductCatalogPreview";
 import axios from "axios";
 import Icon from "react-native-vector-icons/Ionicons";
 
@@ -19,15 +19,8 @@ const AllProductScreen = ({ navigation }) => {
     , []);
 
     const toggleFilter = (filter) => {
-        if (filter === "Filter") {
-            console.log("Mở trang bộ lọc"); 
-        } else {
-            setSelectedFilters((prev) =>
-                prev.includes(filter)
-                    ? prev.filter((f) => f !== filter)
-                    : [...prev, filter]
-            );
-        }
+        if (filter === "Filter") console.log("Mở trang bộ lọc"); 
+        else setSelectedFilters((prev) => prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]);
     };
 
     const renderFilterButton = (filter) => {
@@ -36,14 +29,11 @@ const AllProductScreen = ({ navigation }) => {
         const showIcon = selectedFilters.length === 0;
 
         return (
-            <TouchableOpacity key={filter}
-                style={[ styles.filterButton, isSelected && !isFilterButton && styles.selectedFilterButton,]}
-                onPress={() => toggleFilter(filter)}
-            >
+            <TouchableOpacity key={filter} style={[ styles.filterButton, isSelected && !isFilterButton && styles.selectedFilterButton,]}
+            onPress={() => toggleFilter(filter)}>
                 {isFilterButton && showIcon && (
                     <Icon name="options-outline" size={18} color="#000" style={styles.filterIcon}/>
                 )}
-
                 {isFilterButton && selectedFilters.length > 0 && (
                     <View style={styles.filterBadge}>
                         <Text style={styles.filterBadgeText}>
@@ -51,7 +41,6 @@ const AllProductScreen = ({ navigation }) => {
                         </Text>
                     </View>
                 )}
-
                 <Text style={ isSelected ? styles.filterButtonTextSelected : styles.filterButtonText}>
                     {filter}
                 </Text>
@@ -66,15 +55,10 @@ const AllProductScreen = ({ navigation }) => {
         
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}style={styles.container}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
             <Text style={styles.header}>TẤT CẢ SẢN PHẨM</Text>
             <View style={styles.searchContainer}>
-                <Icon
-                    name="search-outline"
-                    size={20}
-                    color="#888"
-                    style={styles.searchIcon}
-                />
+                <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon}/>
                 <TextInput
                     placeholder="Tìm sản phẩm..."
                     value={searchQuery}
@@ -82,12 +66,7 @@ const AllProductScreen = ({ navigation }) => {
                     style={styles.searchBar}
                 />
             </View>
-
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.filterContainer}
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
                 {["Filter", ...filterOptions].map(renderFilterButton)}
             </ScrollView>
             <FlatList
