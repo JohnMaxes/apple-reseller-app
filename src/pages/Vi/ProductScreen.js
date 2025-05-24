@@ -8,6 +8,8 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { LinearGradient } from 'expo-linear-gradient';
+import Icon from 'react-native-vector-icons/Ionicons';
 import Item1 from '../../assets/Product-Screen/Item1.jpg';
 import Item2 from '../../assets/Product-Screen/Item2.jpg';
 import Item3 from '../../assets/Product-Screen/Item3.webp';
@@ -27,7 +29,7 @@ const ProductScreen = ({ route }) => {
     { label: 'RAM', value: '8GB' },
     { label: 'Dung lượng lưu trữ', value: '256GB' },
     { label: 'Dung lượng khả dụng', value: '241GB' },
-    
+
   ];
   const Camera = [
     { label: 'Camera sau', value: '48MP, 48MP và 12PP' },
@@ -41,31 +43,31 @@ const ProductScreen = ({ route }) => {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
   const [activeTab, setActiveTab] = useState('specs');
-  const {addToCart } = useContext(CartContext); // Sử dụng hook từ CartContext
+  const { addToCart } = useContext(CartContext); // Sử dụng hook từ CartContext
 
   const renderSpecs = () => (
     <View style={styles.specsContainer}>
-      <Text style= {{fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Cấu hình và bộ nhớ</Text>
+      <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15 }}>Cấu hình và bộ nhớ</Text>
       {Configuration.map((item, index) => (
         <View key={index} style={styles.specItem}>
-          <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 500}]}>{item.label}</Text>
-          <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
+          <Text style={[styles.specLabel, { marginLeft: 20, fontSize: 14, fontWeight: 500 }]}>{item.label}</Text>
+          <Text style={[styles.specValue, { textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400 }]}>{item.value}</Text>
         </View>
       ))}
-      <Text style= {{fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Camera và Màn hình</Text>
+      <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15 }}>Camera và Màn hình</Text>
       {Camera.map((item, index) => (
         <View key={index} style={styles.specItem}>
-          <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 500}]}>{item.label}</Text>
-          <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
+          <Text style={[styles.specLabel, { marginLeft: 20, fontSize: 14, fontWeight: 500 }]}>{item.label}</Text>
+          <Text style={[styles.specValue, { textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400 }]}>{item.value}</Text>
         </View>
       ))}
       <TouchableOpacity>
-        <Text style={[styles.buyButtonText, {color: '#0073FF', alignSelf: 'center', marginTop: 20, fontSize: 18}]}>Xem thêm</Text>
+        <Text style={[styles.buyButtonText, { color: '#0073FF', alignSelf: 'center', marginTop: 20, fontSize: 18 }]}>Xem thêm</Text>
       </TouchableOpacity>
     </View>
   );
 
-const handleAddToCart = () => {
+  const handleAddToCart = () => {
     addToCart({
       id: id || title, // Nếu không có id thì dùng title
       title,
@@ -77,6 +79,11 @@ const handleAddToCart = () => {
     Alert.alert("Đã thêm vào giỏ hàng!");
   };
 
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const handleBookmarked = () => {
+    setIsBookmarked(!isBookmarked);
+    Alert.alert(isBookmarked ? "Đã bỏ đánh dấu yêu thích!" : "Đã thêm vào danh sách yêu thích!");
+  }
 
   // Dữ liệu mẫu cho đánh giá
   const reviews = [
@@ -153,7 +160,7 @@ const handleAddToCart = () => {
       ))}
       {/* Nút xem thêm và viết đánh giá */}
       <TouchableOpacity style={styles.reviewButton}>
-        <Text style={[styles.reviewButtonText, { color: '#247CFF'}]}>Xem thêm đánh giá</Text>
+        <Text style={[styles.reviewButtonText, { color: '#247CFF' }]}>Xem thêm đánh giá</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.reviewButton, { backgroundColor: "#247CFF", }]}>
         <Text style={[styles.reviewButtonText]}>Viết đánh giá</Text>
@@ -164,8 +171,38 @@ const handleAddToCart = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: image }} style={styles.productImage} />
+      <View style={styles.imageContainer}>
+        <LinearGradient
+          colors={["#FFFFFF", "#90E0EF", "#3E77BE"]}
+          style={styles.gradientBackground}
+        />
+        <Image source={{ uri: image }} style={[styles.productImage]} />
+        <View style={{position: "absolute", flexDirection: "row", alignItems: "center", gap: 20, zIndex: 2, bottom: 20, left: 30, }}>
+          <Icon
+            name={isBookmarked ? "bookmark" : "bookmark-outline"}
+            size={30}
+            color="#0073FF"
+            style={{ marginRight: 5, position: "relative", borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF" }}
+            onPress={handleBookmarked}
+          />
+          <Icon
+            name="bag-outline"
+            size={30}
+            color="#0073FF"
+            style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
+            onPress={() => Alert.alert("Đã thêm sản phẩm vào giỏ hàng!")}
+          />
+          <Icon
+            name="share-social-outline"
+            size={30}
+            color="#0073FF"
+            style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
+            onPress={() => Alert.alert("Chia sẻ sản phẩm này với bạn bè!")}
+          />
+          
+        </View>
 
+      </View>
       <View style={styles.section}>
         <Text style={[styles.title]}>{title}</Text>
         <Text style={styles.discountPrice}>{price}đ</Text>
@@ -253,7 +290,7 @@ const handleAddToCart = () => {
 
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -264,6 +301,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 400,
     resizeMode: "contain",
+    position: "absolute",
+    top: 0,
+    left: 0,
   },
   section: {
     paddingHorizontal: 20,
@@ -464,7 +504,17 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     color: '#666',
   },
-
+  gradientBackground: {
+    ...StyleSheet.absoluteFillObject,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 90,
+  },
+  imageContainer: {
+    height: 500,
+    position: "relative",
+    backgroundColor: "#fff",
+    marginBottom: 20,
+  },
 
 });
 

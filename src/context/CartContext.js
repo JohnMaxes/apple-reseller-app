@@ -22,11 +22,13 @@ const CartProvider = ({ children }) => {
     // Thêm hàm addToCart
     const addToCart = (product) => {
         setCart(prevCart => {
-            const found = prevCart.find(item => item.id === product.id);
+            const found = prevCart.find(item => item.id === product.id && item.color === product.color &&
+            item.storage === product.storage);
             if (found) {
                 // Nếu đã có thì tăng số lượng
                 return prevCart.map(item =>
-                    item.id === product.id
+                    item.id === product.id && item.color === product.color &&
+                item.storage === product.storage
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );

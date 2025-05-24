@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { CartContext } from '../context/CartContext';
 import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
@@ -23,28 +24,46 @@ configureReanimatedLogger({
 });
 
 const BottomTab = createBottomTabNavigator();
-const CustomTabIcon = ({ name, focused }) => {
+
+const CustomTabIcon = ({ name, focused, cartCount }) => {
     return (
-        <View style={{ alignItems: "center", justifyContent: "center"}}>
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
             {focused && (
                 <View style={{
                     position: "absolute",
                     width: 55,
                     height: 55,
                     backgroundColor: "#0073FF",
-                    borderRadius: 55/2,
+                    borderRadius: 55 / 2,
                     alignItems: "center",
                     justifyContent: "center",
                 }} />
             )}
             <Icon name={name} color={focused ? "white" : "black"} size={26} style={{ position: "absolute" }} />
+            {name === "cart-outline" && cartCount > 0 && (
+                <View style={{
+                    position: 'absolute',
+                    top: -5,
+                    right: -10,
+                    backgroundColor: 'red',
+                    borderRadius: 10,
+                    minWidth: 18,
+                    height: 18,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 4,
+                    zIndex: 10,
+                }}>
+                    <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{cartCount}</Text>
+                </View>
+            )}
         </View>
     );
 };
 const BottomTabNavigation = () => {
-    const [fontsLoaded] = useFonts({
-        'Inter': require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'), 
-    });
+    const { cart } = useContext(CartContext);
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
     return (
         <BottomTab.Navigator
             initialRouteName='Home'
@@ -59,7 +78,7 @@ const BottomTabNavigation = () => {
                     borderRadius: 40,
                     position: 'absolute'
                 },
-                
+
                 tabBarBackground: () => (
                     <BlurView tint="light" intensity={50} style={StyleSheet.absoluteFill} />
                 ),
@@ -68,43 +87,43 @@ const BottomTabNavigation = () => {
                 animation: 'shift',
             }}
         >
-            <BottomTab.Screen 
-                name='Home' 
+            <BottomTab.Screen
+                name='Home'
                 component={Home}
                 options={{
-                    tabBarIcon: ({ focused }) => <CustomTabIcon name="home-outline" focused={focused}/>,
+                    tabBarIcon: ({ focused }) => <CustomTabIcon name="home-outline" focused={focused} />,
                     headerShown: false,
-                }} 
+                }}
             />
-            <BottomTab.Screen 
-                name='Categories' 
-                component={Categories} 
+            <BottomTab.Screen
+                name='Categories'
+                component={Categories}
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="phone-portrait-outline" focused={focused} />,
-                }} 
+                }}
             />
-            <BottomTab.Screen 
-                name='Cart' 
-                component={Cart} 
+            <BottomTab.Screen
+                name='Cart'
+                component={Cart}
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="cart-outline" focused={focused} />,
-                }} 
+                }}
             />
-            <BottomTab.Screen 
-                name='User' 
-                component={User} 
+            <BottomTab.Screen
+                name='User'
+                component={User}
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="person-circle-outline" focused={focused} />,
                     headerShown: false,
-                }} 
+                }}
             />
-            <BottomTab.Screen 
-                name='Test' 
-                component={Test} 
+            <BottomTab.Screen
+                name='Test'
+                component={Test}
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="cart-outline" focused={focused} />,
                     headerShown: false,
-                }} 
+                }}
             />
         </BottomTab.Navigator>
     )
@@ -121,7 +140,7 @@ const BottomTabNavigation = () => {
 //     return(<ForgetPassword2></ForgetPassword2>)
 // }
 const Test = () => {
-    return(<ForgetPassword3></ForgetPassword3>)
+    return (<ForgetPassword3></ForgetPassword3>)
 }
 
 export default BottomTabNavigation;
