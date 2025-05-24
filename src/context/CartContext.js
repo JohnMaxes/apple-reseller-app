@@ -7,17 +7,38 @@ const CartProvider = ({ children }) => {
     const [cartTotal, setCartTotal] = useState(0);
     const [checkedItems, setCheckedItems] = useState([]);
 
-    useEffect(() => { async function cartInit() {
-        try {
-            let cart_ = await AsyncStorage.getItem('cart');
-            if(cart_) setCart(JSON.parse(cart_));
-            console.log('Initiated cart.');
-        }
-        catch(err) { console.log(err) }
-    };
-    cartInit(); }, [])
+    useEffect(() => { 
+        async function cartInit() {
+            try {
+                let cart_ = await AsyncStorage.getItem('cart');
+                if(cart_) setCart(JSON.parse(cart_));
+            }
+            catch(err) { console.log(err) }
+        };
+        cartInit(); 
+    }, [])
 
-    useEffect(() => { async function saveCart() { AsyncStorage.setItem('cart', JSON.stringify(cart))}; saveCart() }, [cart])
+    useEffect(() => {
+        async function saveCart() { AsyncStorage.setItem('cart', JSON.stringify(cart)) }; 
+        saveCart() 
+    }, [cart])
+
+    const addToCart = ({id, title, price, image, color, option }) => {
+        if (cart.some(element => element.id === id))
+            setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item ))
+        else {
+            let newItem = { id, title, price, image, color, option, quantity: 1 };
+            setCart(prevCart => [...prevCart, newItem]);
+            setCartTotal(prevTotal => prevTotal + price);
+            alert('Item added to cart successfully!');
+        }
+    };
+
+    const editCart = ({id, operation, newColor}) => {
+        if (operation == 'color') setCart((prev) => prev.map(item => item.id === id ? {...item, color: newColor } : item ));
+        if (operation == 'x' || (operation == '-' && itemQuantity == 1)) setCart((prevCart) => ( prevCart.filter(item => item.id !== id)) );
+        else setCart((prev) => prev.map(item => item.id === id ? { ...item, quantity: operation == '+' ? item.quantity + 1 : item.quantity - -1 } : item ));
+    }
 
     // Thêm hàm addToCart
     const addToCart = (product) => {
@@ -39,7 +60,7 @@ const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ cart, setCart, cartTotal, setCartTotal, checkedItems, setCheckedItems, addToCart }}>
+        <CartContext.Provider value={{ cart, cartTotal, checkedItems, setCheckedItems, addToCart, editCart }}>
             {children}
         </CartContext.Provider>
     );

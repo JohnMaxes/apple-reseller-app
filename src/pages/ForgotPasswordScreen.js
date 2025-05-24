@@ -1,39 +1,20 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-} from 'react-native';
+import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const ForgetPassword1 = ({ navigation }) => {
+const ForgotPasswordScreen = ({ navigation }) => {
   const [input, setInput] = useState('');
 
   const handleSendCode = () => {
-    if (!input) {
-      alert('Vui lòng nhập số điện thoại hoặc email');
-      return;
-    }
-    alert(`Mã xác thực đã được gửi đến ${input}`);
+    if (!input) return alert('Vui lòng nhập số điện thoại hoặc email');
+    navigation.navigate('OTPChallenge', { input: input });
   };
 
-  const handleGoBack = () => {
-    if (navigation) {
-      navigation.goBack();
-    }
-  };
+  const handleGoBack = () => navigation ? navigation.goBack() : null;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <KeyboardAvoidingView
-        style={styles.wrapper}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <KeyboardAvoidingView style={styles.wrapper} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
         <View style={styles.backIconWrapper}>
           <Icon name="chevron-back" size={22} color="#000" />
@@ -135,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgetPassword1;
+export default ForgotPasswordScreen;

@@ -1,63 +1,40 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const CustomInput = ({
-  placeholder,
-  placeholderTextColor,
-  secureTextEntry,
-  iconUri,
-  onChangeText,
-  value,
-  keyboardType,
-  minLength,
-  maxLength,
-  showToggleEye,
-  style
-}) => {
-  const [hidePassword, setHidePassword] = useState(secureTextEntry || false);
-
+const CustomInput = ({ placeholder, placeholderTextColor, secureTextEntry, iconName, onChangeText, value, keyboardType, minLength, maxLength }) => {
   return (
-    <View style={[styles.inputContainer, { backgroundColor: "#F7F4F4", borderRadius: 30, borderWidth: 1, padding: 15}, style]}>
-      {iconUri && (
-        <Icon
-          name={iconUri}
-          size={20}
-          color="grey"
-          style={styles.inputIcon}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.inputContainer}>
+        {iconName && (
+          <Icon name={iconName} size={20} color="black" style={styles.inputIcon}/>
+        )}
+        <TextInput
+          style={{ flex: 1, fontFamily:'Inter-Regular' }}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          secureTextEntry={secureTextEntry}
+          onChangeText={onChangeText}
+          value={value}
+          keyboardType={keyboardType}
+          maxLength={maxLength}
         />
-      )}
-      <TextInput
-        style={{ flex: 1, fontFamily: 'Inter-Regular' }}
-        placeholder={placeholder}
-        placeholderTextColor={placeholderTextColor}
-        secureTextEntry={hidePassword}
-        onChangeText={onChangeText}
-        value={value}
-        keyboardType={keyboardType}
-        maxLength={maxLength}
-      />
-      {showToggleEye && (
-        <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
-          <Icon
-            name={hidePassword ? 'eye-off-outline' : 'eye-outline'}
-            size={20}
-            color="grey"
-            style={styles.inputIcon}
-          />
-        </TouchableOpacity>
-      )}
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 const styles = StyleSheet.create({
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-    paddingHorizontal: 10,
-  },
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "white",
+      height: 60,
+      borderRadius: 15,
+      marginHorizontal: "5%",
+      marginVertical: 10,
+      paddingLeft: 20,
+    },
   inputIcon: {
     marginRight: 10,
   },

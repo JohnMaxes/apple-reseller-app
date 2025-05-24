@@ -1,12 +1,12 @@
-import React, { useContext, useEffect } from 'react';
 import { CartProvider } from './src/context/CartContext';
-import { AuthContext, AuthProvider } from './src/context/AuthContext';
+import { AuthProvider } from './src/context/AuthContext';
 import { NavigationContainer } from '@react-navigation/native';
 import BottomTabNavigation from './src/navigation/BottomNavigation';
 import 'react-native-gesture-handler';
 
+import { createStackNavigator } from '@react-navigation/stack';
 import {configureReanimatedLogger,ReanimatedLogLevel} from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Authentication from './src/navigation/Authentication';
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
@@ -24,15 +24,13 @@ const App = () => {
     );
 };
 
+const MainStack = createStackNavigator();
 const MainContent = () => {    
-    const { setLoggedIn } = useContext(AuthContext);
-    useEffect(() => {
-        
-        let token = AsyncStorage.getItem('token'), currentTime = Math.floor(Date.now() / 1000);
-        if(token && token.iat && currentTime > token.iat) {
-            
-        }
-    }, [])
-    return (<BottomTabNavigation></BottomTabNavigation>);
+    return (
+        <MainStack.Navigator initialRouteName='BottomTab' screenOptions={{ headerShown: false }}>
+            <MainStack.Screen name='BottomTab' component={BottomTabNavigation}/>
+            <MainStack.Screen name='Authentication' component={Authentication} options={{ presentation: 'modal' }}/>
+        </MainStack.Navigator>
+    );
 };
 export default App;

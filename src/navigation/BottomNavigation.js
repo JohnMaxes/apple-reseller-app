@@ -1,22 +1,16 @@
-import React, { useContext } from 'react';
-import { CartContext } from '../context/CartContext';
-import { View, StyleSheet } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useFonts } from 'expo-font';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from './Home';
 import Categories from './Categories';
-import User from './User';
 import Cart from './Cart';
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import ProductCatalogPreview from '../components/ProductCatalogPreview';
-import ForgetPassword1 from '../pages/ForgetPassword1';
-import ForgetPassword2 from '../pages/ForgetPassword2';
-import ForgetPassword3 from '../pages/ForgetPassword3';
-import { BlurView } from 'expo-blur';
-
+import ForgotPasswordScreen from '../pages/ForgotPasswordScreen';
+import LoadingScreen from '../pages/LoadingScreen';
+import Profile from './Profile';
 
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
@@ -61,26 +55,25 @@ const CustomTabIcon = ({ name, focused, cartCount }) => {
     );
 };
 const BottomTabNavigation = () => {
-    const { cart } = useContext(CartContext);
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
+    const [fontsLoaded] = useFonts({
+        Inter: require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'), 
+    });
+    if(!fontsLoaded) return <LoadingScreen/>
     return (
         <BottomTab.Navigator
             initialRouteName='Home'
             screenOptions={{
                 tabBarStyle: {
-                    height: 60,
-                    width: '80%',
-                    marginBottom: 25,
-                    marginHorizontal: '10%',
-                    paddingTop: 10,
-                    backgroundColor: '#ddd',
-                    borderRadius: 40,
+                    height: 80,
+                    paddingHorizontal: '10%',
+                    paddingTop: 20,
                     position: 'absolute'
                 },
-
-                tabBarBackground: () => (
-                    <BlurView tint="light" intensity={50} style={StyleSheet.absoluteFill} />
+                tabBarButton: (props) => (
+                    <TouchableOpacity
+                        {...props}
+                        activeOpacity={1}
+                    />
                 ),
                 tabBarShowLabel: false,
                 headerShown: false,
@@ -109,9 +102,9 @@ const BottomTabNavigation = () => {
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="cart-outline" focused={focused} />,
                 }}
             />
-            <BottomTab.Screen
-                name='User'
-                component={User}
+            <BottomTab.Screen 
+                name='User' 
+                component={Profile} 
                 options={{
                     tabBarIcon: ({ focused }) => <CustomTabIcon name="person-circle-outline" focused={focused} />,
                     headerShown: false,
@@ -139,8 +132,22 @@ const BottomTabNavigation = () => {
 // const Test = () => {
 //     return(<ForgetPassword2></ForgetPassword2>)
 // }
+// const Test = () => {
+//     return(<ForgetPassword3></ForgetPassword3>)
+// }
+// const Test = () => {
+//   return(<AllProductScreen></AllProductScreen>)
+// }
 const Test = () => {
-    return (<ForgetPassword3></ForgetPassword3>)
+  return(<ForgotPasswordScreen></ForgotPasswordScreen>)
 }
-
+// const Test = () => {
+//   return(<ClickFilter></ClickFilter>)
+// }
+// const Test = () => {
+//   return(<Search1></Search1>)
+// }
+// const Test = () => {
+//   return(<Search2></Search2>)
+// }
 export default BottomTabNavigation;

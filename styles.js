@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
       paddingTop: 20,
     },
     header: {
-      marginTop: 40,
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
@@ -37,6 +36,7 @@ const styles = StyleSheet.create({
       textAlign: "center",
       padding: 20,
       fontWeight: "bold",
+      fontFamily: "Inter",
     },
     inputContainer: {
       flexDirection: "row",
