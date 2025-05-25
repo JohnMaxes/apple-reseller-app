@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Platform } from "react-native";
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Platform, Alert } from "react-native";
+import { LinearGradient } from 'expo-linear-gradient';
 
 import Item1 from '../assets/Product-Screen/Item1.jpg';
 import Item2 from '../assets/Product-Screen/Item2.jpg';
@@ -13,6 +14,8 @@ const storageOptions = ["256GB", "512GB", "1T"];
 
 const ProductScreen = ({ route, navigation }) => {
   const { id, title, image, description, price, rating, ratingCount } = route.params;
+  const isBookmarked = false;
+  const handleBookmark = () => console.log('Bookmark');
   const colors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },
@@ -123,13 +126,31 @@ const ProductScreen = ({ route, navigation }) => {
 
   const goBack = () => navigation.goBack();
   return (
-    <ScrollView contentContainerStyle={[styles.container, { paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }) } ]}>
-        <TouchableOpacity style={[styles.backButton, {marginLeft: 20}]} onPress={goBack}>
-          <View style={styles.backIconWrapper}>
-            <Icon name="chevron-back" size={22} color="#000" />
+    <ScrollView contentContainerStyle={styles.container}>
+        <View style={[styles.imageContainer, { paddingTop: Platform.select({ ios: 60, android: 40, default: 40 }) }]}>
+          <TouchableOpacity style={{marginLeft: 20, zIndex: 10}} onPress={goBack}>
+            <View style={styles.backIconWrapper}>
+              <Icon name="chevron-back" size={22} color="#000" />
+            </View>
+          </TouchableOpacity>
+          <LinearGradient
+            colors={["#FFFFFF", "#90E0EF", "#3E77BE"]}
+            style={styles.gradientBackground}
+          />
+          <Image source={{ uri: image }} style={[styles.productImage]} />
+          <View style={{flexDirection: "row", alignItems: "center", gap: 20, zIndex: 2, bottom: 20, left: 30 }}>
+            <Icon name={isBookmarked ? "bookmark" : "bookmark-outline"} size={30} color="#0073FF"
+              style={{ marginRight: 5, position: "relative", borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF" }}
+              onPress={handleBookmark}
+            />
+            <Icon name="bag-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
+              onPress={() => Alert.alert("Đã thêm sản phẩm vào giỏ hàng!")}
+            />
+            <Icon name="share-social-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
+              onPress={() => Alert.alert("Chia sẻ sản phẩm này với bạn bè!")}
+            />
           </View>
-        </TouchableOpacity>
-        <Image source={{ uri: image }} style={styles.productImage} />
+        </View>
         <View style={styles.section}>
             <Text style={[styles.title]}>{title}</Text>
             <Text style={styles.discountPrice}>{price}đ</Text>
@@ -216,6 +237,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 400,
     resizeMode: "contain",
+    marginBottom: 30,
   },
   section: {
     paddingHorizontal: 20,
@@ -433,6 +455,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 2,
+  },
+  gradientBackground: {
+    ...StyleSheet.absoluteFillObject,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 90,
+  },
+  imageContainer: {
+    backgroundColor: "#fff",
+    marginBottom: 20,
   },
 });
 
