@@ -1,8 +1,8 @@
 import { useCallback, useContext } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useFocusEffect } from '@react-navigation/native';
-import UserViewScreen from "../pages/UserViewScreen";
-import UserEditScreen from "../pages/UserEditScreen";
+import UserViewScreen from "../pages/Vi/UserViewScreen";
+import UserEditScreen from "../pages/Vi/UserEditScreen";
 import { AuthContext } from "../context/AuthContext";
 
 const ProfileStack = createStackNavigator();

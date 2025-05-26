@@ -1,13 +1,14 @@
 import { useContext, useEffect, useState, useRef, useLayoutEffect } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Alert, StyleSheet, Platform } from "react-native";
+import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Alert, StyleSheet, Platform, Image, Button } from "react-native";
 import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import Icon from 'react-native-vector-icons/Ionicons';
+import { color } from "react-native-elements/dist/helpers";
 
 const UserEditScreen = ({ navigation }) => {
     const { userInfo, setUserInfo } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
-    
+
     const [formData, setFormData] = useState({
         firstName: userInfo.name.firstname,
         lastName: userInfo.name.lastname,
@@ -63,26 +64,26 @@ const UserEditScreen = ({ navigation }) => {
             const updatedUserInfo = {
                 ...userInfo,
                 name: {
-                    firstname: formDataRef.current.firstName,
-                    lastname: formDataRef.current.lastName,
+                    firstname: formData.firstName,
+                    lastname: formData.lastName,
                 },
-                username: formDataRef.current.username,
-                email: formDataRef.current.email,
-                phone: formDataRef.current.phoneNumber,
+                username: formData.username,
+                email: formData.email,
+                phone: formData.phoneNumber,
                 address: {
-                    number: formDataRef.current.houseNumber,
-                    street: formDataRef.current.street,
-                    city: formDataRef.current.city,
+                    number: formData.houseNumber,
+                    street: formData.street,
+                    city: formData.city,
                 },
             };
-            setUserInfo(updatedUserInfo);
-            
+
             try {
                 const response = await axios.put(`https://fakestoreapi.com/users/${userInfo.id}`, updatedUserInfo, {
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
+                setUserInfo(response.data || updatedUserInfo);
                 navigation.goBack();
             } catch (error) {
                 console.error('Error saving user: ', error);
@@ -96,33 +97,40 @@ const UserEditScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={{paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }), paddingHorizontal: 20}}>
+        <View style={{ paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }), paddingHorizontal: 20 }}>
+
             <TouchableOpacity style={styles.backButton} onPress={goBack}>
-                <View style={styles.backIconWrapper}>
-                    <Icon name="chevron-back" size={22} color="#000" />
+                <View style={[styles.backIconWrapper, { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 20 , justifyContent: 'space-between' }]}>
+                    <Icon name="chevron-back" size={22} color="#000"  />
+                    <Text style={{ justifyContent: 'center', fontSize: 20, fontWeight: 'bold' }}>Thông tin cá nhân</Text>
+                    <TouchableOpacity onPress={handleSubmit}>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }} >Lưu</Text>
+                    </TouchableOpacity>
                 </View>
             </TouchableOpacity>
-            <View style={{flexDirection: 'row', width: '100%'}}>
-                <View style={{flex: 3, marginRight: 5}}>
-                    <Text style={styles.label}>First Name:</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={formData.firstName}
-                        onChangeText={(value) => handleChange('firstName', value)}
-                        required
-                    />
-                </View>
-                <View style={{flex: 2, marginLeft: 5}}>
-                    <Text style={styles.label}>Last Name:</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={formData.lastName}
-                        onChangeText={(value) => handleChange('lastName', value)}
-                        required
-                    />
-                </View>
+            <View style={{ flexDirection: 'column', marginBottom: 10, alignItems: 'center', marginTop: 40, gap: 10 }}>
+                <Image source={{ uri: 'https://images.immediate.co.uk/production/volatile/sites/3/2022/07/val-kilmer-batman-forever-cb74c7d.jpg?quality=90&fit=700,466' }}
+                    style={{ height: 100, width: 100, borderRadius: 50, alignItems: 'center', justifyContent: 'center' }} />
+                <Text style={{ fontWeight: 'bold', fontSize: 25 }}>{userInfo.name.firstname + ' ' + userInfo.name.lastname}</Text>
+                <Text style={{ color: '#0D6EFD', fontSize: 16 }}>Đổi ảnh đại diện</Text>
             </View>
-            
+
+            <Text style={styles.label}>Họ</Text>
+            <TextInput
+                style={styles.input}
+                value={formData.firstName}
+                onChangeText={(value) => handleChange('firstName', value)}
+                required
+            />
+            <Text style={styles.label}>Tên</Text>
+            <TextInput
+                style={styles.input}
+                value={formData.lastName}
+                onChangeText={(value) => handleChange('lastName', value)}
+                required
+            />
+
+
             <Text style={styles.label}>Username:</Text>
             <TextInput
                 style={styles.input}
@@ -138,34 +146,14 @@ const UserEditScreen = ({ navigation }) => {
                 keyboardType="email-address"
                 required
             />
-            <Text style={styles.label}>Phone Number:</Text>
+            <Text style={styles.label}>Số điện thoại:</Text>
             <TextInput
                 style={styles.input}
                 value={formData.phoneNumber}
                 onChangeText={(value) => handleChange('phoneNumber', value)}
                 required
             />
-            <Text style={styles.label}>House Number:</Text>
-            <TextInput
-                style={styles.input}
-                value={formData.houseNumber}
-                onChangeText={(value) => handleChange('houseNumber', value)}
-                required
-            />
-            <Text style={styles.label}>Street:</Text>
-            <TextInput
-                style={styles.input}
-                value={formData.street}
-                onChangeText={(value) => handleChange('street', value)}
-                required
-            />
-            <Text style={styles.label}>City:</Text>
-            <TextInput
-                style={styles.input}
-                value={formData.city}
-                onChangeText={(value) => handleChange('city', value)}
-                required
-            />
+
         </View>
     );
 };
@@ -181,18 +169,19 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 50,
     },
-    label: {
-        fontWeight: 'bold',
-        fontSize: 18,
-        marginBottom: 10,
-    },
+
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 4,
-        padding: 10,
+        borderRadius: 25,
+        padding: 15,
         marginBottom: 15,
     },
+    label: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+    }
 });
 
 

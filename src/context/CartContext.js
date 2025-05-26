@@ -41,23 +41,23 @@ const CartProvider = ({ children }) => {
     }
 
     // Thêm hàm addToCart
-    const addToCart = (product) => {
-        setCart(prevCart => {
-            const found = prevCart.find(item => item.id === product.id && item.color === product.color &&
-            item.storage === product.storage);
-            if (found) {
-                // Nếu đã có thì tăng số lượng
-                return prevCart.map(item =>
-                    item.id === product.id && item.color === product.color &&
-                item.storage === product.storage
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
-            }
-            // Nếu chưa có thì thêm mới
-            return [...prevCart, { ...product, quantity: 1 }];
-        });
-    };
+    // const addToCart = (product) => {
+    //     setCart(prevCart => {
+    //         const found = prevCart.find(item => item.id === product.id && item.color === product.color &&
+    //         item.storage === product.storage);
+    //         if (found) {
+    //             // Nếu đã có thì tăng số lượng
+    //             return prevCart.map(item =>
+    //                 item.id === product.id && item.color === product.color &&
+    //             item.storage === product.storage
+    //                     ? { ...item, quantity: item.quantity + 1 }
+    //                     : item
+    //             );
+    //         }
+    //         // Nếu chưa có thì thêm mới
+    //         return [...prevCart, { ...product, quantity: 1 }];
+    //     });
+    // };
 
     return (
         <CartContext.Provider value={{ cart, cartTotal, checkedItems, setCheckedItems, addToCart, editCart }}>
