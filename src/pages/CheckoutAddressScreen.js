@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Checkbox from '../components/Checkbox';
 
 const initialAddresses = [
   {
@@ -19,13 +20,12 @@ const initialAddresses = [
   },
 ];
 
-const ShippingAddressScreen = () => {
+const CheckoutAddressScreen = ({navigation}) => {
   const [addresses, setAddresses] = useState(initialAddresses);
 
   const handleSelect = (id) => {
     const updated = addresses.map((item) => ({
-      ...item,
-      isDefault: item.id === id,
+      ...item, isDefault: item.id === id,
     }));
     setAddresses(updated);
   };
@@ -41,11 +41,13 @@ const ShippingAddressScreen = () => {
     setAddresses([...addresses, newAddress]);
   };
 
+  const goBack = () => navigation.goBack();
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <TouchableOpacity style={styles.row} onPress={() => handleSelect(item.id)}>
-        <View style={styles.checkbox}>
-          {item.isDefault && <View style={styles.checked} />}
+      <TouchableOpacity style={styles.row}>
+        <View style={{ marginRight: 10, justifyContent: 'center' }}>
+          <Checkbox value={item.isDefault} onValueChange={() => handleSelect(item.id)}/>
         </View>
         <View style={styles.info}>
           <Text style={styles.name}>{item.name}</Text>
@@ -67,7 +69,16 @@ const ShippingAddressScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>ĐỊA CHỈ GIAO HÀNG</Text>
+      <View style={styles.header}>
+        <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+          <View style={styles.backIconWrapper}>
+            <Icon name="chevron-back" size={22} color="#000" />
+          </View>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>ĐỊA CHỈ</Text>
+        <View style={{ width: 24 }} />
+      </View>
+
 
       <Text style={styles.sectionTitle}>Địa chỉ giao hàng</Text>
 
@@ -75,6 +86,7 @@ const ShippingAddressScreen = () => {
         data={addresses}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        style={{backgroundColor: '#f7f7f7'}}
         ListFooterComponent={
           <TouchableOpacity style={styles.addBox} onPress={handleAddAddress}>
             <Icon name="add" size={30} color="#000" />
@@ -85,53 +97,42 @@ const ShippingAddressScreen = () => {
   );
 };
 
-export default ShippingAddressScreen;
+export default CheckoutAddressScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
     paddingTop: 50,
+    marginHorizontal: 20,
   },
   header: {
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 30,
+  },
+  headerTitle: {
+    fontSize: 25, 
+    fontFamily: 'Inter', 
+    fontWeight: "bold", 
+    textAlign: "center"
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: '500',
-    marginLeft: 20,
     marginBottom: 10,
     color: '#000',
   },
   card: {
     backgroundColor: '#fff',
-    marginHorizontal: 20,
     borderRadius: 12,
     padding: 15,
     marginBottom: 12,
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  checkbox: {
-    height: 24,
-    width: 24,
-    borderRadius: 4,
-    borderWidth: 2,
-    borderColor: '#007AFF',
-    marginRight: 12,
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-  checked: {
-    height: 14,
-    width: 14,
-    backgroundColor: '#007AFF',
-    borderRadius: 2,
   },
   info: {
     flex: 1,
@@ -164,11 +165,25 @@ const styles = StyleSheet.create({
   },
   addBox: {
     backgroundColor: '#fff',
-    marginHorizontal: 20,
     borderRadius: 12,
     height: 70,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
+  },
+  backIconWrapper: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3,
   },
 });

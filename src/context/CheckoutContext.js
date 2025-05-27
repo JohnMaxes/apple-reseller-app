@@ -1,11 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from 'jwt-decode';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
 
 const CheckoutContext = createContext();
-const CheckoutContextProvider = () => {
+const CheckoutProvider = ({children}) => {
+    const [checkoutItems, setCheckoutItems] = useState([]);
+    const [address, setAddress] = useState({});
+    const [vouchers, setVouchers] = useState([]);
 
+    return (
+        <CheckoutContext.Provider value={{ checkoutItems, setCheckoutItems, address, setAddress, vouchers, setVouchers }}>
+            {children}
+        </CheckoutContext.Provider>
+    )
 }
 
-export { CheckoutContext, CheckoutContextProvider }
+export { CheckoutContext, CheckoutProvider }

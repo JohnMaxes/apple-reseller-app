@@ -15,7 +15,7 @@ const Categories = ({navigation}) => {
                 options={({ navigation }) => ({
                     header: () => (
                     <View style={{ flexDirection: "row", alignItems: "center", paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }), paddingHorizontal: 10,paddingVertical: 10 }}>
-                        <View style={{ flex: 1 }} />
+                        <View style={{ flex: 1 }}/>
                         <View style={{ flex: 3 }}>
                             <Text style={{ fontSize: 25, fontFamily: 'Inter', fontWeight: "bold", textAlign: "center"}}>SẢN PHẨM</Text>
                         </View>
@@ -28,8 +28,8 @@ const Categories = ({navigation}) => {
                     )
                 })}
             />
-            <CategoriesStack.Screen name='AllProduct' component={AllProductScreen}/>
-            <CategoriesStack.Screen name='AllAccessory' component={AllAccessoryScreen}/>
+            <CategoriesStack.Screen name='AllProduct' component={AllProductScreen} options={{headerShown: false}}/>
+            <CategoriesStack.Screen name='AllAccessory' component={AllAccessoryScreen} options={{headerShown: false}}/>
             <CategoriesStack.Screen name='ProductScreen' component={ProductScreen} options={{headerShown: false}}/>
         </CategoriesStack.Navigator>
     )

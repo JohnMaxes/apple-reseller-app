@@ -12,16 +12,24 @@ const AllProductScreen = ({ navigation }) => {
 
     const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt"];
 
-    useEffect(() => axios.get("https://fakestoreapi.com/products")
-        .then((response) => setProducts(response.data))
-        .catch(console.error)
-        .finally(() => setLoading(false))
-    , []);
+    useEffect(() => {
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get("https://fakestoreapi.com/products");
+            setProducts(response.data);
+        }
+        catch (error) { console.error(error); } 
+        finally { setLoading(false); }
+    };
+
+    fetchProducts();
+    }, []);
 
     const toggleFilter = (filter) => {
         if (filter === "Filter") console.log("Mở trang bộ lọc"); 
         else setSelectedFilters((prev) => prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]);
     };
+    const goBack = () => navigation.goBack();
 
     const renderFilterButton = (filter) => {
         const isSelected = selectedFilters.includes(filter);
@@ -56,7 +64,15 @@ const AllProductScreen = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-            <Text style={styles.header}>TẤT CẢ SẢN PHẨM</Text>
+            <View style={styles.header}>
+                <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+                    <View style={styles.backIconWrapper}>
+                    <Icon name="chevron-back" size={22} color="#000" />
+                    </View>
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>TẤT CẢ SẢN PHẨM</Text>
+                <View style={{ width: 24 }} />
+            </View>
             <View style={styles.searchContainer}>
                 <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon}/>
                 <TextInput

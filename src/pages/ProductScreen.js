@@ -9,13 +9,12 @@ import Item4 from '../assets/Product-Screen/Item4.webp';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { CartContext } from "../context/CartContext";
+import { WishlistContext } from "../context/WishlistContext";
 
-const storageOptions = ["256GB", "512GB", "1T"];
+const storageOptions = ["256GB", "512GB", "1TB"];
 
 const ProductScreen = ({ route, navigation }) => {
   const { id, title, image, description, price, rating, ratingCount } = route.params;
-  const isBookmarked = false;
-  const handleBookmark = () => console.log('Bookmark');
   const colors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },
@@ -38,7 +37,14 @@ const ProductScreen = ({ route, navigation }) => {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
   const [activeTab, setActiveTab] = useState('specs');
+
+  const { wishlistItems, wishlist } = useContext(WishlistContext);
+  const [isWishlisted, setIsWishlisted] = useState(wishlistItems.some(element => element.id == id));
   const { addToCart } = useContext(CartContext); // Sử dụng hook từ CartContext
+  const handleWishlist = () => wishlist(
+    { id, title, image, price, rating }
+  );
+
 
   const renderSpecs = () => (
     <View style={styles.specsContainer}>
@@ -125,6 +131,7 @@ const ProductScreen = ({ route, navigation }) => {
   );
 
   const goBack = () => navigation.goBack();
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
         <View style={[styles.imageContainer, { paddingTop: Platform.select({ ios: 60, android: 40, default: 40 }) }]}>
@@ -139,9 +146,9 @@ const ProductScreen = ({ route, navigation }) => {
           />
           <Image source={{ uri: image }} style={[styles.productImage]} />
           <View style={{flexDirection: "row", alignItems: "center", gap: 20, zIndex: 2, bottom: 20, left: 30 }}>
-            <Icon name={isBookmarked ? "bookmark" : "bookmark-outline"} size={30} color="#0073FF"
+            <Icon name={isWishlisted ? "bookmark" : "bookmark-outline"} size={30} color="#0073FF"
               style={{ marginRight: 5, position: "relative", borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF" }}
-              onPress={handleBookmark}
+              onPress={handleWishlist}
             />
             <Icon name="bag-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
               onPress={() => Alert.alert("Đã thêm sản phẩm vào giỏ hàng!")}
@@ -183,7 +190,7 @@ const ProductScreen = ({ route, navigation }) => {
             </View>
         </View>
 
-        <TouchableOpacity style={[styles.buyButton, { backgroundColor: "#0073FF", }]}>
+        <TouchableOpacity onPress={handleAddToCart} style={[styles.buyButton, { backgroundColor: "#0073FF", }]}>
             <Text style={styles.buyButtonText}>Mua Ngay</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleAddToCart}>
@@ -214,7 +221,7 @@ const ProductScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    backIconWrapper: {
+  backIconWrapper: {
     width: 36,
     height: 36,
     borderRadius: 18,

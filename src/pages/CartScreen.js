@@ -1,17 +1,20 @@
 import { useContext } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import CartItem from "../components/CartItem";
 import { CartContext } from "../context/CartContext";
-import { CartIcon } from "../assets/icons/cart-icon";
 import { AuthContext } from "../context/AuthContext";
 
-const CartScreen = ({navigation}) => {
+const CartScreen = () => {
     const { cart } = useContext(CartContext);
     const { loggedIn } = useContext(AuthContext);
+    const navigation = useNavigation();
     const navigateToProducts = () => navigation.navigate('Categories');
+    const navigateToCheckout = () => navigation.navigate('Checkout');
+
     if ( cart.length === 0 || !loggedIn ) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <CartIcon width={150} height={150}></CartIcon>
+            <Image style={{width: 150, height: 150}} source={require('../assets/icons/empty_cart.webp')}></Image>
             <Text style={cartStyle.emptyCartText1}>Giỏ hàng của bạn đang trống.</Text>
             <Text style={cartStyle.emptyCartText2}>Hãy duyệt thêm các sản phẩm hoặc mua{"\n"}các sản phẩm bạn đã lưu trước đó.</Text>
             <TouchableOpacity onPress={navigateToProducts} style={cartStyle.exploreButton}><Text style={{color: 'black', fontSize: 16, fontFamily: 'Inter'}}>Khám phá ngay</Text></TouchableOpacity>
@@ -25,7 +28,7 @@ const CartScreen = ({navigation}) => {
                     <View style={{flex: 6, justifyContent: 'center'}}> 
                         <Text style={{fontWeight: 600, fontSize: 20}}>Tất cả sản phẩm</Text>
                     </View>
-                    <TouchableOpacity style={{ justifyContent: 'center', flex: 5, backgroundColor: '#007bff', paddingVertical: 10, borderRadius: 10, width: '90%' }}>
+                    <TouchableOpacity onPress={navigateToCheckout} style={{ justifyContent: 'center', flex: 5, backgroundColor: '#007bff', paddingVertical: 10, borderRadius: 10, width: '90%' }}>
                         <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>Thanh toán</Text>
                     </TouchableOpacity>
                 </View>

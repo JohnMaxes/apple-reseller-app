@@ -8,10 +8,9 @@ import Categories from './Categories';
 import Cart from './Cart';
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
-import ForgotPasswordScreen from '../pages/ForgotPasswordScreen';
 import LoadingScreen from '../pages/LoadingScreen';
 import Profile from './Profile';
-import Checkout from '../pages/Quynh/Checkout';
+import CheckoutScreen from '../pages/CheckoutScreen';
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
@@ -104,36 +103,8 @@ const BottomTabNavigation = () => {
     )
 }
 
-// const Test = () => {
-//     return(<View><ProductCatalogPreview image='https://i.imgur.com/g3nyNsZ.png' 
-//         title='Iphone 16 Pro Max Titan Sa Mạc 1TB' price='45.590.000'></ProductCatalogPreview></View>)
-// }
-// const Test = () => {
-//     return(<ForgetPassword1></ForgetPassword1>)
-// }
-// const Test = () => {
-//     return(<ForgetPassword2></ForgetPassword2>)
-// }
-// const Test = () => {
-//     return(<ForgetPassword3></ForgetPassword3>)
-// }
-// const Test = () => {
-//   return(<AllProductScreen></AllProductScreen>)
-// }
-// const Test = () => {
-//   return(<ForgotPasswordScreen></ForgotPasswordScreen>)
-// }
-// const Test = () => {
-//   return(<ClickFilter></ClickFilter>)
-// }
-// const Test = () => {
-//   return(<Search1></Search1>)
-// }
-// const Test = () => {
-//   return(<Search2></Search2>)
-// }
 const Test = () => {
-  return(<Checkout></Checkout>)
+  return(<CheckoutScreen></CheckoutScreen>)
 }
 
 export default BottomTabNavigation;

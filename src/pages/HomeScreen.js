@@ -38,7 +38,7 @@ const HomeScreen = ({navigation}) => {
 
     return (
     <>
-        <ScrollView style={{ margin: 0, padding: 0 }} contentContainerStyle={{ flexGrow: 1, margin: 0, paddingBottom: 75, paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }), backgroundColor: '#F5F5F7' }}>
+        <ScrollView style={{ margin: 0, padding: 0 }} contentContainerStyle={{ flexGrow: 1, margin: 0, paddingBottom: 90, paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }), backgroundColor: '#F5F5F7' }}>
             <View style={{paddingHorizontal: 20 }}>
                 <Image source={require('../assets/icons/reseller-upsized.webp')} style={{width: 200, resizeMode: 'contain'}}/>
             </View>

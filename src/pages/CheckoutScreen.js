@@ -1,22 +1,15 @@
-import React, { useState } from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    ScrollView,
-    TouchableOpacity,
-    TextInput,
-    Image,
-    KeyboardAvoidingView,
-    Platform
-} from "react-native";
+import { useContext, useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, KeyboardAvoidingView, Platform } from "react-native";
 import { Checkbox } from "react-native-paper";
 import Icon from "react-native-vector-icons/Ionicons";
+import { CheckoutContext } from "../context/CheckoutContext";
 
-const CheckoutScreen = () => {
+const CheckoutScreen = ({navigation}) => {
     const [paymentMethod, setPaymentMethod] = useState("");
     const [voucher, setVoucher] = useState("");
+    const {checkoutItems} = useContext(CheckoutContext);;
 
+    /*
     const products = [
         {
             id: 1,
@@ -33,11 +26,12 @@ const CheckoutScreen = () => {
             image: "https://mixicomputer.vn/media/product/4572-iphone-16-256gb-xanh-mong-ket.png"
         }
     ];
+    */
 
     const togglePaymentMethod = (method) => {
         setPaymentMethod(method === paymentMethod ? "" : method);
     };
-
+    const goBack = () => navigation.goBack();
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -46,16 +40,25 @@ const CheckoutScreen = () => {
             <ScrollView
                 contentContainerStyle={styles.scrollViewContainer}
                 keyboardShouldPersistTaps="handled"
+
             >
-                <Text style={styles.title}>THANH TOÁN</Text>
+                <View style={styles.header}>
+                    <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+                        <View style={styles.backIconWrapper}>
+                        <Icon name="chevron-back" size={22} color="#000" />
+                        </View>
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>THANH TOÁN</Text>
+                    <View style={{ width: 24 }} />
+                </View>
 
                 {/* Sản phẩm */}
                 <View style={styles.box}>
-                    {products.map((p) => (
+                    {checkoutItems.map((p) => (
                         <View key={p.id} style={styles.productItem}>
                             <Image source={{ uri: p.image }} style={styles.productImage} />
                             <View style={styles.productDetails}>
-                                <Text style={styles.productName}>{p.name}</Text>
+                                <Text style={styles.productName}>{p.title}</Text>
                                 <Text style={styles.productPrice}>{p.price.toLocaleString()}đ</Text>
                                 <Text style={styles.productQuantity}>x{p.quantity}</Text>
                             </View>
@@ -73,7 +76,7 @@ const CheckoutScreen = () => {
                     </View>
                     <TouchableOpacity 
                     style={styles.addressRightColumn} 
-                    onPress={() => navigation.navigate("AddressScreen")} // ← Thay bằng tên màn hình thực tế
+                    onPress={() => navigation.navigate("CheckoutAddressScreen")} // ← Thay bằng tên màn hình thực tế
                     >
                     <View style={{ flex: 1 }}>
                         <Text style={styles.bold}>Hau Bro</Text>
@@ -175,20 +178,41 @@ const CheckoutScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    backIconWrapper: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 3,
+    },
     container: {
         flex: 1,
-        backgroundColor: "#f9f9f9"
+        backgroundColor: "#f9f9f9",
+        paddingTop: Platform.select({ ios: 70, android: 50, default: 40 })
     },
     scrollViewContainer: {
         paddingHorizontal: 15,
         paddingBottom: 120
     },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
-        textAlign: "center",
-        marginVertical: 20,
-        paddingTop: 25
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    headerTitle: {
+        fontSize: 25, 
+        fontFamily: 'Inter', 
+        fontWeight: "bold", 
+        textAlign: "center"
     },
     box: {
         backgroundColor: "#fff",

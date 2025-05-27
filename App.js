@@ -7,6 +7,9 @@ import 'react-native-gesture-handler';
 import { createStackNavigator } from '@react-navigation/stack';
 import {configureReanimatedLogger,ReanimatedLogLevel} from 'react-native-reanimated';
 import Authentication from './src/navigation/Authentication';
+import Checkout from './src/navigation/Checkout';
+import { WishlistProvider } from './src/context/WishlistContext';
+import { CheckoutProvider } from './src/context/CheckoutContext';
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
@@ -15,11 +18,15 @@ configureReanimatedLogger({
 const App = () => {
     return (
         <NavigationContainer>
-            <AuthProvider>
-                <CartProvider>
-                    <MainContent/>
-                </CartProvider>
-            </AuthProvider>
+            <CheckoutProvider>
+                <AuthProvider>
+                    <CartProvider>
+                        <WishlistProvider>
+                            <MainContent/>
+                        </WishlistProvider>
+                    </CartProvider>
+                </AuthProvider>
+            </CheckoutProvider>
         </NavigationContainer>
     );
 };
@@ -30,6 +37,7 @@ const MainContent = () => {
         <MainStack.Navigator initialRouteName='BottomTab' screenOptions={{ headerShown: false }}>
             <MainStack.Screen name='BottomTab' component={BottomTabNavigation}/>
             <MainStack.Screen name='Authentication' component={Authentication} options={{ presentation: 'modal' }}/>
+            <MainStack.Screen name='Checkout' component={Checkout} options={{ presentation: 'modal' }}/>
         </MainStack.Navigator>
     );
 };

@@ -7,58 +7,20 @@ const width = Dimensions.get('window').width * 0.45;
 
 const ProductCatalogPreview = ({ title, image, description, price, rating, ratingCount, navigation, id }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const handleWishlist = () => setIsBookmarked(!isBookmarked);
 
-  /*
-  const { cart, setCart, setCartTotal } = useContext(CartContext);
-  const addToCart = () => {
-    if (cart.some(element => element.id === id)) {
-      alert('Item is already in cart');
-      return;
-    }
-    let newItem = { id, title, price, image, quantity: 1 };
-    console.log(newItem);
-    setCart(prevCart => [...prevCart, newItem]);
-    setCartTotal(prevTotal => prevTotal + price);
-    alert('Item added to cart successfully!');
-  };
-  */
-
-  const handleBookmarkEvent = () => setIsBookmarked(!isBookmarked);
-
-  const navigateToItem = () => {
-    navigation.navigate('ProductScreen', { title, image, description, price, rating, ratingCount });
-  };
-
-  const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  };
+  const navigateToItem = () => navigation.navigate('ProductScreen', { title, image, description, price, rating, ratingCount });
+  const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }
 
   return (
-    <TouchableOpacity onPress={navigateToItem}
-      style={{
-        width: width,
-        height: 240,
-        justifyContent: 'center',   
-        alignItems: 'center',       
-        alignSelf: 'center',  
-        transform: [{ scale: 0.95 }], marginLeft: 5, marginRight: 5, marginBottom: 5
-      }}
-    >
+    <TouchableOpacity activeOpacity={1} onPress={navigateToItem}style={styles.container}>
       <View style={styles.card}>
-        <TouchableOpacity style={styles.bookmarkIcon} onPress={handleBookmarkEvent}>
-          <Icon
-            size={24}
-            name={isBookmarked ? "bookmark" : "bookmark-outline"}
-            color={isBookmarked ? "#007bff" : "#000"}
-          />
+        <TouchableOpacity style={styles.bookmarkIcon} onPress={handleWishlist}>
+          <Icon size={24} name={isBookmarked ? "bookmark" : "bookmark-outline"} color={isBookmarked ? "#007bff" : "#000"}/>
         </TouchableOpacity>
-        
-        <Image
-          source={{ uri: image }}
-          style={styles.image}
-        />
+        <Image source={{ uri: image }} style={styles.image}/>
         <View style={styles.titleContainer}>
-          <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
             {title}
           </Text>
         </View>
@@ -69,12 +31,23 @@ const ProductCatalogPreview = ({ title, image, description, price, rating, ratin
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: width, 
+    height: 215, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    alignSelf: 'center',  
+    transform: [{ scale: 0.95 }], 
+    marginLeft: 5, 
+    marginRight: 5, 
+    marginBottom: 5
+  },
   card: {
     width: '100%',
     height: '100%', // Đảm bảo card chiếm toàn bộ chiều cao của TouchableOpacity
     backgroundColor: '#F6F6F6',
     borderRadius: 20,
-    padding: 15,
+    padding: 10,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -93,22 +66,22 @@ const styles = StyleSheet.create({
     width: 110, 
     height: 130,
     resizeMode: 'contain',
-    marginTop: 10,
+    marginTop: 5,
   },
   titleContainer: {
     height: 50, // Giảm chiều cao để chỉ chứa tối đa 2 dòng
     justifyContent: 'center',
-    marginBottom: 5,
   },
   title: {
     fontSize: 14, 
-    fontWeight: 'bold',
+    fontWeight: 600,
     textAlign: 'center',
   },
   price: {
+    marginTop: -10,
     fontSize: 14,
     color: '#007bff', 
-    fontWeight: 'bold',
+    fontWeight: 400,
   },
 });
 
