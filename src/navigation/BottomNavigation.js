@@ -11,7 +11,7 @@ import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-rean
 import ForgotPasswordScreen from '../pages/ForgotPasswordScreen';
 import LoadingScreen from '../pages/LoadingScreen';
 import Profile from './Profile';
-
+import Checkout from '../pages/Quynh/Checkout';
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
@@ -120,9 +120,9 @@ const BottomTabNavigation = () => {
 // const Test = () => {
 //   return(<AllProductScreen></AllProductScreen>)
 // }
-const Test = () => {
-  return(<ForgotPasswordScreen></ForgotPasswordScreen>)
-}
+// const Test = () => {
+//   return(<ForgotPasswordScreen></ForgotPasswordScreen>)
+// }
 // const Test = () => {
 //   return(<ClickFilter></ClickFilter>)
 // }
@@ -132,4 +132,8 @@ const Test = () => {
 // const Test = () => {
 //   return(<Search2></Search2>)
 // }
+const Test = () => {
+  return(<Checkout></Checkout>)
+}
+
 export default BottomTabNavigation;
