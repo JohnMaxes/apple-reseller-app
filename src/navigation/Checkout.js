@@ -11,7 +11,7 @@ const Checkout = () => {
             <CheckoutStack.Screen name='CheckoutScreen' component={CheckoutScreen}/>
             <CheckoutStack.Screen name='CheckoutAddressScreen' component={CheckoutAddressScreen}/>
             <CheckoutStack.Screen name='CheckoutAddressAddScreen' component={CheckoutAddressAddScreen}/>
-            <CheckoutStack.Screen name='CheckoutAddressEditcreen' component={CheckoutAddressEditScreen}/>
+            <CheckoutStack.Screen name='CheckoutAddressEditScreen' component={CheckoutAddressEditScreen}/>
         </CheckoutStack.Navigator>
     )
 }

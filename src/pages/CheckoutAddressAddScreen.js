@@ -1,18 +1,26 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { View, Text, TextInput, Switch, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { CheckoutContext } from '../context/CheckoutContext';
 
-const CheckoutAddressAddScreen = () => {
+const CheckoutAddressAddScreen = ({navigation}) => {
+  const { setAddresses } = useContext(CheckoutContext)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
+  const [newAddress, setNewAddress] = useState('');
   const [note, setNote] = useState('');
   const [isDefault, setIsDefault] = useState(false);
 
   const handleSave = () => {
-    console.log({ name, phone, address, note, isDefault });
+    const newAddress = { name: name, phone: phone, address: newAddress, isDefault: isDefault };
+    setAddresses((prev) => {
+      let noDefaults = prev.map(item => ({...item, isDefault: false}));
+      return [...noDefaults, newAddress]
+    })
+    goBack();
   };
-  const goBack = () => console.log('lmao');
+
+  const goBack = () => navigation.goBack();
 
   return (
     <View style={[styles.container, { paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }) } ]}>
@@ -29,14 +37,14 @@ const CheckoutAddressAddScreen = () => {
 
       {/* Form */}
       <View style={styles.formGroup}>
-        <Text style={styles.label}>Họ và tên</Text>
+        <Text style={styles.label}>Họ và tên người nhận</Text>
         <TextInput style={styles.input} placeholder="HauBro" value={name} onChangeText={setName}/>
 
         <Text style={styles.label}>Số điện thoại</Text>
         <TextInput style={styles.input} placeholder="0123456789" keyboardType="phone-pad" value={phone} onChangeText={setPhone}/>
 
         <Text style={styles.label}>Địa chỉ</Text>
-        <TextInput style={styles.input} placeholder="Thủ Đức, HCM" value={address} onChangeText={setAddress} />
+        <TextInput style={styles.input} placeholder="Thủ Đức, HCM" value={newAddress} onChangeText={setNewAddress} />
 
         <Text style={styles.label}>Ghi chú cho shipper</Text>
         <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={note} onChangeText={setNote}/>

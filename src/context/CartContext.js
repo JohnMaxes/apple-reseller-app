@@ -12,6 +12,9 @@ const CartProvider = ({ children }) => {
             try {
                 let cart_ = await AsyncStorage.getItem('cart');
                 if(cart_) setCart(JSON.parse(cart_));
+                else {
+                    // init fetch
+                }
             }
             catch(err) { console.log(err) }
         };
@@ -19,7 +22,10 @@ const CartProvider = ({ children }) => {
     }, [])
 
     useEffect(() => {
-        async function saveCart() { AsyncStorage.setItem('cart', JSON.stringify(cart)) }; 
+        async function saveCart() { 
+            AsyncStorage.setItem('cart', JSON.stringify(cart)) 
+            // reassignCart API here, doesn't need await
+        }; 
         saveCart() 
     }, [cart])
 
@@ -38,6 +44,10 @@ const CartProvider = ({ children }) => {
         if (operation == 'color') setCart((prev) => prev.map(item => item.id === id ? {...item, color: newColor } : item ));
         if (operation == 'x' || (operation == '-' && itemQuantity == 1)) setCart((prevCart) => ( prevCart.filter(item => item.id !== id)) );
         else setCart((prev) => prev.map(item => item.id === id ? { ...item, quantity: operation == '+' ? item.quantity + 1 : item.quantity - -1 } : item ));
+    }
+
+    const clearCart = () => {
+        
     }
 
     return (

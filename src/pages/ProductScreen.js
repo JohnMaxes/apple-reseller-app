@@ -14,7 +14,7 @@ import { WishlistContext } from "../context/WishlistContext";
 const storageOptions = ["256GB", "512GB", "1TB"];
 
 const ProductScreen = ({ route, navigation }) => {
-  const { id, title, image, description, price, rating, ratingCount } = route.params;
+  const { id, title, image, price, rating, ratingCount } = route.params;
   const colors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },

@@ -9,7 +9,7 @@ const ProductCatalogPreview = ({ title, image, description, price, rating, ratin
   const [isBookmarked, setIsBookmarked] = useState(false);
   const handleWishlist = () => setIsBookmarked(!isBookmarked);
 
-  const navigateToItem = () => navigation.navigate('ProductScreen', { title, image, description, price, rating, ratingCount });
+  const navigateToItem = () => navigation.navigate('ProductScreen', { title, image, price, rating, ratingCount });
   const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }
 
   return (

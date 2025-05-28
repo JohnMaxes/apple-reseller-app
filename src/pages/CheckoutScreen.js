@@ -1,47 +1,29 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, KeyboardAvoidingView, Platform } from "react-native";
-import { Checkbox } from "react-native-paper";
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
 
 const CheckoutScreen = ({navigation}) => {
-    const [paymentMethod, setPaymentMethod] = useState("");
-    const [voucher, setVoucher] = useState("");
-    const {checkoutItems} = useContext(CheckoutContext);;
-
-    /*
-    const products = [
-        {
-            id: 1,
-            name: "iPhone 16 Xanh Mòng Két 256GB",
-            price: 23999000,
-            quantity: 1,
-            image: "https://mixicomputer.vn/media/product/4572-iphone-16-256gb-xanh-mong-ket.png"
-        },
-        {
-            id: 2,
-            name: "iPhone 16 Xanh Mòng Két 256GB",
-            price: 23999000,
-            quantity: 1,
-            image: "https://mixicomputer.vn/media/product/4572-iphone-16-256gb-xanh-mong-ket.png"
-        }
-    ];
-    */
+    const { checkoutItems, selectedAddress, total, selectedMethod, setSelectedMethod } = useContext(CheckoutContext);
+    const [paymentMethod, setPaymentMethod] = useState(selectedMethod);
+    const [voucher, setVoucher] = useState([]);
 
     const togglePaymentMethod = (method) => {
-        setPaymentMethod(method === paymentMethod ? "" : method);
+        setPaymentMethod(method);
+        setSelectedMethod(method);
     };
+
+    const paymentMethods = [
+        { label: 'Thanh toán qua Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
+        { label: 'Thanh toán qua ngân hàng', icon: require('../assets/icons/banking-icon.png'), value: 'eBanking' },
+        { label: 'Thanh toán qua Apple Pay', icon: require('../assets/icons/applepay-icon.png'), value: 'ApplePay'},
+        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash'},
+    ];
+
     const goBack = () => navigation.goBack();
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.container}
-        >
-            <ScrollView
-                contentContainerStyle={styles.scrollViewContainer}
-                keyboardShouldPersistTaps="handled"
-
-            >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollViewContainer} keyboardShouldPersistTaps="handled">
                 <View style={styles.header}>
                     <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
                         <View style={styles.backIconWrapper}>
@@ -71,21 +53,18 @@ const CheckoutScreen = ({navigation}) => {
                 {/* Địa chỉ giao hàng */}
                 <View style={styles.box}>
                    <View style={styles.rowBetween}>
-                    <View style={styles.leftColumn}>
-                    <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
+                        <View style={styles.leftColumn}>
+                            <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
+                        </View>
+                        <TouchableOpacity style={styles.addressRightColumn} onPress={() => navigation.navigate("CheckoutAddressScreen")}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.bold}>{selectedAddress.name}</Text>
+                            <Text>{selectedAddress.phone}</Text>
+                            <Text>{selectedAddress.address}</Text>
+                        </View>
+                        <Icon name="chevron-forward" size={18} color="#000" />
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity 
-                    style={styles.addressRightColumn} 
-                    onPress={() => navigation.navigate("CheckoutAddressScreen")} // ← Thay bằng tên màn hình thực tế
-                    >
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.bold}>Hau Bro</Text>
-                        <Text>0123456789</Text>
-                        <Text>120, đường San Fran Xích Long</Text>
-                    </View>
-                    <Icon name="chevron-forward" size={18} color="#000" />
-                    </TouchableOpacity>
-                </View>
 
                     <View style={styles.divider} />
 
@@ -95,22 +74,20 @@ const CheckoutScreen = ({navigation}) => {
                             <Text style={styles.grayLabel}>Hình thức{"\n"}thanh toán</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                            {[
-                                "Thanh toán qua Momo",
-                                "Thanh toán Ngân hàng",
-                                "Thanh toán Apple Pay",
-                                "Thanh toán khi nhận hàng"
-                            ].map((method) => (
-                                <View key={method} style={styles.paymentOption}>
-                                    <Checkbox
-                                        status={paymentMethod === method ? "checked" : "unchecked"}
-                                        onPress={() => togglePaymentMethod(method)}
-                                        color="#007bff"
-                                        uncheckedColor="#ccc"
-                                    />
-                                    <Text style={styles.paymentText}>{method}</Text>
-                                </View>
-                            ))}
+                        { paymentMethods.map((method) => (
+                            <TouchableOpacity key={method.value} style={[ styles.paymentBox, paymentMethod === method.value && styles.paymentBoxSelected ]}
+                                onPress={() => togglePaymentMethod(method.value)} activeOpacity={0.8}
+                            >
+                                <Image
+                                    source={method.icon}
+                                    style={{ width: 28, height: 28, marginRight: 12, tintColor: paymentMethod === method.value ? "#fff" : "#007bff" }}
+                                    resizeMode="contain"
+                                />
+                                <Text style={[ styles.paymentText, paymentMethod === method.value && { color: "#fff", fontWeight: "bold" } ]}>
+                                    {method.label}
+                                </Text>
+                            </TouchableOpacity>
+                        )) }                        
                         </View>
                     </View>
 
@@ -148,12 +125,13 @@ const CheckoutScreen = ({navigation}) => {
                     <Text style={styles.summaryTitle}>Chi tiết thanh toán</Text>
                     <View style={styles.summaryLine}>
                         <Text>Tổng tiền sản phẩm:</Text>
-                        <Text>65.890.000đ</Text>
+                        <Text>{total}</Text>
                     </View>
                     <View style={styles.summaryLine}>
                         <Text>Tổng phí vận chuyển:</Text>
                         <Text>50.000đ</Text>
                     </View>
+                    {/*}
                     <View style={styles.summaryLine}>
                         <Text>Giảm từ mã giảm giá:</Text>
                         <Text style={styles.discountBlue}>-100.000đ</Text>
@@ -162,9 +140,10 @@ const CheckoutScreen = ({navigation}) => {
                         <Text>Giảm phí vận chuyển:</Text>
                         <Text style={styles.discountBlue}>-50.000đ</Text>
                     </View>
+                    {*/}
                     <View style={styles.summaryLine}>
                         <Text style={styles.bold}>Tổng thanh toán:</Text>
-                        <Text style={[styles.bold]}>65.740.000đ</Text>
+                        <Text style={[styles.bold]}>{total + 50000}đ</Text>
                     </View>
                 </View>
 
@@ -328,7 +307,21 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
         fontWeight: "bold"
-    }
+    },
+    paymentBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 12,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#007bff",
+        marginBottom: 8,
+        backgroundColor: "#fff"
+    },
+    paymentBoxSelected: {
+        backgroundColor: "#007bff",
+        borderColor: "#007bff",
+    },
 });
 
 export default CheckoutScreen;

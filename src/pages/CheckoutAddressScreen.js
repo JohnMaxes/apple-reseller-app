@@ -1,51 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Checkbox from '../components/Checkbox';
-
-const initialAddresses = [
-  {
-    id: '1',
-    name: 'Nguyễn Văn A',
-    phone: '0909123456',
-    address: '123 Đường ABC, Quận 1, TP.HCM',
-    isDefault: true,
-  },
-  {
-    id: '2',
-    name: 'Trần Thị B',
-    phone: '0987654321',
-    address: '456 Đường XYZ, Quận 3, TP.HCM',
-    isDefault: false,
-  },
-];
+import { CheckoutContext } from '../context/CheckoutContext';
 
 const CheckoutAddressScreen = ({navigation}) => {
-  const [addresses, setAddresses] = useState(initialAddresses);
+  const { addresses, setAddresses } = useContext(CheckoutContext);
 
-  const handleSelect = (id) => {
-    const updated = addresses.map((item) => ({
-      ...item, isDefault: item.id === id,
-    }));
+  const handleSelect = (id) => { 
+    const updated = addresses.map((item) => ({...item, isDefault: item.id === id, }));
     setAddresses(updated);
   };
 
-  const handleAddAddress = () => {
-    const newAddress = {
-      id: (addresses.length + 1).toString(),
-      name: 'Tên mới',
-      phone: '0123456789',
-      address: 'Địa chỉ mới',
-      isDefault: false,
-    };
-    setAddresses([...addresses, newAddress]);
-  };
+  const handleEdit = (item) => navigation.navigate('CheckoutAddressEditScreen', { 
+    id: item, name: item.name, phone: item.phone, address: item.address, isDefault: item.isDefault,
+  })
 
   const goBack = () => navigation.goBack();
+  const handleAddAddress = () => navigation.navigate('CheckoutAddressAddScreen');
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <TouchableOpacity style={styles.row}>
+      <TouchableOpacity style={styles.row} onPress={() => handleEdit(item)}>
         <View style={{ marginRight: 10, justifyContent: 'center' }}>
           <Checkbox value={item.isDefault} onValueChange={() => handleSelect(item.id)}/>
         </View>

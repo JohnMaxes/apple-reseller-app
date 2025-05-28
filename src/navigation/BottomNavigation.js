@@ -10,7 +10,6 @@ import Cart from './Cart';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import LoadingScreen from '../pages/LoadingScreen';
 import Profile from './Profile';
-import CheckoutScreen from '../pages/CheckoutScreen';
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
@@ -59,6 +58,7 @@ const BottomTabNavigation = () => {
                 tabBarShowLabel: false,
                 headerShown: false,
                 animation: 'shift',
+                tabBarHideOnKeyboard: true,
             }}
         >
             <BottomTab.Screen 
@@ -91,20 +91,8 @@ const BottomTabNavigation = () => {
                     headerShown: false,
                 }} 
             />
-            <BottomTab.Screen 
-                name='Test' 
-                component={Test} 
-                options={{
-                    tabBarIcon: ({ focused }) => <CustomTabIcon name="cart-outline" focused={focused} />,
-                    headerShown: false,
-                }} 
-            />
         </BottomTab.Navigator>
     )
-}
-
-const Test = () => {
-  return(<CheckoutScreen></CheckoutScreen>)
 }
 
 export default BottomTabNavigation;

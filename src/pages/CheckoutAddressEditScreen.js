@@ -2,21 +2,25 @@ import { useState } from 'react';
 import { View, Text, TextInput, Switch, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const CheckoutAddressEditScreen = () => {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [note, setNote] = useState('');
-  const [isDefault, setIsDefault] = useState(false);
+const CheckoutAddressEditScreen = ({ navigation, route }) => {
+  const { id, name, phone, address, isDefault } = route.params;
+  const [newName, setNewName] = useState(name);
+  const [newPhone, setNewPhone] = useState(phone);
+  const [newAddress, setNewAddress] = useState(address);
+  const [newIsDefault, setNewIsDefault] = useState(isDefault);
 
   const handleSave = () => {
-    console.log({ name, phone, address, note, isDefault });
+    const newAddress = { name: name, phone: phone, address: newAddress, isDefault: isDefault };
+    setAddresses((prev) => {
+      let noDefaults = prev.map(item => ({...item, isDefault: false}));
+      return [...noDefaults, newAddress]
+    })
+    goBack();
   };
-  const goBack = () => console.log('lmao');
+  const goBack = () => navigation.goBack();
 
   return (
-    <View style={[styles.container, { paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }) } ]}>
-      {/* Header */}
+    <View style={[styles.container, { paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }) }, ]}>
       <View style={styles.header}>
         <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
           <View style={styles.backIconWrapper}>
@@ -24,31 +28,30 @@ const CheckoutAddressEditScreen = () => {
           </View>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>ĐỊA CHỈ</Text>
-        <View style={{ width: 24 }} /> {/* Để giữ khoảng cách như icon bên trái */}
+        <View style={{ width: 24 }} />
       </View>
 
-      {/* Form */}
       <View style={styles.formGroup}>
-        <Text style={styles.label}>Họ và tên</Text>
-        <TextInput style={styles.input} placeholder="HauBro" value={name} onChangeText={setName}/>
+        <Text style={styles.label}>Họ và tên người nhận</Text>
+        <TextInput style={styles.input} placeholder="HauBro" value={newName} onChangeText={setNewName}/>
 
         <Text style={styles.label}>Số điện thoại</Text>
-        <TextInput style={styles.input} placeholder="0123456789" keyboardType="phone-pad" value={phone} onChangeText={setPhone}/>
+        <TextInput style={styles.input} placeholder="0123456789" keyboardType="phone-pad" value={newPhone} onChangeText={setNewPhone}/>
 
         <Text style={styles.label}>Địa chỉ</Text>
-        <TextInput style={styles.input} placeholder="Thủ Đức, HCM" value={address} onChangeText={setAddress} />
+        <TextInput style={styles.input} placeholder="Thủ Đức, HCM" value={newAddress} onChangeText={setNewAddress} />
 
-        <Text style={styles.label}>Ghi chú cho shipper</Text>
-        <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={note} onChangeText={setNote}/>
+        {/*
+          <Text style={styles.label}>Ghi chú cho shipper</Text>
+          <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={note} onChangeText={setNote}/>
+        */}
       </View>
 
-      {/* Switch */}
       <View style={styles.switchContainer}>
         <Text style={styles.switchLabel}>Đặt làm mặc định</Text>
-        <Switch value={isDefault} onValueChange={setIsDefault} trackColor={{ false: '#ccc', true: '#3b82f6' }} thumbColor="#fff"/>
+        <Switch value={newIsDefault} onValueChange={setNewIsDefault} trackColor={{ false: '#ccc', true: '#3b82f6' }} thumbColor="#fff"/>
       </View>
 
-      {/* Save button */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Lưu</Text>
       </TouchableOpacity>
@@ -80,7 +83,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 6,
     color: '#333',
   },
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#eee',
@@ -101,7 +104,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   switchLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#333',
   },
   saveButton: {

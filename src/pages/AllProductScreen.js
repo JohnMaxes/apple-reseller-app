@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Dimensions } from "react-native";
 import ProductCatalogPreview from "../components/ProductCatalogPreview";
 import axios from "axios";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -10,23 +10,22 @@ const AllProductScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedFilters, setSelectedFilters] = useState([]);
 
-    const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt"];
+    const filterOptions = ["Giá", "Bộ nhớ", "Năm ra mắt", "Tiêu chí"];
 
     useEffect(() => {
-    const fetchProducts = async () => {
-        try {
-            const response = await axios.get("https://fakestoreapi.com/products");
-            setProducts(response.data);
-        }
-        catch (error) { console.error(error); } 
-        finally { setLoading(false); }
-    };
-
-    fetchProducts();
+        const fetchProducts = async () => {
+            try {
+                const response = await axios.get("https://fakestoreapi.com/products");
+                setProducts(response.data);
+            }
+            catch (error) { console.error(error); } 
+            finally { setLoading(false); }
+        };
+        fetchProducts();
     }, []);
 
     const toggleFilter = (filter) => {
-        if (filter === "Filter") console.log("Mở trang bộ lọc"); 
+        if (filter === "Filter") navigation.navigate('ProductFilterScreen'); 
         else setSelectedFilters((prev) => prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]);
     };
     const goBack = () => navigation.goBack();
@@ -37,7 +36,7 @@ const AllProductScreen = ({ navigation }) => {
         const showIcon = selectedFilters.length === 0;
 
         return (
-            <TouchableOpacity key={filter} style={[ styles.filterButton, isSelected && !isFilterButton && styles.selectedFilterButton,]}
+            <TouchableOpacity key={filter} style={[ styles.filterButton, isSelected && !isFilterButton && styles.selectedFilterButton]}
             onPress={() => toggleFilter(filter)}>
                 {isFilterButton && showIcon && (
                     <Icon name="options-outline" size={18} color="#000" style={styles.filterIcon}/>
@@ -64,14 +63,19 @@ const AllProductScreen = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
-                    <View style={styles.backIconWrapper}>
-                    <Icon name="chevron-back" size={22} color="#000" />
-                    </View>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>TẤT CẢ SẢN PHẨM</Text>
-                <View style={{ width: 24 }} />
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10, paddingHorizontal: 20 }}>
+                <View style={{ flex: 1 }}>
+                    <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+                        <View style={styles.backIconWrapper}>
+                            <Icon name="chevron-back" size={22} color="#000" />
+                        </View>
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flex: 3 }}>
+                    <Text style={{ fontSize: 25, fontFamily: 'Inter', fontWeight: "bold", textAlign: "center"}}>TẤT CẢ SẢN PHẨM</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                </View>
             </View>
             <View style={styles.searchContainer}>
                 <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon}/>
@@ -82,7 +86,7 @@ const AllProductScreen = ({ navigation }) => {
                     style={styles.searchBar}
                 />
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
+            <ScrollView horizontal contentContainerStyle={{paddingHorizontal: 20}} showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
                 {["Filter", ...filterOptions].map(renderFilterButton)}
             </ScrollView>
             <FlatList
@@ -101,19 +105,33 @@ const AllProductScreen = ({ navigation }) => {
                 )}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
-                contentContainerStyle={styles.scrollViewContainer}
+                contentContainerStyle={{ alignItems: 'center', paddingBottom: 90 }}            
             />
         </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
+    backIconWrapper: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 3,
+    },
     container: {
-        flex: 1,
         backgroundColor: "#f9f9f9",
+        paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }), 
     },
     scrollViewContainer: {
-        paddingHorizontal: 15,
         paddingBottom: 20,
     },
     header: {
@@ -124,15 +142,20 @@ const styles = StyleSheet.create({
         marginTop: 50,
     },
     searchContainer: {
-        width: "95%",
         alignSelf: "center",
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#ffffff",
         borderRadius: 40,
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
+        marginHorizontal: 20,
         marginBottom: 20,
         height: 40,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 6,
     },
     searchIcon: {
         marginRight: 5,
@@ -146,7 +169,7 @@ const styles = StyleSheet.create({
     filterContainer: {
         flexDirection: "row",
         marginBottom: 6,
-        paddingHorizontal: 10,
+        paddingHorizontal: -20,
     },
     filterButton: {
         backgroundColor: "#f0f0f0",
@@ -158,7 +181,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderWidth: 1,
         borderColor: "#ccc",
-        minHeight: 35,
+        height: 35,
         marginBottom: 15,
     },
     selectedFilterButton: {

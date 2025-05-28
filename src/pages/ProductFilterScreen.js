@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Platform } from "react-native";
 import { Checkbox } from "react-native-paper";
+import Icon from "react-native-vector-icons/Ionicons";
 
-const FilterScreen = ({ navigation }) => {
+const ProductFilterScreen = ({ navigation }) => {
     const [selectedFilters, setSelectedFilters] = useState({
         price: [],
         memory: [],
@@ -57,12 +58,20 @@ const FilterScreen = ({ navigation }) => {
 
     return (
         <ScrollView style={styles.container}>
-            <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
-                <View style={styles.backIconWrapper}>
-                    <Icon name="chevron-back" size={22} color="#000" />
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10}}>
+                <View style={{ flex: 1 }}>
+                    <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+                        <View style={styles.backIconWrapper}>
+                            <Icon name="chevron-back" size={22} color="#000" />
+                        </View>
+                    </TouchableOpacity>
                 </View>
-            </TouchableOpacity>
-            <Text style={styles.header}>LỌC</Text>
+                <View style={{ flex: 3 }}>
+                    <Text style={{ fontSize: 25, fontFamily: 'Inter', fontWeight: "bold", textAlign: "center"}}>LỌC</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                </View>
+            </View>
             <TouchableOpacity onPress={resetFilters} style={styles.resetButton}>
                 <Text style={styles.resetText}>Đặt lại</Text>
             </TouchableOpacity>
@@ -75,6 +84,8 @@ const FilterScreen = ({ navigation }) => {
         </ScrollView>
     );
 };
+
+export default ProductFilterScreen;
 
 const styles = StyleSheet.create({
     backIconWrapper: {
@@ -95,8 +106,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f9f9f9',
-        paddingHorizontal: 20,
         paddingTop: 20,
+        paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }),
+        paddingHorizontal: 20
     },
     backButton: {
         marginBottom: 10,
@@ -106,7 +118,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 10,
-        marginTop: 30
     },
     resetButton: {
         alignSelf: 'flex-start',
@@ -118,11 +129,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     section: {
-        marginBottom:0,
-        paddingHorizontal: 15,
+        marginBottom: 0,
     },
     sectionTitle: {
-        fontSize: 15,
+        fontSize: 18,
         fontWeight: 'bold',
     },
     optionContainer: {
@@ -154,5 +164,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     }
 });
-
-export default FilterScreen;
