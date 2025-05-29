@@ -3,6 +3,7 @@ import CheckoutScreen from "../pages/CheckoutScreen";
 import CheckoutAddressAddScreen from "../pages/CheckoutAddressAddScreen";
 import CheckoutAddressScreen from "../pages/CheckoutAddressScreen";
 import CheckoutAddressEditScreen from "../pages/CheckoutAddressEditScreen";
+import CheckoutVoucherScreen from "../pages/CheckoutVoucherScreen";
 
 const CheckoutStack = createStackNavigator();
 const Checkout = () => {
@@ -12,6 +13,7 @@ const Checkout = () => {
             <CheckoutStack.Screen name='CheckoutAddressScreen' component={CheckoutAddressScreen}/>
             <CheckoutStack.Screen name='CheckoutAddressAddScreen' component={CheckoutAddressAddScreen}/>
             <CheckoutStack.Screen name='CheckoutAddressEditScreen' component={CheckoutAddressEditScreen}/>
+            <CheckoutStack.Screen name='CheckoutVoucherScreen' component={CheckoutVoucherScreen}/>
         </CheckoutStack.Navigator>
     )
 }

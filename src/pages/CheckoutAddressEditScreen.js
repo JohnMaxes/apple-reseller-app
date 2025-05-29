@@ -1,22 +1,25 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { View, Text, TextInput, Switch, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { CheckoutContext } from '../context/CheckoutContext';
 
 const CheckoutAddressEditScreen = ({ navigation, route }) => {
-  const { id, name, phone, address, isDefault } = route.params;
+  const { id, name, phone, address, note, isDefault } = route.params;
+  const { setAddresses } = useContext(CheckoutContext);
+
   const [newName, setNewName] = useState(name);
   const [newPhone, setNewPhone] = useState(phone);
   const [newAddress, setNewAddress] = useState(address);
+  const [newNote, setNewNote] = useState(note);
   const [newIsDefault, setNewIsDefault] = useState(isDefault);
 
   const handleSave = () => {
-    const newAddress = { name: name, phone: phone, address: newAddress, isDefault: isDefault };
-    setAddresses((prev) => {
-      let noDefaults = prev.map(item => ({...item, isDefault: false}));
-      return [...noDefaults, newAddress]
-    })
+    const updatedAddress = { id: id, name: newName, phone: newPhone, address: newAddress, isDefault: newIsDefault };
+    setAddresses(prev => prev.map(item => item.id === id ? updatedAddress
+      : (newIsDefault ? { ...item, isDefault: false } : item) )
+    );
     goBack();
-  };
+  };  
   const goBack = () => navigation.goBack();
 
   return (
@@ -41,10 +44,8 @@ const CheckoutAddressEditScreen = ({ navigation, route }) => {
         <Text style={styles.label}>Địa chỉ</Text>
         <TextInput style={styles.input} placeholder="Thủ Đức, HCM" value={newAddress} onChangeText={setNewAddress} />
 
-        {/*
-          <Text style={styles.label}>Ghi chú cho shipper</Text>
-          <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={note} onChangeText={setNote}/>
-        */}
+        <Text style={styles.label}>Ghi chú cho shipper</Text>
+        <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={note} onChangeText={setNote}/>
       </View>
 
       <View style={styles.switchContainer}>

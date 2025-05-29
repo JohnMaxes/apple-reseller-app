@@ -5,42 +5,43 @@ import Checkbox from '../components/Checkbox';
 import { CheckoutContext } from '../context/CheckoutContext';
 
 const CheckoutAddressScreen = ({navigation}) => {
-  const { addresses, setAddresses } = useContext(CheckoutContext);
+  const { addresses } = useContext(CheckoutContext);
+  const { selectedAddress, setSelectedAddress } = useContext(CheckoutContext);
 
-  const handleSelect = (id) => { 
-    const updated = addresses.map((item) => ({...item, isDefault: item.id === id, }));
-    setAddresses(updated);
-  };
-
+  const handleSelect = (id) => setSelectedAddress(addresses.find(item => item.id === id));
   const handleEdit = (item) => navigation.navigate('CheckoutAddressEditScreen', { 
-    id: item, name: item.name, phone: item.phone, address: item.address, isDefault: item.isDefault,
+    id: item.id, name: item.name, phone: item.phone, address: item.address, isDefault: item.isDefault ? true: false,
   })
 
   const goBack = () => navigation.goBack();
   const handleAddAddress = () => navigation.navigate('CheckoutAddressAddScreen');
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <TouchableOpacity style={styles.row} onPress={() => handleEdit(item)}>
+    <TouchableOpacity style={styles.card} onPress={() => handleSelect(item.id)}>
+      <View style={styles.row}>
         <View style={{ marginRight: 10, justifyContent: 'center' }}>
-          <Checkbox value={item.isDefault} onValueChange={() => handleSelect(item.id)}/>
+          <Checkbox value={selectedAddress ? item.id === selectedAddress.id : item.isDefault} onValueChange={() => handleSelect(item.id)}/>
         </View>
         <View style={styles.info}>
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.phone}>{item.phone}</Text>
           <Text style={styles.address}>{item.address}</Text>
         </View>
-        {item.isDefault ? (
-          <View style={styles.defaultLabel}>
-            <Text style={styles.defaultText}>Mặc định</Text>
-          </View>
-        ) : (
-          <TouchableOpacity>
+        <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          {item.isDefault ? (
+            <View style={[styles.defaultLabel, {flex: 1}]}>
+              <Text style={[styles.defaultText, {alignSelf: 'flex-end'}]}>Mặc định</Text>
+            </View>
+          ) : (
+            <View style={[styles.defaultLabelEmpty, {flex: 1}]}/>
+          )}
+          <View style={{flex: 6, marginVertical: 10}}/>
+          <TouchableOpacity style={{flex: 1}} onPress={() => handleEdit(item)}>
             <Text style={styles.editText}>Sửa</Text>
           </TouchableOpacity>
-        )}
-      </TouchableOpacity>
-    </View>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -129,6 +130,10 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 6,
     alignSelf: 'flex-start',
+  },
+  defaultLabelEmpty: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   defaultText: {
     fontSize: 12,

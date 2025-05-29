@@ -4,10 +4,12 @@ import { useNavigation } from "@react-navigation/native";
 import CartItem from "../components/CartItem";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
+import { CheckoutContext } from "../context/CheckoutContext";
 
 const CartScreen = () => {
     const { cart } = useContext(CartContext);
     const { loggedIn } = useContext(AuthContext);
+    const { checkoutItems } = useContext(CheckoutContext)
     const navigation = useNavigation();
     const navigateToProducts = () => navigation.navigate('Categories');
     const navigateToCheckout = () => navigation.navigate('Checkout');
@@ -28,7 +30,7 @@ const CartScreen = () => {
                     <View style={{flex: 6, justifyContent: 'center'}}> 
                         <Text style={{fontWeight: 600, fontSize: 20}}>Tất cả sản phẩm</Text>
                     </View>
-                    <TouchableOpacity onPress={navigateToCheckout} style={{ justifyContent: 'center', flex: 5, backgroundColor: '#007bff', paddingVertical: 10, borderRadius: 10, width: '90%' }}>
+                    <TouchableOpacity onPress={checkoutItems.length > 0 ? navigateToCheckout : () => alert('Hãy chọn ít nhất một sản phẩm.')} style={{ justifyContent: 'center', flex: 5, backgroundColor: '#007bff', paddingVertical: 10, borderRadius: 10, width: '90%' }}>
                         <Text style={{ color: 'white', fontSize: 18, textAlign: 'center' }}>Thanh toán</Text>
                     </TouchableOpacity>
                 </View>
