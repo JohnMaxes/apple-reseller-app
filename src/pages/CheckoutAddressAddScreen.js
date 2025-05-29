@@ -12,10 +12,15 @@ const CheckoutAddressAddScreen = ({navigation}) => {
   const [isDefault, setIsDefault] = useState(false);
 
   const handleSave = () => {
-    const newAddress = { name: name, phone: phone, address: newAddress, isDefault: isDefault };
+    if(!name || !phone || !newAddress) return alert('Xin điền vào tất cả các ô!')
+    const newAddress = { id: name + phone, name: name, phone: phone, address: newAddress, note: note, isDefault: isDefault };
     setAddresses((prev) => {
-      let noDefaults = prev.map(item => ({...item, isDefault: false}));
-      return [...noDefaults, newAddress]
+      if(!prev) return [newAddress];
+      if(isDefault) { 
+        let noDefaults = prev.map(item => ({...item, isDefault: false}));
+        return [...noDefaults, newAddress]
+      }
+      return [...prev, newAddress];
     })
     goBack();
   };
@@ -32,7 +37,7 @@ const CheckoutAddressAddScreen = ({navigation}) => {
           </View>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>ĐỊA CHỈ</Text>
-        <View style={{ width: 24 }} /> {/* Để giữ khoảng cách như icon bên trái */}
+        <View style={{ width: 24 }}></View>
       </View>
 
       {/* Form */}
@@ -53,7 +58,7 @@ const CheckoutAddressAddScreen = ({navigation}) => {
       {/* Switch */}
       <View style={styles.switchContainer}>
         <Text style={styles.switchLabel}>Đặt làm mặc định</Text>
-        <Switch value={isDefault} onValueChange={setIsDefault} trackColor={{ false: '#ccc', true: '#3b82f6' }} thumbColor="#fff"/>
+        <Switch value={isDefault} onValueChange={setIsDefault} trackColor={{ false: '#ccc', true: '#3b82f6' }} thumbColor="#fff" style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}/>
       </View>
 
       {/* Save button */}
@@ -88,7 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 17,
     marginBottom: 6,
     color: '#333',
   },
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   switchLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#333',
   },
   saveButton: {

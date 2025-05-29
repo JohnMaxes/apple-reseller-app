@@ -4,14 +4,10 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
 
 const CheckoutScreen = ({navigation}) => {
-    const { checkoutItems, selectedAddress, total, selectedMethod, setSelectedMethod } = useContext(CheckoutContext);
-    const [paymentMethod, setPaymentMethod] = useState(selectedMethod);
-    const [voucher, setVoucher] = useState([]);
-
-    const togglePaymentMethod = (method) => {
-        setPaymentMethod(method);
-        setSelectedMethod(method);
-    };
+    const { checkoutItems, selectedAddress } = useContext(CheckoutContext);
+    const { selectedPaymentMethod, setSelectedPaymentMethod } = useContext(CheckoutContext);
+    const { selectedShipVoucher, selectedOrderVoucher } = useContext(CheckoutContext);
+    const { subtotal, total } = useContext(CheckoutContext);
 
     const paymentMethods = [
         { label: 'Thanh toán qua Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
@@ -57,12 +53,18 @@ const CheckoutScreen = ({navigation}) => {
                             <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
                         </View>
                         <TouchableOpacity style={styles.addressRightColumn} onPress={() => navigation.navigate("CheckoutAddressScreen")}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={styles.bold}>{selectedAddress.name}</Text>
-                            <Text>{selectedAddress.phone}</Text>
-                            <Text>{selectedAddress.address}</Text>
-                        </View>
-                        <Icon name="chevron-forward" size={18} color="#000" />
+                            { selectedAddress ? (
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.bold}>{selectedAddress.name}</Text>
+                                    <Text>{selectedAddress.phone}</Text>
+                                    <Text>{selectedAddress.address}</Text>
+                                </View>
+                            ) : (
+                                <View style={{flex: 1}}>
+                                    <Text style={styles.bold}>Hãy chọn một địa chỉ!</Text>
+                                </View>
+                            )}
+                            <Icon name="chevron-forward" size={18} color="#000" />
                         </TouchableOpacity>
                     </View>
 
@@ -75,15 +77,15 @@ const CheckoutScreen = ({navigation}) => {
                         </View>
                         <View style={{ flex: 1 }}>
                         { paymentMethods.map((method) => (
-                            <TouchableOpacity key={method.value} style={[ styles.paymentBox, paymentMethod === method.value && styles.paymentBoxSelected ]}
-                                onPress={() => togglePaymentMethod(method.value)} activeOpacity={0.8}
+                            <TouchableOpacity key={method.value} style={[ styles.paymentBox, selectedPaymentMethod === method.value && styles.paymentBoxSelected ]}
+                                onPress={ () => setSelectedPaymentMethod(method.value) } activeOpacity={0.8}
                             >
                                 <Image
                                     source={method.icon}
-                                    style={{ width: 28, height: 28, marginRight: 12, tintColor: paymentMethod === method.value ? "#fff" : "#007bff" }}
+                                    style={{ width: 45, height: 45, marginRight: 12 }}
                                     resizeMode="contain"
                                 />
-                                <Text style={[ styles.paymentText, paymentMethod === method.value && { color: "#fff", fontWeight: "bold" } ]}>
+                                <Text style={[ styles.paymentText, selectedPaymentMethod === method.value && { color: "#fff", fontWeight: "bold" } ]}>
                                     {method.label}
                                 </Text>
                             </TouchableOpacity>
@@ -98,25 +100,31 @@ const CheckoutScreen = ({navigation}) => {
                         <View style={styles.leftColumn}>
                             <Text style={styles.grayLabel}>Mã giảm{"\n"}giá</Text>
                         </View>
-                        <View style={styles.rightColumn}>
-                            <View style={{ marginBottom: 8 }}>
-                                <Text style={styles.bold}>VOUCHER03</Text>
-                                <Text style={styles.discountBlue}>Đã giảm 100.000đ</Text>
+                        <TouchableOpacity style={styles.addressRightColumn} onPress={() => navigation.navigate("CheckoutVoucherScreen")}>
+                            <View style={{flex: 1}}>
+                                { selectedOrderVoucher ? (
+                                    <View style={{ marginBottom: 8 }}>
+                                        <Text style={styles.bold}>{selectedOrderVoucher.title}</Text>
+                                        <Text style={styles.discountBlue}>Đã giảm { 
+                                            selectedOrderVoucher.type == 'static' ? selectedOrderVoucher.value :
+                                            selectedOrderVoucher.value * subtotal
+                                        }đ</Text>
+                                    </View>
+                                ) : null }
+                                { selectedShipVoucher ? (
+                                    <View style={{ marginBottom: 8 }}>
+                                        <Text style={styles.bold}>{selectedShipVoucher.title}</Text>
+                                        <Text style={styles.discountBlue}>Đã giảm {selectedShipVoucher.value * 50}đ</Text>
+                                    </View>
+                                ): null }
+                                { !selectedShipVoucher && !selectedOrderVoucher ? (
+                                    <View style={{flex: 1}}>
+                                        <Text style={styles.bold}>Áp dụng voucher ở đây!</Text>
+                                    </View>
+                                ): null }
                             </View>
-                            <View style={{ marginBottom: 8 }}>
-                                <Text style={styles.bold}>Miễn phí vận chuyển</Text>
-                                <Text style={styles.discountBlue}>Đã giảm 50.000đ</Text>
-                            </View>
-                            <View style={styles.voucherInputRow}>
-                                <TextInput
-                                    placeholder="Nhập mã giảm giá"
-                                    value={voucher}
-                                    onChangeText={setVoucher}
-                                    style={styles.voucherInput}
-                                />
-                                <Icon name="search-outline" size={20} color="#888" />
-                            </View>
-                        </View>
+                            <Icon name="chevron-forward" size={18} color="#000" />
+                        </TouchableOpacity>
                     </View>
                 </View>
 
@@ -125,17 +133,29 @@ const CheckoutScreen = ({navigation}) => {
                     <Text style={styles.summaryTitle}>Chi tiết thanh toán</Text>
                     <View style={styles.summaryLine}>
                         <Text>Tổng tiền sản phẩm:</Text>
-                        <Text>{total}</Text>
+                        <Text>{subtotal}</Text>
                     </View>
                     <View style={styles.summaryLine}>
                         <Text>Tổng phí vận chuyển:</Text>
                         <Text>50.000đ</Text>
                     </View>
+                    { selectedOrderVoucher ? (
+                        <View style={styles.summaryLine}>
+                            <Text>Giảm từ mã giảm giá:</Text>
+                            <Text style={styles.discountBlue}>-{ 
+                                selectedOrderVoucher.type == 'static' ? selectedOrderVoucher.value :
+                                selectedOrderVoucher.value * subtotal
+                            }đ</Text>
+                        </View>
+                    ) : null }
+                    { selectedShipVoucher ? (
+                        <View style={styles.summaryLine}>
+                            <Text>Giảm phí vận chuyển:</Text>
+                            <Text style={styles.discountBlue}>-{selectedShipVoucher.value * 50}đ</Text>
+                        </View>
+                    ) : null }
                     {/*}
-                    <View style={styles.summaryLine}>
-                        <Text>Giảm từ mã giảm giá:</Text>
-                        <Text style={styles.discountBlue}>-100.000đ</Text>
-                    </View>
+                    
                     <View style={styles.summaryLine}>
                         <Text>Giảm phí vận chuyển:</Text>
                         <Text style={styles.discountBlue}>-50.000đ</Text>
@@ -143,13 +163,13 @@ const CheckoutScreen = ({navigation}) => {
                     {*/}
                     <View style={styles.summaryLine}>
                         <Text style={styles.bold}>Tổng thanh toán:</Text>
-                        <Text style={[styles.bold]}>{total + 50000}đ</Text>
+                        <Text style={[styles.bold]}>{total}đ</Text>
                     </View>
                 </View>
 
                 {/* Nút đặt hàng */}
                 <TouchableOpacity style={styles.orderButton}>
-                    <Text style={styles.orderButtonText}>Đặt hàng</Text>
+                    <Text style={styles.orderButtonText}>Tiếp tục</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -179,7 +199,7 @@ const styles = StyleSheet.create({
     },
     scrollViewContainer: {
         paddingHorizontal: 15,
-        paddingBottom: 120
+        paddingBottom: 30,
     },
     header: {
         flexDirection: 'row',
@@ -314,7 +334,7 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: "#007bff",
+        borderColor: "#ddd",
         marginBottom: 8,
         backgroundColor: "#fff"
     },
