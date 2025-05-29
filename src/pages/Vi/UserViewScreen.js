@@ -22,6 +22,7 @@ const UserViewScreen = ({navigation}) => {
     }, []);
     const handleUserEdit = () => navigation.navigate('UserEdit');
     const handleLogout = () => { navigation.navigate('Home'); logOut() }
+    const handleWishList = () => navigation.navigate('WishList');
     if (loading) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <ActivityIndicator size="large" color="#0000ff" />
@@ -48,11 +49,11 @@ const UserViewScreen = ({navigation}) => {
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
             </View>
             <View style={styles.divider} />
-            <View style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 20}]}>
+            <TouchableOpacity style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 20}]} onPress= {handleWishList}>
                 <Icon name='bookmark-outline' color='black' size={26} />
                 <Text style={{fontWeight:'medium', fontSize: 18, flex:1}}>Đã lưu</Text>
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
-            </View>
+            </TouchableOpacity>
             <View style={styles.divider} />
             <View style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 20}]}>
                 <Icon name='help-circle-outline' color='black' size={26} />

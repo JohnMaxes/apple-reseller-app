@@ -15,6 +15,7 @@ import Item2 from '../../assets/Product-Screen/Item2.jpg';
 import Item3 from '../../assets/Product-Screen/Item3.webp';
 import Item4 from '../../assets/Product-Screen/Item4.webp';
 import { CartContext } from "../../context/CartContext"; // Import hook từ CartContext
+import { BookmarkContext } from "../../context/BookmarkContext.js";
 
 const storageOptions = ["256GB", "512GB", "1T"];
 
@@ -44,6 +45,17 @@ const ProductScreen = ({ route }) => {
   const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
   const [activeTab, setActiveTab] = useState('specs');
   const { addToCart } = useContext(CartContext); // Sử dụng hook từ CartContext
+  const { addBookmark, bookmarks, removeBookmark } = useContext(BookmarkContext); // Sử dụng hook từ BookmarkContext
+  const isBookmarked = bookmarks.some(item => item.id === id);
+
+  // Hàm xử lý bookmark
+const handleBookmark = () => {
+    if (isBookmarked) {
+        removeBookmark(id);
+    } else {
+        addBookmark({ id, title, image, price });
+    }
+};
 
   const renderSpecs = () => (
     <View style={styles.specsContainer}>
@@ -79,11 +91,7 @@ const ProductScreen = ({ route }) => {
     Alert.alert("Đã thêm vào giỏ hàng!");
   };
 
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const handleBookmarked = () => {
-    setIsBookmarked(!isBookmarked);
-    Alert.alert(isBookmarked ? "Đã bỏ đánh dấu yêu thích!" : "Đã thêm vào danh sách yêu thích!");
-  }
+  
 
   // Dữ liệu mẫu cho đánh giá
   const reviews = [
@@ -183,7 +191,7 @@ const ProductScreen = ({ route }) => {
             size={30}
             color="#0073FF"
             style={{ marginRight: 5, position: "relative", borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF" }}
-            onPress={handleBookmarked}
+            onPress={handleBookmark}
           />
           <Icon
             name="bag-outline"

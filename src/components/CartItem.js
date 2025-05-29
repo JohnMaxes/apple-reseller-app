@@ -9,17 +9,22 @@ const CartItem = ({ title, image, price, id, quantity }) => {
   const [itemQuantity, setQuantity] = useState(quantity);
   const [modalVisible, setModalVisible] = useState(false);
   const [checked, setChecked] = useState(false);
-  const { cart, setCart, setCheckedItems } = useContext(CartContext);
+  const { cart, editCart, setCheckedItems } = useContext(CartContext);
 
   const handleChangeQuantity = (operation) => {
-    if (operation == 'x' || (operation == '-' && itemQuantity == 1)) {
-      setCart((prevCart) => (prevCart.filter(item => item.id !== id)));
+    if (operation === 'x' || (operation === '-' && itemQuantity === 1)) {
+      // Xóa sản phẩm khỏi giỏ hàng
+      editCart({ id, operation: 'x' });
       return;
     }
-    else if (operation == '+') setQuantity(previousQuantity => previousQuantity + 1);
-    else if (operation == '-') setQuantity(previousQuantity => previousQuantity - 1);
-    const updatedItems = cart.map(item => item.id === id ? { ...item, quantity: itemQuantity } : item );
-    setCart(updatedItems);
+    if (operation === '+') {
+      setQuantity(prev => prev + 1);
+      editCart({ id, operation: '+' });
+    }
+    if (operation === '-') {
+      setQuantity(prev => prev - 1);
+      editCart({ id, operation: '-' });
+    }
   };
 
   const handleCheck = () => {

@@ -6,7 +6,7 @@ import { CartIcon } from "../assets/icons/cart-icon";
 import { AuthContext } from "../context/AuthContext";
 
 const CartScreen = ({navigation}) => {
-    const { cart } = useContext(CartContext);
+    const { cart, editCart } = useContext(CartContext);
     const { loggedIn } = useContext(AuthContext);
     const navigateToProducts = () => navigation.navigate('Categories');
     if ( cart.length === 0 || !loggedIn ) return (
@@ -31,13 +31,21 @@ const CartScreen = ({navigation}) => {
                 </View>
             </View>
             <FlatList 
-                data={cart}
-                renderItem={({item}) => {return <CartItem title={item.title} image={item.image} price={item.price} id={item.id} quantity={item.quantity}/>}}
-                keyExtractor={(item) => (item.id.toString())}
-                scrollEnabled={true}
-                style={{paddingBottom: 60}}
-                contentContainerStyle={{paddingBottom: 100}}
-            />
+  data={cart.filter(item => item.id !== undefined && item.id !== null)}
+  renderItem={({item}) => (
+    <CartItem
+      title={item.title}
+      image={item.image}
+      price={item.price}
+      id={item.id}
+      quantity={item.quantity}
+    />
+  )}
+  keyExtractor={(item) => String(item.id)}
+  scrollEnabled={true}
+  style={{paddingBottom: 60}}
+  contentContainerStyle={{paddingBottom: 100}}
+/>
         </>
     );
 }
