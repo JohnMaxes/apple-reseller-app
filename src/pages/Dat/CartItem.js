@@ -5,7 +5,6 @@ import {
   Image,
   TouchableOpacity,
   Modal,
-  ScrollView,
   StyleSheet
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -13,30 +12,32 @@ import { CartContext } from "../context/CartContext";
 import { CheckoutContext } from "../context/CheckoutContext";
 
 const Checkbox = ({ value, onValueChange }) => (
-  <TouchableOpacity onPress={() => onValueChange(!value)} style={[styles.checkbox, { backgroundColor: value ? '#007bff' : '#fff' }]}>  {/* changed to black */}
+  <TouchableOpacity onPress={() => onValueChange(!value)} style={[styles.checkbox, { backgroundColor: value ? '#007bff' : '#fff' }]}>  
     {value ? <Icon name="checkmark" size={16} color="#fff" /> : null}
   </TouchableOpacity>
 );
 
-const CartItem = ({ title, image, price, id, quantity, color, status='inStock'}) => {
+const CartItem = ({ title, image, price, id, quantity, color, storage, status = 'inStock' }) => {
   const { checkoutItems, setCheckoutItems } = useContext(CheckoutContext);
   const { cart, setCart } = useContext(CartContext);
   const [itemQuantity, setQuantity] = useState(quantity);
   const [modalVisible, setModalVisible] = useState(false);
   const [checked, setChecked] = useState(checkoutItems.some(item => item.id === id));
   const colorOptions = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
+  const storageOptions = ["256GB", "512GB", "1T"];
   const [selectedColor, setSelectedColor] = useState(color || colorOptions[0]);
+  const [selectedStorage, setSelectedStorage] = useState(storage || storageOptions[0]);
 
   const handleChangeQuantity = (operation) => {
     if (operation === '-' && itemQuantity === 1) return setModalVisible(true);
     const newQuantity = operation === '+' ? itemQuantity + 1 : itemQuantity - 1;
     setQuantity(newQuantity);
-    setCart(cart.map(item => item.id === id && item.color === selectedColor ? { ...item, quantity: newQuantity } : item));
+    setCart(cart.map(item => item.id === id && item.color === selectedColor && item.storage === selectedStorage ? { ...item, quantity: newQuantity } : item));
   };
 
   const removeCartItem = () => {
-    setCart(cart.filter(item => !(item.id === id && item.color === selectedColor)));
-    setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor)));
+    setCart(cart.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
+    setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
     setModalVisible(false);
   };
 
@@ -44,9 +45,9 @@ const CartItem = ({ title, image, price, id, quantity, color, status='inStock'})
     const newChecked = !checked;
     setChecked(newChecked);
     if (newChecked)
-      setCheckoutItems([...checkoutItems, { title, image, price, id, quantity: itemQuantity, color: selectedColor }]);
+      setCheckoutItems([...checkoutItems, { title, image, price, id, quantity: itemQuantity, color: selectedColor, storage: selectedStorage }]);
     else
-      setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor)));
+      setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
   };
 
   return (
@@ -54,7 +55,7 @@ const CartItem = ({ title, image, price, id, quantity, color, status='inStock'})
       <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={{ fontSize: 17 ,fontWeight:'bold'}}>Bạn có chắc muốn xóa sản phẩm này?</Text>
+            <Text style={{ fontSize: 17, fontWeight: 'bold' }}>Bạn có chắc muốn xóa sản phẩm này?</Text>
             <View style={styles.modalButtonsContainer}>
               <TouchableOpacity style={styles.confirmButton} onPress={removeCartItem}>
                 <Text style={styles.confirmButtonText}>Xác nhận</Text>
@@ -69,7 +70,7 @@ const CartItem = ({ title, image, price, id, quantity, color, status='inStock'})
 
       <View style={styles.cartItemContainer}>
         <TouchableOpacity style={styles.deleteButton} onPress={() => setModalVisible(true)}>
-          <Icon name="close-circle-outline" size={22} color="#000" /> {/* changed to black */}
+          <Icon name="close-circle-outline" size={22} color="#000" />
         </TouchableOpacity>
 
         <View style={styles.itemRow}>
@@ -91,11 +92,11 @@ const CartItem = ({ title, image, price, id, quantity, color, status='inStock'})
                     onPress={() => {
                       setSelectedColor(colorOption);
                       setCart(cart.map(item =>
-                        item.id === id && item.color === selectedColor ? { ...item, color: colorOption } : item
+                        item.id === id && item.color === selectedColor && item.storage === selectedStorage ? { ...item, color: colorOption } : item
                       ));
                       if (checked) {
                         setCheckoutItems(checkoutItems.map(item =>
-                          item.id === id && item.color === selectedColor ? { ...item, color: colorOption } : item
+                          item.id === id && item.color === selectedColor && item.storage === selectedStorage ? { ...item, color: colorOption } : item
                         ));
                       }
                     }}
@@ -103,6 +104,31 @@ const CartItem = ({ title, image, price, id, quantity, color, status='inStock'})
                     <View style={[styles.outerColorCircle, isSelected && { borderColor: '#0073FF', borderWidth: 2 }]}> 
                       <View style={[styles.innerColorCircle, { backgroundColor: colorOption }, isSelected && { borderColor: '#fff', borderWidth: 2 }]} />
                     </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.storageOptions}>
+              {storageOptions.map((option, index) => {
+                const isSelected = selectedStorage === option;
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.storageButton, isSelected ? styles.storageButtonSelected : styles.storageButtonUnselected]}
+                    onPress={() => {
+                      setSelectedStorage(option);
+                      setCart(cart.map(item =>
+                        item.id === id && item.color === selectedColor && item.storage === selectedStorage ? { ...item, storage: option } : item
+                      ));
+                      if (checked) {
+                        setCheckoutItems(checkoutItems.map(item =>
+                          item.id === id && item.color === selectedColor && item.storage === selectedStorage ? { ...item, storage: option } : item
+                        ));
+                      }
+                    }}
+                  >
+                    <Text style={[styles.storageText, isSelected && styles.storageTextSelected]}>{option}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -127,21 +153,19 @@ const CartItem = ({ title, image, price, id, quantity, color, status='inStock'})
   );
 };
 
-
 export default CartItem;
 
 const styles = StyleSheet.create({
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 20
-  },
-  subHeader: {
-    fontSize: 16,
-    marginLeft: 20,
-    marginVertical: 10,
-    fontWeight: 'bold'
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 3,
+    borderWidth: 1.5,
+    borderColor: '#999',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    marginTop: 25
   },
   cartItemContainer: {
     backgroundColor: '#fff',
@@ -150,6 +174,12 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     position: 'relative'
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    zIndex: 10,
   },
   itemRow: {
     flexDirection: 'row'
@@ -171,28 +201,11 @@ const styles = StyleSheet.create({
   itemPrice: {
     color: '#333',
     marginTop: 2,
-    fontSize:16
+    fontSize: 16
   },
   discountNote: {
     fontSize: 12,
     color: '#999'
-  },
-  quantityControl: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6
-  },
-  quantityText: {
-    marginHorizontal: 10,
-    fontSize: 16
-  },
-  quantityBtn: {
-    fontSize: 18,
-    paddingHorizontal: 10
-  },
-  stockStatus: {
-    fontSize: 13,
-    marginTop: 4
   },
   colorOptions: {
     flexDirection: 'row',
@@ -211,31 +224,57 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     borderColor: "#ccc",
   },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 3,
-    borderWidth: 1.5,
-    borderColor: '#999',
-    justifyContent: 'center',
+  storageOptions: {
+    flexDirection: 'row',
+    marginTop: 8,
+    gap: 8,
+    flexWrap: 'wrap'
+  },
+  storageButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    minWidth: 60,
     alignItems: 'center',
-    marginRight: 8,
-    marginTop: 25
+    justifyContent: 'center'
   },
-  CheckoutButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 12,
-    borderRadius: 30,
-    alignItems: "center",
-    marginBottom: 20,
-    width: "40%",
-    alignSelf: "center",
+  storageButtonSelected: {
+    backgroundColor: '#007bff',
+    borderColor: '#007bff',
+    borderWidth: 1
   },
-  doneButtonText: {
-    textAlign: 'center',
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 15,
+  storageButtonUnselected: {
+    backgroundColor: '#fff',
+    borderColor: '#007bff',
+    borderWidth: 1
+  },
+  storageText: {
+    fontSize: 13,
+    fontWeight: 'bold'
+  },
+  storageTextSelected: {
+    color: '#fff'
+  },
+  quantityControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6
+  },
+  quantityText: {
+    marginHorizontal: 10,
+    fontSize: 16
+  },
+  quantityBtn: {
+    fontSize: 18,
+    paddingHorizontal: 10
+  },
+  totalPrice: {
+    fontSize: 14,
+    marginTop: 4
+  },
+  stockStatus: {
+    fontSize: 13,
+    marginTop: 4
   },
   modalContainer: {
     flex: 1,
@@ -271,11 +310,5 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#333'
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    zIndex: 10,
   }
 });
