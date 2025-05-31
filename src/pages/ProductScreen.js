@@ -11,10 +11,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from '../context/WishlistContext';
 
-const storageOptions = ["256GB", "512GB", "1TB"];
+
 
 const ProductScreen = ({ route, navigation }) => {  
-  const colors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
+  const availableColors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
+  const availableStorageOptions = ["256GB", "512GB", "1TB"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },
     { label: 'Chip xử lý (CPU)', value: 'Apple A18 Pro 6 nhân' },
@@ -22,23 +23,25 @@ const ProductScreen = ({ route, navigation }) => {
     { label: 'RAM', value: '8GB' },
     { label: 'Dung lượng lưu trữ', value: '256GB' },
     { label: 'Dung lượng khả dụng', value: '241GB' },
-    
   ];
+  
   const Camera = [
     { label: 'Camera sau', value: '48MP, 48MP và 12PP' },
     { label: 'Camera trước', value: '12MP' },
     { label: 'Độ phân giải màn hình', value: 'Super Retina XDR' },
     { label: 'Công nghệ màn hình', value: 'OLED' },
-    { label: 'Quay phim camera sau', value: 'ProRes 4K 30FPS, 4K 120FPS, 1080 60FPS, v.v.' },
+    { label: 'Quay phim camera sau', value: 'ProRes\n4K 30FPS\n4K 120FPS\n1080 60FPS\n v.v.' },
     { label: 'Tính năng camera', value: 'Ảnh Raw\nDolby Vision\nDeep Fusion\nPhotonic Engine\n v.v.' },
   ]
   
   const { id, title, image, price, rating, ratingCount } = route.params;
   const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext);
   const { addToCart } = useContext(CartContext);
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
+  const [selectedColor, setSelectedColor] = useState(availableColors[0]);
+  const [selectedStorage, setSelectedStorage] = useState(availableStorageOptions[0]);
   const [activeTab, setActiveTab] = useState('specs');
+  const [showMoreSpecs, setShowMoreSpecs] = useState(false);
+
   const isWishlisted = wishlistItems.some(element => element.title == title && element.image == image);
 
   const handleWishlist = () => {
@@ -51,24 +54,34 @@ const ProductScreen = ({ route, navigation }) => {
         <Text style= {{fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Cấu hình và bộ nhớ</Text>
         {Configuration.map((item, index) => (
             <View key={index} style={styles.specItem}>
-            <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 500}]}>{item.label}</Text>
+            <Text style={[styles.specLabel, {fontFamily: 'Inter', marginLeft: 20, fontSize: 14, fontWeight: 700}]}>{item.label}</Text>
             <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
             </View>
         ))}
-        <Text style= {{fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Camera và Màn hình</Text>
-        {Camera.map((item, index) => (
-            <View key={index} style={styles.specItem}>
-            <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 500}]}>{item.label}</Text>
-            <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
-            </View>
-        ))}
-        <TouchableOpacity>
-            <Text style={[styles.buyButtonText, {color: '#0073FF', alignSelf: 'center', marginTop: 20, fontSize: 18}]}>Xem thêm</Text>
+        {showMoreSpecs && (
+          <>
+            <Text style= {{fontFamily: 'Inter', fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Camera và Màn hình</Text>
+            {Camera.map((item, index) => (
+              <View key={index} style={styles.specItem}>
+                <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 700}]}>{item.label}</Text>
+                <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
+              </View>
+            ))}
+          </>
+        )}
+        <TouchableOpacity onPress={() => setShowMoreSpecs(prev => !prev)}>
+            <Text style={[styles.buyButtonText, {color: '#0073FF', alignSelf: 'center', marginTop: 20, fontSize: 18}]}>{showMoreSpecs ? 'Thu gọn' : 'Xem thêm'}</Text>
         </TouchableOpacity>
     </View>
   );
 
-  const handleAddToCart = () => addToCart({ id: id || title, title, image, price, color: selectedColor, storage: selectedStorage });
+  const handleAddToCart = () => addToCart({ 
+    id: id || title, title, image, price, 
+    color: selectedColor, 
+    storage: selectedStorage,
+    availableColors: availableColors, 
+    availableStorageOptions: availableStorageOptions,
+  });
 
   const reviews = [
     {
@@ -167,7 +180,7 @@ const ProductScreen = ({ route, navigation }) => {
         <View style={styles.section}>
             <Text style={styles.sectionLabel}>Tùy chọn màu sắc</Text>
             <View style={styles.colorContainer}>
-            {colors.map((color, index) => (
+            {availableColors.map((color, index) => (
                 <TouchableOpacity
                 key={index}
                 style={[ styles.colorCircle, { backgroundColor: color, borderWidth: selectedColor === color ? 2 : 0, borderColor: "#0073FF" } ]}
@@ -180,7 +193,7 @@ const ProductScreen = ({ route, navigation }) => {
         <View style={styles.section}>
             <Text style={styles.sectionLabel}>Tùy chọn bộ nhớ</Text>
             <View style={styles.storageContainer}>
-            {storageOptions.map((option, index) => (
+            {availableStorageOptions.map((option, index) => (
                 <TouchableOpacity onPress={() => setSelectedStorage(option)} key={index} style={[ styles.storageButton, selectedStorage === option && styles.storageButtonSelected ]}>
                 <Text style={[ styles.storageText, selectedStorage === option && { color: "#fff" } ]}>
                     {option}
@@ -440,11 +453,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   specLabel: {
-    fontWeight: 'bold',
+    fontFamily: 'Inter',
+    fontWeight: 700,
     color: '#444',
     flex: 1,
   },
   specValue: {
+    fontWeight: 500,
+    fontFamily: 'Inter',
     flex: 1,
     textAlign: 'right',
     color: '#666',

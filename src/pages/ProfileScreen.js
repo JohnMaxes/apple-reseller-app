@@ -18,7 +18,7 @@ const ProfileScreen = ({navigation}) => {
         }
         initUser()
     }, []);
-    const handleProfileEdit = () => navigation.navigate('UserEdit');
+    const handleProfileEdit = () => navigation.navigate('ProfileEdit');
     const handleWishlist = () => navigation.navigate('WishlistScreen');
     const handleLogout = () => { navigation.navigate('Home'); logOut() }
     if (loading) return (

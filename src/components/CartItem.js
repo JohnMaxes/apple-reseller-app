@@ -4,46 +4,49 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { CartContext } from '../context/CartContext';
 import { CheckoutContext } from '../context/CheckoutContext';
 const Checkbox = ({ value, onValueChange }) => (
-  <TouchableOpacity onPress={() => onValueChange(!value)} style={[styles.checkbox, { backgroundColor: value ? '#007bff' : '#fff' }]}>  {/* changed to black */}
+  <TouchableOpacity onPress={() => onValueChange(!value)} style={[styles.checkbox, { backgroundColor: value ? '#007bff' : '#fff' }]}>
     {value ? <Icon name="checkmark" size={16} color="#fff" /> : null}
   </TouchableOpacity>
 );
 
-const CartItem = ({ title, image, price, id, quantity, color, storage, status='inStock'}) => {
+const CartItem = ({ title, image, price, id, quantity, color, storage, availableColors, availableStorageOptions, status='inStock'}) => {
   const { checkoutItems, setCheckoutItems } = useContext(CheckoutContext);
   const { cart, setCart } = useContext(CartContext);
   const [itemQuantity, setQuantity] = useState(quantity);
   const [modalVisible, setModalVisible] = useState(false);
   const [checked, setChecked] = useState(checkoutItems.some(item => item.id === id));
-  const colorOptions = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
-  const storageOptions = ["256GB", "512GB", "1T"];
 
-  const [selectedColor, setSelectedColor] = useState(color || colorOptions[0]);
-  const [selectedStorage, setSelectedStorage] = useState(storage || storageOptions[0]);
+  const colorOptions = availableColors; // ? availableColors : ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
+  const storageOptions = availableStorageOptions; // ? availableStorageOptions : ["256GB", "512GB", "1T"];
+
+  const [selectedColor, setSelectedColor] = useState(color);
+  const [selectedStorage, setSelectedStorage] = useState(storage);
 
   const handleChangeQuantity = (operation) => {
     if (operation === '-' && itemQuantity === 1) return setModalVisible(true);
     const newQuantity = operation === '+' ? itemQuantity + 1 : itemQuantity - 1;
     setQuantity(newQuantity);
-    setCart(cart.map(item => item.id === id && item.color === selectedColor ? { ...item, quantity: newQuantity } : item));
+    setCart(cart.map(item => item.id === id && item.color === selectedColor && item.storage === selectedStorage ? 
+      { ...item, quantity: newQuantity } : item));
   };
 
   const removeCartItem = () => {
     setCart(cart.filter(item => !(item.id === id && item.color === selectedColor)));
-    setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor)));
+    setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
     setModalVisible(false);
   };
 
   const handleCheck = () => {
     const newChecked = !checked;
     setChecked(newChecked);
-    if (newChecked) setCheckoutItems([...checkoutItems, { title, image, price, id, quantity: itemQuantity, color: selectedColor }]);
-    else setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor)));
+    if (newChecked) setCheckoutItems([...checkoutItems, { title, image, price, id, quantity: itemQuantity, color: selectedColor, storage: selectedStorage }]);
+    else setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
   };
 
   useEffect(() => {
-    setCart(cart.map(item => item.id === id && item.color === selectedColor ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
-    if (checked) setCheckoutItems(checkoutItems.map(item => item.id === id && item.color === selectedColor ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
+    setCart(cart.map(item => item.id === id ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
+    if (checked) setCheckoutItems(checkoutItems.map(item => item.id === id && item.color === selectedColor && item.storage === selectedStorage ?
+      { ...item, color: selectedColor, storage: selectedStorage } : item ));
   }, [selectedColor, selectedStorage])
 
   return (

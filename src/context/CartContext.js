@@ -23,17 +23,18 @@ const CartProvider = ({ children }) => {
 
     useEffect(() => {
         async function saveCart() { 
+            console.log(cart);
             AsyncStorage.setItem('cart', JSON.stringify(cart)) 
             // reassignCart API here, doesn't need await
         }; 
         saveCart() 
     }, [cart])
 
-    const addToCart = ({id, title, price, image, color, option }) => {
-        if (cart.some(element => element.id === id))
+    const addToCart = ({id, title, price, image, color, storage, availableColors, availableStorageOptions }) => {
+        if (cart.some(element => element.id === id && element.color === color && element.storage === storage))
             setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item ))
         else {
-            let newItem = { id, title, price, image, color, option, quantity: 1 };
+            let newItem = { id, title, price, image, color, storage, availableColors, availableStorageOptions, quantity: 1 };
             setCart(prevCart => [...prevCart, newItem]);
             setCartTotal(prevTotal => prevTotal + price);
             alert('Item added to cart successfully!');
