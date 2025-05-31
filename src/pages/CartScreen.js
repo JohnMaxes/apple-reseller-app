@@ -18,7 +18,7 @@ const CartScreen = () => {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Image style={{width: 150, height: 150}} source={require('../assets/icons/empty_cart.webp')}></Image>
             <Text style={cartStyle.emptyCartText1}>Giỏ hàng của bạn đang trống.</Text>
-            <Text style={cartStyle.emptyCartText2}>Hãy duyệt thêm các sản phẩm hoặc mua{"\n"}các sản phẩm bạn đã lưu trước đó.</Text>
+            <Text style={cartStyle.emptyCartText2}>Hãy duyệt thêm các sản phẩm hoặc mua{'\n'}các sản phẩm bạn đã lưu trước đó.</Text>
             <TouchableOpacity onPress={navigateToProducts} style={cartStyle.exploreButton}><Text style={{color: 'black', fontSize: 16, fontFamily: 'Inter'}}>Khám phá ngay</Text></TouchableOpacity>
         </View>
     );

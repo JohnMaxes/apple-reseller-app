@@ -3,9 +3,8 @@ import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Alert, Styl
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import Icon from 'react-native-vector-icons/Ionicons';
-import { color } from "react-native-elements/dist/helpers";
 
-const UserEditScreen = ({ navigation }) => {
+const ProfileEditScreen = ({ navigation }) => {
     const { userInfo, setUserInfo } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
 
@@ -164,6 +163,8 @@ const UserEditScreen = ({ navigation }) => {
     );
 };
 
+export default ProfileEditScreen;
+
 const styles = StyleSheet.create({
     container: {
         padding: 20,
@@ -204,6 +205,3 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
 });
-
-
-export default UserEditScreen;

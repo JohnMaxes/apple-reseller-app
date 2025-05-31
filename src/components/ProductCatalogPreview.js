@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { View, Text, Dimensions, Image, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { StyleSheet } from 'react-native';
+import { WishlistContext } from "../context/WishlistContext";
 
 const width = Dimensions.get('window').width * 0.45;
 
-const ProductCatalogPreview = ({ title, image, description, price, rating, ratingCount, navigation, id }) => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const handleWishlist = () => setIsBookmarked(!isBookmarked);
+const ProductCatalogPreview = ({ id, title, image, price, rating, ratingCount, navigation }) => {
+  const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext)
+  const isBookmarked = wishlistItems.some(element => element.title == title && element.image == image);
+  const handleWishlist = () => {
+    let item = { id, title, image, price, rating, ratingCount };
+    !isBookmarked ? wishlist(item) : unwishlist(item);
+  }
 
   const navigateToItem = () => navigation.navigate('ProductScreen', { title, image, price, rating, ratingCount });
   const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }

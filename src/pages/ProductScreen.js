@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Platform, Alert } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -9,12 +9,11 @@ import Item4 from '../assets/Product-Screen/Item4.webp';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { CartContext } from "../context/CartContext";
-import { WishlistContext } from "../context/WishlistContext";
+import { WishlistContext } from '../context/WishlistContext';
 
 const storageOptions = ["256GB", "512GB", "1TB"];
 
-const ProductScreen = ({ route, navigation }) => {
-  const { id, title, image, price, rating, ratingCount } = route.params;
+const ProductScreen = ({ route, navigation }) => {  
   const colors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },
@@ -33,18 +32,19 @@ const ProductScreen = ({ route, navigation }) => {
     { label: 'Quay phim camera sau', value: 'ProRes 4K 30FPS, 4K 120FPS, 1080 60FPS, v.v.' },
     { label: 'Tính năng camera', value: 'Ảnh Raw\nDolby Vision\nDeep Fusion\nPhotonic Engine\n v.v.' },
   ]
-
+  
+  const { id, title, image, price, rating, ratingCount } = route.params;
+  const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext);
+  const { addToCart } = useContext(CartContext);
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
   const [activeTab, setActiveTab] = useState('specs');
+  const isWishlisted = wishlistItems.some(element => element.title == title && element.image == image);
 
-  const { wishlistItems, wishlist } = useContext(WishlistContext);
-  const [isWishlisted, setIsWishlisted] = useState(wishlistItems.some(element => element.id == id));
-  const { addToCart } = useContext(CartContext); // Sử dụng hook từ CartContext
-  const handleWishlist = () => wishlist(
-    { id, title, image, price, rating }
-  );
-
+  const handleWishlist = () => {
+    let item = { id, title, image, price, rating, ratingCount };
+    !isWishlisted ? wishlist(item) : unwishlist(item);
+  }
 
   const renderSpecs = () => (
     <View style={styles.specsContainer}>
