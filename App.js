@@ -10,6 +10,7 @@ import Authentication from './src/navigation/Authentication';
 import Checkout from './src/navigation/Checkout';
 import { WishlistProvider } from './src/context/WishlistContext';
 import { CheckoutProvider } from './src/context/CheckoutContext';
+
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
