@@ -1,29 +1,11 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
 const slides = [
-  {
-    key: 'one',
-    title: 'Chào mừng!',
-    text: 'Khám phá các sản phẩm Apple chính hãng.',
-    image: require('../assets/intro1.png'),
-    backgroundColor: '#fff',
-  },
-  {
-    key: 'two',
-    title: 'Mua sắm dễ dàng',
-    text: 'Tìm kiếm và đặt hàng chỉ với vài thao tác.',
-    image: require('../assets/intro2.png'),
-    backgroundColor: '#f7f7f7',
-  },
-  {
-    key: 'three',
-    title: 'Thanh toán an toàn',
-    text: 'Hỗ trợ nhiều phương thức thanh toán tiện lợi.',
-    image: require('../assets/intro3.png'),
-    backgroundColor: '#e3f2fd',
-  },
+  { key: 'one', title: 'Chào mừng!', text: 'Khám phá các sản phẩm Apple chính hãng.', image: require('../assets/intro1.png'), backgroundColor: '#fff' },
+  { key: 'two', title: 'Mua sắm dễ dàng', text: 'Tìm kiếm và đặt hàng chỉ với vài thao tác.', image: require('../assets/intro2.png'), backgroundColor: '#f7f7f7' },
+  { key: 'three', title: 'Thanh toán an toàn', text: 'Hỗ trợ nhiều phương thức thanh toán tiện lợi.', image: require('../assets/intro3.png'), backgroundColor: '#e3f2fd' },
 ];
 
 const Introduction = ({ onDone }) => {
@@ -86,7 +68,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 8,
     textAlign: 'center',
-    fontFamily: 'Inter', // if available in your project
+    fontFamily: 'Inter',
   },
   text: {
     fontSize: 16,
@@ -94,7 +76,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
     paddingHorizontal: 24,
-    fontFamily: 'Inter', // if available
+    fontFamily: 'Inter',
   },
   dotsContainer: {
     flexDirection: 'row',

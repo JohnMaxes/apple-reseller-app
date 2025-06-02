@@ -3,9 +3,9 @@ import { View, Text, TouchableOpacity, ScrollView, Image, Platform, Alert } from
 import CustomInput from '../components/CustomInput';
 import CustomInputToggleable from '../components/CustomInputToggleable';
 import styles from '../../styles';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { register } from '../services/sso';
-const SignUpScreen = ({ togglePage, navigation }) => {
+
+const SignUpScreen = ({ navigation }) => {
 
     const [registUsername, setRUsername] = useState('');
     const [registEmail, setREmail] = useState('');
