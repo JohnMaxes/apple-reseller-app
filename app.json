@@ -2,6 +2,7 @@
   "expo": {
     "name": "apple_reseller",
     "slug": "apple_reseller",
+    "scheme": "applereseller",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
