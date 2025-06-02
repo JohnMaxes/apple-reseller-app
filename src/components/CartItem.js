@@ -1,93 +1,130 @@
-import { useContext, useState } from "react";
-import { View, Text, Dimensions, Image, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import { useContext, useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import styles from "../../styles";
-import { CartContext } from "../context/CartContext";
-import { CheckoutContext } from "../context/CheckoutContext";
-import Checkbox from "./Checkbox";
+import { CartContext } from '../context/CartContext';
+import { CheckoutContext } from '../context/CheckoutContext';
 
-const CartItem = ({ title, image, price, id, quantity, color }) => {
+import Toast from 'react-native-toast-message';
+
+const Checkbox = ({ value, onValueChange }) => (
+  <TouchableOpacity onPress={() => onValueChange(!value)} style={[styles.checkbox, { backgroundColor: value ? '#007bff' : '#fff' }]}>
+    {value ? <Icon name="checkmark" size={16} color="#fff" /> : null}
+  </TouchableOpacity>
+);
+
+const CartItem = ({ uuid, id, title, image, price, quantity, color, storage, availableColors, availableStorageOptions, status='inStock'}) => {
   const { checkoutItems, setCheckoutItems } = useContext(CheckoutContext);
   const { cart, setCart } = useContext(CartContext);
   const [itemQuantity, setQuantity] = useState(quantity);
   const [modalVisible, setModalVisible] = useState(false);
-  const [checked, setChecked] = useState(checkoutItems.some(item => item.id == id) ? true : false);
+  const [checked, setChecked] = useState(checkoutItems.some(item => item.id === id));
+
+  const colorOptions = availableColors;
+  const storageOptions = availableStorageOptions;
+
+  const [selectedColor, setSelectedColor] = useState(color);
+  const [selectedStorage, setSelectedStorage] = useState(storage);
 
   const handleChangeQuantity = (operation) => {
-    if (operation == '-' && itemQuantity == 1) {
-      return setModalVisible(true);
-    }
-    else if (operation == '+') setQuantity(previousQuantity => previousQuantity + 1);
-    else if (operation == '-') setQuantity(previousQuantity => previousQuantity - 1);
-    const updatedItems = cart.map(item => item.id === id ? { ...item, quantity: itemQuantity } : item );
-    setCart(updatedItems);
+    if (operation === '-' && itemQuantity === 1) return setModalVisible(true);
+    const newQuantity = operation === '+' ? itemQuantity + 1 : itemQuantity - 1;
+    setQuantity(newQuantity);
+    setCart(cart.map(item => item.id === id && item.color === selectedColor && item.storage === selectedStorage ? 
+      { ...item, quantity: newQuantity } : item));
   };
 
   const removeCartItem = () => {
-    setCart((prevCart) => (prevCart.filter(item => item.id !== id)));
-    setCheckoutItems((prev) => prev.filter(item => item.id !== id))
-  }
+    setCart(cart.filter(item => item.uuid !== uuid));
+    setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
+    setModalVisible(false);
+    Toast.show({
+      type: 'success',
+      text1: 'Xóa sản phẩm khỏi giỏ hàng thành công.',
+      text1Style: {fontFamily: 'Inter', fontSize: 14, fontWeight: 500},
+      autoHide: true, avoidKeyboard: true, topOffset: 20,
+    })
+  };
 
   const handleCheck = () => {
-    setChecked((prevChecked) => {
-      const newChecked = !prevChecked;
-      if (newChecked) setCheckoutItems((prev) => [...prev, {title, image, price, id, quantity, color}]);
-      else setCheckoutItems((prev) => prev.filter(item => item.id !== id));
-      return newChecked;
-    });
+    const newChecked = !checked;
+    setChecked(newChecked);
+    if (newChecked) setCheckoutItems([...checkoutItems, { id, uuid, title, image, price, quantity: itemQuantity, color: selectedColor, memory: selectedStorage }]);
+    else setCheckoutItems(checkoutItems.filter(item => item.uuid !== uuid));
   };
+
+  useEffect(() => {
+    setCart(cart.map(item => item.uuid === uuid ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
+    if (checked) setCheckoutItems(checkoutItems.map(item => item.uuid === uuid ?
+      { ...item, color: selectedColor, memory: selectedStorage } : item ));
+  }, [selectedColor, selectedStorage])
 
   return (
     <>
-      <Modal transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+      <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={{fontSize: 17}}>Xóa sản phẩm này khỏi giỏ hàng?</Text>
-            <View style={cartItemStyles.modalButtonsContainer}>
-              <TouchableOpacity style={cartItemStyles.confirmButton} onPress={() => removeCartItem()}>
-                <Text style={cartItemStyles.confirmButtonText}>Xác nhận</Text>
+            <Text style={{ fontSize: 17 ,fontWeight:'bold', fontFamily: 'Inter', textAlign: 'center'}}>Xóa sản phẩm này khỏi giỏ hàng?</Text>
+            <View style={styles.modalButtonsContainer}>
+              <TouchableOpacity style={styles.confirmButton} onPress={removeCartItem}>
+                <Text style={styles.confirmButtonText}>Xác nhận</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={cartItemStyles.cancelButton} onPress={() => setModalVisible(false)}>
-                <Text style={cartItemStyles.cancelButtonText}>Hủy</Text>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Hủy</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      <View style={cartItemStyles.cartItemContainer}>
-        <View style={cartItemStyles.itemRow}>
-          <Checkbox onValueChange={handleCheck} value={checked}/>
+      <View style={styles.cartItemContainer}>
+        <TouchableOpacity style={styles.deleteButton} onPress={() => setModalVisible(true)}>
+          <Icon name="close-circle-outline" size={22} color="#000" />
+        </TouchableOpacity>
 
-          <View style={{height: '90%', alignItems: 'flex-start'}}>
-            <Image source={{ uri: image }} style={cartItemStyles.productImage} />
-          </View>
+        <View style={styles.itemRow}>
+          <Checkbox onValueChange={handleCheck} value={checked} />
+          <Image source={{ uri: image }} style={styles.productImage} />
+          <View style={styles.itemInfo}>
+            <Text numberOfLines={2} style={styles.itemTitle}>{title}</Text>
+            <Text style={styles.itemPrice}>{price}đ</Text>
+            <Text style={styles.discountNote}>Chưa áp dụng ưu đãi</Text>
 
-          <View style={cartItemStyles.itemInfo}>
-            <Text numberOfLines={2} style={cartItemStyles.itemTitle}>{title}</Text>
-            <Text style={cartItemStyles.itemPrice}>{price}đ</Text>
-            <Text style={[cartItemStyles.discountNote, {display: 'none'}]}>(Chưa áp dụng ưu đãi)</Text>
-
-            <View style={cartItemStyles.colorOptions}>
-              <View style={[cartItemStyles.colorCircle, { backgroundColor: color || '#ccc' }]} />
-            </View>
-            <Text style={cartItemStyles.stockStatus}>Tình trạng: Còn hàng</Text>
-
-            <View style={cartItemStyles.quantityControl}>
-              <TouchableOpacity style={cartItemStyles.quantityButton} onPress={() => handleChangeQuantity('-')}>
-                <Icon name="remove-outline" size={22}></Icon>
-              </TouchableOpacity>
-              <View style={{justifyContent: 'center', paddingHorizontal: 5}}>
-                <Text style={[cartItemStyles.quantityText]}>{itemQuantity}</Text>
-              </View>
-              <TouchableOpacity style={cartItemStyles.quantityButton} onPress={() => handleChangeQuantity('+')}>
-                <Icon name="add-outline" size={22}></Icon>
-              </TouchableOpacity>
+            <View style={styles.colorOptions}>
+              {colorOptions.map((colorOption, index) => {
+                const isSelected = selectedColor === colorOption;
+                return (
+                  <TouchableOpacity key={index} onPress={() => setSelectedColor(colorOption)} >
+                    <View style={[styles.outerColorCircle, isSelected && { borderColor: '#0073FF', borderWidth: 2 }]}> 
+                      <View style={[styles.innerColorCircle, { backgroundColor: colorOption.hex }, isSelected && { borderColor: '#fff', borderWidth: 2 }]} />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
 
-            <Text style={cartItemStyles.totalPrice}>
-              Tổng: {price * itemQuantity}đ
-            </Text>
+            <View style={styles.storageOptions}>
+              {storageOptions.map((option, index) => {
+                const isSelected = selectedStorage === option;
+                return (
+                  <TouchableOpacity key={index} style={[styles.storageButton, isSelected ? styles.storageButtonSelected : styles.storageButtonUnselected]} onPress={() => setSelectedStorage(option)} >
+                    <Text style={[styles.storageText, isSelected && styles.storageTextSelected]}>{option}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.quantityControl}>
+              <TouchableOpacity onPress={() => handleChangeQuantity('-')}>
+                <Text style={styles.quantityBtn}>–</Text>
+              </TouchableOpacity>
+              <Text style={styles.quantityText}>{itemQuantity}</Text>
+              <TouchableOpacity onPress={() => handleChangeQuantity('+')}>
+                <Text style={styles.quantityBtn}>+</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.totalPrice}>Tổng: {price * itemQuantity}đ</Text>
+            <Text style={[styles.stockStatus, { color: status === 'inStock' ? 'green' : 'red' }]}>Tình trạng: {status === 'inStock' ? 'Còn hàng' : 'Tạm hết hàng'}</Text>
           </View>
         </View>
       </View>
@@ -95,111 +132,191 @@ const CartItem = ({ title, image, price, id, quantity, color }) => {
   );
 };
 
+
 export default CartItem;
 
-const cartItemStyles = StyleSheet.create({
+const styles = StyleSheet.create({
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20
+  },
+  subHeader: {
+    fontSize: 16,
+    marginLeft: 20,
+    marginVertical: 10,
+    fontWeight: 'bold'
+  },
   cartItemContainer: {
-    width: Dimensions.get('window').width * 0.9,
     backgroundColor: '#fff',
+    marginHorizontal: 10,
+    marginBottom: 10,
+    padding: 10,
     borderRadius: 10,
-    marginHorizontal: Dimensions.get('window').width * 0.05,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    padding: 5,
-    paddingTop: 15,
-    shadowRadius: 1.41,
-    elevation: 2,
+    position: 'relative'
   },
   itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkboxContainer: {
-    borderColor: 'black', borderWidth: 2
-  },
-  checkbox: {
-    height: 18,
-    width: 18,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#000',
+    flexDirection: 'row'
   },
   productImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
+    width: 70,
+    height: 70,
+    resizeMode: 'contain',
+    marginRight: 5
   },
   itemInfo: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'space-between',
+    flex: 1
   },
   itemTitle: {
+    fontSize: 16,
     fontWeight: 'bold',
-    fontSize: 18.77,
+    width: '90%'
   },
   itemPrice: {
-    fontSize: 18.77,
     color: '#333',
+    marginTop: 2,
+    fontSize:16
   },
   discountNote: {
-    fontSize: 13,
-    color: 'gray',
-  },
-  colorOptions: {
-    flexDirection: 'row',
-    marginTop: 5,
-  },
-  colorCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    marginRight: 5,
-  },
-  stockStatus: {
-    color: 'green',
-    fontSize: 13,
-    marginTop: 4,
+    fontSize: 12,
+    color: '#999'
   },
   quantityControl: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  quantityButton: {
-    justifyContent: 'center',
-    paddingVertical: 5,
+    marginTop: 6
   },
   quantityText: {
-    fontSize: 16,
+    marginHorizontal: 10,
+    fontSize: 16
   },
-  totalPrice: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 4,
+  quantityBtn: {
+    fontSize: 18,
+    paddingHorizontal: 10
+  },
+  stockStatus: {
+    fontSize: 13,
+    marginTop: 4
+  },
+  colorOptions: {
+    flexDirection: 'row',
+    marginTop: 5
+  },
+  outerColorCircle: {
+    borderRadius: 20,
+    borderWidth: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 6,
+  },
+  innerColorCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderColor: "#ccc",
+  },
+  storageOptions: {
+    flexDirection: 'row',
+    marginTop: 8,
+    gap: 8,
+    flexWrap: 'wrap'
+  },
+  storageButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    minWidth: 60,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  storageButtonSelected: {
+    backgroundColor: '#007bff',
+    borderColor: '#007bff',
+    borderWidth: 1
+  },
+  storageButtonUnselected: {
+    backgroundColor: '#fff',
+    borderColor: '#007bff',
+    borderWidth: 1
+  },
+  storageText: {
+    fontSize: 13,
+    fontWeight: 'bold'
+  },
+  storageTextSelected: {
+    color: '#fff'
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 3,
+    borderWidth: 1.5,
+    borderColor: '#999',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    marginTop: 25
+  },
+  CheckoutButton: {
+    backgroundColor: "#007bff",
+    paddingVertical: 12,
+    borderRadius: 30,
+    alignItems: "center",
+    marginBottom: 20,
+    width: "40%",
+    alignSelf: "center",
+  },
+  doneButtonText: {
+    textAlign: 'center',
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)'
+  },
+  modalContent: {
+    margin: 30,
+    marginHorizontal: 50,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10
   },
   modalButtonsContainer: {
-    marginTop: 20,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
+    marginTop: 15
   },
   confirmButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#4CAF50',
-    marginHorizontal: 5,
-  },
-  cancelButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#f44336',
-    marginHorizontal: 5,
+    width: 100,
+    backgroundColor: '#e53935',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8
   },
   confirmButtonText: {
-    color: 'white',
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  cancelButton: {
+    width: 100,
+    backgroundColor: '#ccc',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 8
   },
   cancelButtonText: {
-    color: 'white',
+    color: '#333',
+    textAlign: 'center',
   },
+  deleteButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    zIndex: 10,
+  }
 });

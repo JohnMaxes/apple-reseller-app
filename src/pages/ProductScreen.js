@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Platform, Alert } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -9,13 +9,18 @@ import Item4 from '../assets/Product-Screen/Item4.webp';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { CartContext } from "../context/CartContext";
-import { WishlistContext } from "../context/WishlistContext";
+import { WishlistContext } from '../context/WishlistContext';
+import { AuthContext } from "../context/AuthContext";
 
-const storageOptions = ["256GB", "512GB", "1TB"];
+const ProductScreen = ({ route, navigation }) => {  
+  const availableColors = [
+    { hex: "#C4AB98", title: "Vàng cát" },
+    { hex: "#C2BCB2", title: "Bạc ánh kim" },
+    { hex: "#D7D7D7", title: "Trắng" },
+    { hex: "#3C3C3D", title: "Đen" }
+  ];
 
-const ProductScreen = ({ route, navigation }) => {
-  const { id, title, image, price, rating, ratingCount } = route.params;
-  const colors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
+  const availableStorageOptions = ["256GB", "512GB", "1TB"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },
     { label: 'Chip xử lý (CPU)', value: 'Apple A18 Pro 6 nhân' },
@@ -23,52 +28,70 @@ const ProductScreen = ({ route, navigation }) => {
     { label: 'RAM', value: '8GB' },
     { label: 'Dung lượng lưu trữ', value: '256GB' },
     { label: 'Dung lượng khả dụng', value: '241GB' },
-    
   ];
+  
   const Camera = [
     { label: 'Camera sau', value: '48MP, 48MP và 12PP' },
     { label: 'Camera trước', value: '12MP' },
     { label: 'Độ phân giải màn hình', value: 'Super Retina XDR' },
     { label: 'Công nghệ màn hình', value: 'OLED' },
-    { label: 'Quay phim camera sau', value: 'ProRes 4K 30FPS, 4K 120FPS, 1080 60FPS, v.v.' },
+    { label: 'Quay phim camera sau', value: 'ProRes\n4K 30FPS\n4K 120FPS\n1080 60FPS\n v.v.' },
     { label: 'Tính năng camera', value: 'Ảnh Raw\nDolby Vision\nDeep Fusion\nPhotonic Engine\n v.v.' },
   ]
-
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
+  
+  const { id, title, image, price, rating, ratingCount } = route.params;
+  const { loggedIn } = useContext(AuthContext);
+  const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext);
+  const { addToCart } = useContext(CartContext);
+  const [selectedColor, setSelectedColor] = useState(availableColors[0]);
+  const [selectedStorage, setSelectedStorage] = useState(availableStorageOptions[0]);
   const [activeTab, setActiveTab] = useState('specs');
+  const [showMoreSpecs, setShowMoreSpecs] = useState(false);
 
-  const { wishlistItems, wishlist } = useContext(WishlistContext);
-  const [isWishlisted, setIsWishlisted] = useState(wishlistItems.some(element => element.id == id));
-  const { addToCart } = useContext(CartContext); // Sử dụng hook từ CartContext
-  const handleWishlist = () => wishlist(
-    { id, title, image, price, rating }
-  );
-
+  const isWishlisted = wishlistItems.some(element => element.title == title && element.image == image);
+  const handleWishlist = () => {
+    let item = { id, title, image, price, rating, ratingCount };
+    if(!loggedIn) navigation.navigate('Authentication');
+    !isWishlisted ? wishlist(item) : unwishlist(item);
+  }
 
   const renderSpecs = () => (
     <View style={styles.specsContainer}>
         <Text style= {{fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Cấu hình và bộ nhớ</Text>
         {Configuration.map((item, index) => (
             <View key={index} style={styles.specItem}>
-            <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 500}]}>{item.label}</Text>
+            <Text style={[styles.specLabel, {fontFamily: 'Inter', marginLeft: 20, fontSize: 14, fontWeight: 700}]}>{item.label}</Text>
             <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
             </View>
         ))}
-        <Text style= {{fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Camera và Màn hình</Text>
-        {Camera.map((item, index) => (
-            <View key={index} style={styles.specItem}>
-            <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 500}]}>{item.label}</Text>
-            <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
-            </View>
-        ))}
-        <TouchableOpacity>
-            <Text style={[styles.buyButtonText, {color: '#0073FF', alignSelf: 'center', marginTop: 20, fontSize: 18}]}>Xem thêm</Text>
+        {showMoreSpecs && (
+          <>
+            <Text style= {{fontFamily: 'Inter', fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15}}>Camera và Màn hình</Text>
+            {Camera.map((item, index) => (
+              <View key={index} style={styles.specItem}>
+                <Text style={[styles.specLabel, {marginLeft: 20, fontSize: 14, fontWeight: 700}]}>{item.label}</Text>
+                <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
+              </View>
+            ))}
+          </>
+        )}
+        <TouchableOpacity onPress={() => setShowMoreSpecs(prev => !prev)}>
+            <Text style={[styles.buyButtonText, {color: '#0073FF', alignSelf: 'center', marginTop: 20, fontSize: 18}]}>{showMoreSpecs ? 'Thu gọn' : 'Xem thêm'}</Text>
         </TouchableOpacity>
     </View>
   );
 
-  const handleAddToCart = () => addToCart({ id: id || title, title, image, price, color: selectedColor, storage: selectedStorage });
+  const handleAddToCart = () => {
+    loggedIn ? 
+      addToCart({ 
+      id: id || title, title, image, price, 
+      color: selectedColor, 
+      storage: selectedStorage,
+      availableColors: availableColors, 
+      availableStorageOptions: availableStorageOptions,
+    }) : 
+    navigation.navigate('Authentication')
+  }
 
   const reviews = [
     {
@@ -151,7 +174,7 @@ const ProductScreen = ({ route, navigation }) => {
               onPress={handleWishlist}
             />
             <Icon name="bag-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
-              onPress={() => Alert.alert("Đã thêm sản phẩm vào giỏ hàng!")}
+              onPress={() => handleAddToCart()}
             />
             <Icon name="share-social-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
               onPress={() => Alert.alert("Chia sẻ sản phẩm này với bạn bè!")}
@@ -167,11 +190,10 @@ const ProductScreen = ({ route, navigation }) => {
         <View style={styles.section}>
             <Text style={styles.sectionLabel}>Tùy chọn màu sắc</Text>
             <View style={styles.colorContainer}>
-            {colors.map((color, index) => (
+            {availableColors.map((color, index) => (
                 <TouchableOpacity
-                key={index}
-                style={[ styles.colorCircle, { backgroundColor: color, borderWidth: selectedColor === color ? 2 : 0, borderColor: "#0073FF" } ]}
-                onPress={() => setSelectedColor(color)}
+                key={index} onPress={() => setSelectedColor(color)}
+                style={[ styles.colorCircle, { backgroundColor: color.hex, borderWidth: selectedColor.hex === color.hex ? 2 : 0, borderColor: "#0073FF" } ]}
                 />
             ))}
             </View>
@@ -180,7 +202,7 @@ const ProductScreen = ({ route, navigation }) => {
         <View style={styles.section}>
             <Text style={styles.sectionLabel}>Tùy chọn bộ nhớ</Text>
             <View style={styles.storageContainer}>
-            {storageOptions.map((option, index) => (
+            {availableStorageOptions.map((option, index) => (
                 <TouchableOpacity onPress={() => setSelectedStorage(option)} key={index} style={[ styles.storageButton, selectedStorage === option && styles.storageButtonSelected ]}>
                 <Text style={[ styles.storageText, selectedStorage === option && { color: "#fff" } ]}>
                     {option}
@@ -440,11 +462,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   specLabel: {
-    fontWeight: 'bold',
+    fontFamily: 'Inter',
+    fontWeight: 700,
     color: '#444',
     flex: 1,
   },
   specValue: {
+    fontWeight: 500,
+    fontFamily: 'Inter',
     flex: 1,
     textAlign: 'right',
     color: '#666',

@@ -1,18 +1,20 @@
 import { useCallback, useContext } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useFocusEffect } from '@react-navigation/native';
-import UserViewScreen from "../pages/UserViewScreen";
-import UserEditScreen from "../pages/UserEditScreen";
+import ProfileScreen from "../pages/ProfileScreen";
 import { AuthContext } from "../context/AuthContext";
+import WishListScreen from "../pages/WishlistScreen";
+import ProfileEditScreen from "../pages/ProfileEditScreen";
 
 const ProfileStack = createStackNavigator();
 const Profile = ({navigation}) => {
     const { loggedIn } = useContext(AuthContext);
     useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication', { redirectTo: 'Profile' }) }, [loggedIn]) )
     if(loggedIn) return (
-        <ProfileStack.Navigator initialRouteName="UserView" screenOptions={{ headerShown: false }}>
-            <ProfileStack.Screen name="UserView" component={UserViewScreen}/>
-            <ProfileStack.Screen name="UserEdit" component={UserEditScreen}/>
+        <ProfileStack.Navigator initialRouteName="ProfileScreen" screenOptions={{ headerShown: false }}>
+            <ProfileStack.Screen name="ProfileScreen" component={ProfileScreen}/>
+            <ProfileStack.Screen name="ProfileEdit" component={ProfileEditScreen}/>
+            <ProfileStack.Screen name="WishlistScreen" component={WishListScreen}/>
         </ProfileStack.Navigator>
     )
 }

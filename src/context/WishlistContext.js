@@ -7,11 +7,12 @@ const WishlistContext = createContext();
 const WishlistProvider = ({children}) => {
     const { token } = useContext(AuthContext);
     
-    const [wishlistLoading, setWishlistLoading] = useState(true);
+    const [wishlistInit, setWishlistInit] = useState(false);
     const [wishlistItems, setWishlistItems] = useState([]);
 
     useEffect(() => {
         async function init() {
+            setWishlistItems([]);
             if(token) {
                 let items = await AsyncStorage.getItem('wishlistItems');
                 if(items) setWishlistItems(JSON.parse(items))
@@ -26,29 +27,35 @@ const WishlistProvider = ({children}) => {
             }
             catch (error) { console.log(error) }
             */
-           setWishlistLoading(false);
+           setWishlistInit(true);
+           console.log('wishlist mount');
         }
         init()
     }, [])
-
     
     useEffect(() => {
         const syncWishlist = async () => {
+            console.log('syncing');
             if (!token) return;
-            setWishlistLoading(true);
             try {
                 const response = await axios.get('endpoint to fetch wishlisted items', {
                     headers: { Authorization: token },
                 });
                 const items = response.data.wishlist_items;
                 setWishlistItems(items);
-                await AsyncStorage.setItem('wishlistItems', JSON.stringify(items));
             } catch (e) {
                 console.log("Failed to sync wishlist:", e);
-            } finally { setWishlistLoading(false) } 
+            }
         };
         syncWishlist();
     }, [token]);
+
+    useEffect(() => {
+        if(wishlistInit) {
+            if(wishlistItems.length == 0) AsyncStorage.removeItem('wishlistItems').catch(console.log);
+            else AsyncStorage.setItem('wishlistItems', JSON.stringify(wishlistItems)).catch(console.log);
+        }
+    }, [wishlistItems])
 
     const syncWishlist = async () => {
         if (!token) return;
@@ -58,7 +65,6 @@ const WishlistProvider = ({children}) => {
             });
             const items = response.data.wishlist_items;
             setWishlistItems(items);
-            await AsyncStorage.setItem('wishlistItems', JSON.stringify(items));
         } catch (e) {
             console.log("Failed to sync wishlist:", e);
         }
@@ -66,9 +72,7 @@ const WishlistProvider = ({children}) => {
 
     const wishlist = async (item) => {
         try {
-            const newItems = [...wishlistItems, item];
-            setWishlistItems(newItems);
-            await AsyncStorage.setItem('wishlistItems', JSON.stringify(newItems));
+            setWishlistItems(prev => [...prev, item]);
             // await syncWishlist()
         } catch (e) {
             console.log("Error adding to wishlist:", e);
@@ -77,9 +81,7 @@ const WishlistProvider = ({children}) => {
 
     const unwishlist = async (item) => {
         try {
-            const updatedItems = wishlistItems.filter((i) => i.id !== item.id);
-            setWishlistItems(updatedItems);
-            await AsyncStorage.setItem('wishlistItems', JSON.stringify(updatedItems));
+            setWishlistItems(prev => prev.filter(i => i.id !== item.id));
             /*
             if (token) {
             await axios.delete(`your-api-endpoint/${item.id}`, {
@@ -95,7 +97,7 @@ const WishlistProvider = ({children}) => {
 
 
     return (
-        <WishlistContext.Provider value={{ wishlistItems, wishlist, unwishlist, wishlistLoading }}>
+        <WishlistContext.Provider value={{ wishlistItems, wishlist, unwishlist, wishlistInit }}>
             {children}
         </WishlistContext.Provider>
     ); 

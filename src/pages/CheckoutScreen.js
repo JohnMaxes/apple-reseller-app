@@ -1,7 +1,8 @@
-import { useContext, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, KeyboardAvoidingView, Platform } from "react-native";
+import { useContext } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
+import Toast from "react-native-toast-message";
 
 const CheckoutScreen = ({navigation}) => {
     const { checkoutItems, selectedAddress } = useContext(CheckoutContext);
@@ -10,13 +11,26 @@ const CheckoutScreen = ({navigation}) => {
     const { subtotal, total } = useContext(CheckoutContext);
 
     const paymentMethods = [
-        { label: 'Thanh toán qua Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
+        { label: 'Thanh toán qua Ví Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
         { label: 'Thanh toán qua ngân hàng', icon: require('../assets/icons/banking-icon.png'), value: 'eBanking' },
         { label: 'Thanh toán qua Apple Pay', icon: require('../assets/icons/applepay-icon.png'), value: 'ApplePay'},
         { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash'},
     ];
 
     const goBack = () => navigation.goBack();
+    const infoGuard = () => {
+        if(!selectedAddress || !selectedPaymentMethod) 
+            Toast.show({
+                type: 'error',
+                text1: 'Bạn chưa chọn ' + (!selectedAddress ? 'địa chỉ giao hàng.' : 'phương thức thanh toán.'),
+                text2: 'Vui lòng chọn trước khi tiếp tục!',
+                text1Style: {fontFamily: 'Inter', fontSize: 16, fontWeight: 500},
+                text2Style: {fontFamily: 'Inter', fontSize: 12,},
+                autoHide: true, avoidKeyboard: true, topOffset: 20,  
+            })
+        else navigation.navigate('CheckoutConfirmScreen');
+    }
+
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer} keyboardShouldPersistTaps="handled">
@@ -33,10 +47,10 @@ const CheckoutScreen = ({navigation}) => {
                 {/* Sản phẩm */}
                 <View style={styles.box}>
                     {checkoutItems.map((p) => (
-                        <View key={p.id} style={styles.productItem}>
+                        <View key={p.uuid} style={styles.productItem}>
                             <Image source={{ uri: p.image }} style={styles.productImage} />
                             <View style={styles.productDetails}>
-                                <Text style={styles.productName}>{p.title}</Text>
+                                <Text style={styles.productName}>{p.title} {p.color.title} {p.memory}</Text>
                                 <Text style={styles.productPrice}>{p.price.toLocaleString()}đ</Text>
                                 <Text style={styles.productQuantity}>x{p.quantity}</Text>
                             </View>
@@ -154,13 +168,6 @@ const CheckoutScreen = ({navigation}) => {
                             <Text style={styles.discountBlue}>-{selectedShipVoucher.value * 50}đ</Text>
                         </View>
                     ) : null }
-                    {/*}
-                    
-                    <View style={styles.summaryLine}>
-                        <Text>Giảm phí vận chuyển:</Text>
-                        <Text style={styles.discountBlue}>-50.000đ</Text>
-                    </View>
-                    {*/}
                     <View style={styles.summaryLine}>
                         <Text style={styles.bold}>Tổng thanh toán:</Text>
                         <Text style={[styles.bold]}>{total}đ</Text>
@@ -168,7 +175,7 @@ const CheckoutScreen = ({navigation}) => {
                 </View>
 
                 {/* Nút đặt hàng */}
-                <TouchableOpacity style={styles.orderButton}>
+                <TouchableOpacity style={styles.orderButton} onPress={() => infoGuard()}>
                     <Text style={styles.orderButtonText}>Tiếp tục</Text>
                 </TouchableOpacity>
             </ScrollView>

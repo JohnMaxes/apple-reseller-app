@@ -4,7 +4,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { AuthContext } from "../context/AuthContext";
 import { updateUserInfo } from "../services/user";
 
-const UserEditScreen = ({ navigation }) => {
+const ProfileEditScreen = ({ navigation }) => {
     const { userInfo, setUserInfo } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
 
@@ -139,6 +139,8 @@ const UserEditScreen = ({ navigation }) => {
     );
 };
 
+export default ProfileEditScreen;
+
 const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
@@ -168,5 +170,3 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
 });
-
-export default UserEditScreen;

@@ -73,17 +73,17 @@ const CheckoutProvider = ({children}) => {
   useEffect(() => {
     if(isInit) {
       console.log('vouchers hook');
-      if(!selectedShipVoucher && !selectedOrderVoucher) return setTotal(subtotal + ship);
+      if(!selectedShipVoucher && !selectedOrderVoucher) return setTotal(Math.round((subtotal + ship) * 100) / 100);
       let newShip = ship, deduction = 0;
-      if(selectedShipVoucher) newShip = newShip * (1 - selectedShipVoucher.value)
+      if(selectedShipVoucher) newShip = Math.round((newShip * (1 - selectedShipVoucher.value)) * 100) / 100;
       if(selectedOrderVoucher) {
-        if(selectedOrderVoucher.type == 'ratio') deduction = subtotal * selectedOrderVoucher.value;
-        if(selectedOrderVoucher.type == 'static') deduction = selectedOrderVoucher.value;
+        if(selectedOrderVoucher.type == 'ratio') deduction = Math.round((subtotal * selectedOrderVoucher.value) * 100) / 100;
+        if(selectedOrderVoucher.type == 'static') deduction = Math.round(selectedOrderVoucher.value * 100) / 100;
       }
-      setTotal(subtotal + newShip - deduction);
+      setTotal(Math.round((subtotal + newShip - deduction) * 100) / 100);
     }
   }, [selectedShipVoucher, selectedOrderVoucher])
-
+  
   const checkout = async () => {
     // checkout API call
   }

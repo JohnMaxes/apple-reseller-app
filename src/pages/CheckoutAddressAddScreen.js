@@ -3,6 +3,8 @@ import { View, Text, TextInput, Switch, TouchableOpacity, StyleSheet, Platform }
 import Icon from 'react-native-vector-icons/Ionicons';
 import { CheckoutContext } from '../context/CheckoutContext';
 
+import Toast from 'react-native-toast-message';
+
 const CheckoutAddressAddScreen = ({navigation}) => {
   const { setAddresses } = useContext(CheckoutContext)
   const [name, setName] = useState('');
@@ -12,15 +14,25 @@ const CheckoutAddressAddScreen = ({navigation}) => {
   const [isDefault, setIsDefault] = useState(false);
 
   const handleSave = () => {
-    if(!name || !phone || !newAddress) return alert('Xin điền vào tất cả các ô!')
-    const newAddress = { id: name + phone, name: name, phone: phone, address: newAddress, note: note, isDefault: isDefault };
+    const nameRegExp = /^[a-zA-ZÀ-ỹà-ỹ\s]{2,}$/u.test(name);
+    const phoneRegExp = /^0\d{9}$/.test(phone);
+    const addressRegExp = /^[\wÀ-ỹà-ỹ\s,.-]{5,}$/u.test(newAddress);
+    if(!nameRegExp || !phoneRegExp || !addressRegExp) return Toast.show({
+        type: 'error',
+        text1: 'Trường ' + (!nameRegExp ? 'TÊN' : !phoneRegExp ? 'SỐ ĐIỆN THOẠI' : 'ĐỊA CHỈ NHẬN HÀNG') + ' chưa hợp lệ!',
+        text2: 'Vui lòng điền thông tin hợp lệ trước khi tiếp tục!',
+        text1Style: {fontFamily: 'Inter', fontSize: 16, fontWeight: 500},
+        text2Style: {fontFamily: 'Inter', fontSize: 12,},
+        autoHide: true, avoidKeyboard: true, topOffset: 20,  
+    })
+    const newAddressObj = { id: name + phone, name: name, phone: phone, address: newAddress, note: note, isDefault: isDefault };
     setAddresses((prev) => {
-      if(!prev) return [newAddress];
+      if(!prev) return [newAddressObj];
       if(isDefault) { 
         let noDefaults = prev.map(item => ({...item, isDefault: false}));
-        return [...noDefaults, newAddress]
+        return [...noDefaults, newAddressObj]
       }
-      return [...prev, newAddress];
+      return [...prev, newAddressObj];
     })
     goBack();
   };

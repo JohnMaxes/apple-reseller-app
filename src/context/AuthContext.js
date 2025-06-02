@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from 'jwt-decode';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -27,7 +28,12 @@ const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        if (!email || !password) return alert('Please fill out all fields.');
+        if (!email || !password) return Toast.show({
+            type: 'error',
+            text1: 'Vui lòng điền đầy đủ thông tin!',
+            text1Style: {fontFamily: 'Inter', fontSize: 14, fontWeight: 500},
+            autoHide: true, avoidKeyboard: true, topOffset: 20,  
+        })
         else try {
             const response = await axios.post('https://fakestoreapi.com/auth/login', { username: email, password: password })
             setId(jwtDecode(response.data.token).sub)

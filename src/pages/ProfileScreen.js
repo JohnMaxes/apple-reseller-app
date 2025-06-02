@@ -1,12 +1,11 @@
-import { useContext } from "react";
-import { View, Text, Image, TouchableOpacity, Platform, ScrollView, StyleSheet } from "react-native";
+import { useContext, useState } from "react";
+import { View, Text, Image, TouchableOpacity, Platform, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from "../context/AuthContext";
 
-const UserViewScreen = ({navigation}) => {
+const ProfileScreen = ({navigation}) => {
     const { logOut, userInfo } = useContext(AuthContext);
-
-    // Kiểm tra userInfo có tồn tại không
+    const [loading, setLoading] = useState(false);
     if (!userInfo) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -14,27 +13,25 @@ const UserViewScreen = ({navigation}) => {
             </View>
         );
     }
-
-    // Lấy thông tin từ userInfo
     const avatar = userInfo.avatar || 'https://images.immediate.co.uk/production/volatile/sites/3/2022/07/val-kilmer-batman-forever-cb74c7d.jpg?quality=90&fit=700,466';
     const fullName = userInfo.fullName || '';
-    const email = userInfo.email || '';
-    const phone = userInfo.phone || '';
-
-    const handleUserEdit = () => navigation.navigate('UserEdit');
-    const handleLogout = () => { navigation.navigate('Home'); logOut(); }
-
+    const handleProfileEdit = () => navigation.navigate('ProfileEdit');
+    const handleWishlist = () => navigation.navigate('WishlistScreen');
+    const handleLogout = () => { navigation.navigate('Home'); logOut() }
+    if (loading) return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+    );
     return (
-        <ScrollView style={{ paddingTop: Platform.select({ ios: 50, android: 30, default: 40 }) }}>
+        <ScrollView style={{paddingTop: Platform.select({ ios: 50, android: 30, default: 40 })}}>
             <View style={styles.topBackground}/>
-            <View style={{flexDirection:'column', marginBottom: 20, alignItems:'center'}}>
+            <View style={[ {flexDirection:'column', marginBottom: 20, alignItems:'center'}]}>
                 <Image source={{uri: avatar}}
-                    style={{height: 100, width: 100, borderRadius: 50, marginTop: 130}}/>
-                <Text style={{fontWeight:'bold', fontSize: 25, paddingLeft: 10, marginTop: 10}}>{fullName}</Text>
-                <Text style={{fontSize: 16, color: 'gray', marginTop: 4}}>{email}</Text>
-                {phone ? <Text style={{fontSize: 16, color: 'gray', marginTop: 2}}>{phone}</Text> : null}
+                style={{height: 100, width: 100, borderRadius: 50, marginTop: 130}}/>
+                <Text style={{fontWeight:'bold', fontSize: 25, paddingLeft: 10}}>{fullName}</Text>
             </View>
-            <TouchableOpacity style={[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]} onPress={handleUserEdit}>
+            <TouchableOpacity style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]} onPress={handleProfileEdit}>
                 <Icon name='person-outline' color='black' size={25} />
                 <Text style={{fontWeight:'500', fontSize: 18, flex: 1}}>Thông tin cá nhân</Text>
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
@@ -46,11 +43,11 @@ const UserViewScreen = ({navigation}) => {
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
             </View>
             <View style={styles.divider} />
-            <View style={[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
+            <TouchableOpacity onPress={handleWishlist} style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
                 <Icon name='bookmark-outline' color='black' size={26} />
                 <Text style={{fontWeight:'500', fontSize: 18, flex:1}}>Đã lưu</Text>
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
-            </View>
+            </TouchableOpacity>
             <View style={styles.divider} />
             <View style={[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
                 <Icon name='help-circle-outline' color='black' size={26} />
@@ -71,6 +68,8 @@ const UserViewScreen = ({navigation}) => {
         </ScrollView>
     )
 }
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create ({
     divider: {
@@ -98,4 +97,3 @@ const styles = StyleSheet.create ({
         zIndex: -1,
     }
 })
-export default UserViewScreen;
