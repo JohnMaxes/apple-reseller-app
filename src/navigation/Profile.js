@@ -8,7 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 const ProfileStack = createStackNavigator();
 const Profile = ({navigation}) => {
     const { loggedIn } = useContext(AuthContext);
-    useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication') }, [loggedIn]) )
+    useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication', { redirectTo: 'Profile' }) }, [loggedIn]) )
     if(loggedIn) return (
         <ProfileStack.Navigator initialRouteName="UserView" screenOptions={{ headerShown: false }}>
             <ProfileStack.Screen name="UserView" component={UserViewScreen}/>

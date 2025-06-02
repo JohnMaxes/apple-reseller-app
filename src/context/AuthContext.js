@@ -26,10 +26,6 @@ const AuthProvider = ({ children }) => {
         init()
     }, []);
 
-    const refreshToken = async() => {
-
-    };
-
     const login = async (email, password) => {
         if (!email || !password) return alert('Please fill out all fields.');
         else try {
@@ -39,6 +35,7 @@ const AuthProvider = ({ children }) => {
         }
         catch (error) { console.log(error) }
     };
+    
     const logOut = () => { 
         AsyncStorage.removeItem('cart');
         AsyncStorage.removeItem('wishlistItems')

@@ -1,29 +1,59 @@
 import { useState, useContext, useEffect } from 'react';
-import { Text, Image, View, ScrollView, TouchableOpacity, Platform, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import { Text, Image, View, ScrollView, TouchableOpacity, Platform, ActivityIndicator, TouchableWithoutFeedback, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles';
 
 import CustomInput from '../components/CustomInput';
 import CustomInputToggleable from '../components/CustomInputToggleable';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { AuthContext } from '../context/AuthContext';
 import { Keyboard } from 'react-native';
+import { AuthContext } from '../context/AuthContext';
+import { login } from '../services/sso';
 
-const LoginScreen = ({ togglePage, navigation }) => {
-    useEffect(() => { // sử dụng data và API mẫu
-        setEmail('mor_2314');
-        setPassword('83r5^_');
-    }, [])
-    const [email, setEmail] = useState('');
+const LoginScreen = ({ navigation, route }) => {
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { login, loggedIn } = useContext(AuthContext);
+    const { setLoggedIn, setUserInfo } = useContext(AuthContext);
+    const redirectTo = route?.params?.redirectTo;
+    const fromSignup = route?.params?.fromSignup;
+    
     const onLoginPress = async () => {
         setLoading(true);
-        await login(email, password);
-        if(!loggedIn) setLoading(false);
-        navigation.goBack();
-    }
+        try {
+            const response = await login({
+                username: username,
+                password: password,
+            });
+            const resData = response.data;
+            if (resData.status === 200) {
+                await AsyncStorage.setItem('accessToken', resData.accessToken);
+                await AsyncStorage.setItem('refreshToken', resData.refreshToken);
+                setLoggedIn(true);
+                setUserInfo(resData.userInfo);
+                setLoading(false);
+                // Thoát modal đăng nhập
+                navigation.goBack();
+                // Chờ goBack hoàn tất trước khi điều hướng
+                setTimeout(() => {
+                    navigation.navigate('BottomTab', {
+                        screen: redirectTo || 'User',
+                        params: {
+                            screen: 'UserView',
+                        },
+                    });
+                }, 0);
+            } else {
+                setLoading(false);
+                Alert.alert("Lỗi", resData.message || "Đăng nhập không thành công. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            setLoading(false);
+            const message = error?.response?.data?.message || "Đăng nhập không thành công. Vui lòng thử lại.";
+            Alert.alert("Lỗi", message);
+        }
+    };
+
     const navigateToForgotPassword = () => navigation.navigate('ForgotPassword');
 
     return (
@@ -40,8 +70,8 @@ const LoginScreen = ({ togglePage, navigation }) => {
                     placeholder="Tên đăng nhập"
                     placeholderTextColor="grey"
                     iconName="person"
-                    value={email}
-                    onChangeText={setEmail}
+                    value={username}
+                    onChangeText={setUsername}
                 />
                 <CustomInputToggleable
                     style={{ paddingLeft: 20, fontSize: 16, marginLeft: 20, marginRight: 20 }}
@@ -61,7 +91,7 @@ const LoginScreen = ({ togglePage, navigation }) => {
                 <TouchableOpacity style={[styles.button, { backgroundColor: '#000000', borderRadius: 30 }]} onPress={onLoginPress}>
                     <Text style={[styles.buttonText, { fontSize: 20, fontWeight: 'bold' }]}>{loading ? <ActivityIndicator size="small" color="white" /> : 'Đăng nhập'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={togglePage} style={{ color: "#0171E3", alignItems: "center", marginTop: 20 }}>
+                <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={{ color: "#0171E3", alignItems: "center", marginTop: 20 }}>
                     <Text style={{ color: "#0171E3", fontSize: 16 }}>Đăng ký</Text>
                 </TouchableOpacity>
 

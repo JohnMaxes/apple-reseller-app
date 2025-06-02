@@ -37,7 +37,7 @@ const MainContent = () => {
         <MainStack.Navigator initialRouteName='BottomTab' screenOptions={{ headerShown: false }}>
             <MainStack.Screen name='BottomTab' component={BottomTabNavigation}/>
             <MainStack.Screen name='Authentication' component={Authentication} options={{ presentation: 'modal' }}/>
-            <MainStack.Screen name='Checkout' component={Checkout} options={{ presentation: 'modal' }}/>
+            <MainStack.Screen name='Checkout' component={Checkout} options={{ presentation: 'modal' }} />
         </MainStack.Navigator>
     );
 };

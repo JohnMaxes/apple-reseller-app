@@ -1,19 +1,57 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { verifyCode, sendVerifiCode } from '../services/sso';
 
 const OTPChallengeScreen = ({ route, navigation }) => {
-//   const { phoneNumber } = route.params || {}; // Lấy số điện thoại từ màn hình trước
-  const input = route?.params?.input || '';
-
-  const [otp, setOTP] = useState(['', '', '', '']);
+  // const { phoneNumber } = route.params || {}; // Lấy số điện thoại từ màn hình trước
+  const email = route?.params?.email || '';
+  const [otp, setOTP] = useState(['', '', '', '', '', '']);
   const inputRefs = useRef([]);
 
-  const checkOTP = () => { return otp.every(digit => digit !== '') };
+  const checkOTP = async () => {
+    const otpValue = otp.join('');
+    if (otpValue.length < 6 || otp.includes('')) {
+      Alert.alert("Lỗi", 'Vui lòng nhập đầy đủ mã OTP.');
+      return false;
+    }
+    try {
+      const response = await verifyCode({
+        email: email,
+        code: otpValue,
+      });
+      const resData = response.data;
+      if (resData.status === 200) {
+        Alert.alert("Thành công", resData.message || "Mã xác thực thành công!");
+        return true;
+      } else {
+        Alert.alert("Lỗi", resData.message || "Mã xác thực không chính xác. Vui lòng thử lại.");
+        return false;
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại.";
+      Alert.alert("Lỗi", message);
+      return false;
+    }
+  }
   const goBack = () => navigation.goBack();
-  const handleResendCode = () => alert(`Mã xác thực đã được gửi lại đến ${input}`);
-  const submit = () => { if(checkOTP()) navigation.navigate('PasswordChange') };
-
+  const handleResendCode = async () => {
+    try {
+      const response = await sendVerifiCode({
+        email: email,
+      });
+      const resData = response.data;
+      if (resData.status === 200) {
+        Alert.alert("Thành công", resData.message || `Mã xác thực đã được gửi lại đến ${email}`);
+      } else {
+        Alert.alert("Lỗi", resData.message || "Không thể gửi mã xác thực. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại.";
+      Alert.alert("Lỗi", message);
+    }
+  }
+  const submit = async () => { if (await checkOTP()) navigation.navigate('PasswordChange', { email: email }) };
   const handleOtpChange = (text, index) => {
     const newOtp = [...otp];
     newOtp[index] = text;
@@ -38,7 +76,7 @@ const OTPChallengeScreen = ({ route, navigation }) => {
           <Text style={styles.subtitle}>
             Đã gửi mã xác thực đến
           </Text>
-          <Text style={styles.phoneNumber}>{input}</Text>
+          <Text style={styles.phoneNumber}>{email}</Text>
 
           <View style={styles.otpContainer}>
             {otp.map((value, index) => (

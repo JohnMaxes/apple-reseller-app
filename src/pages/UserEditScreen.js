@@ -1,39 +1,31 @@
-import { useContext, useEffect, useState, useRef, useLayoutEffect } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity, TextInput, Alert, StyleSheet, Platform, Image, Button, TouchableWithoutFeedback, Keyboard } from "react-native";
-import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { TouchableWithoutFeedback, Keyboard, TextInput, View, Text, Alert, TouchableOpacity, Image, StyleSheet, Platform } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 import { AuthContext } from "../context/AuthContext";
-import Icon from 'react-native-vector-icons/Ionicons';
-import { color } from "react-native-elements/dist/helpers";
+import { updateUserInfo } from "../services/user";
 
 const UserEditScreen = ({ navigation }) => {
     const { userInfo, setUserInfo } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
-        firstName: userInfo.name.firstname,
-        lastName: userInfo.name.lastname,
-        username: userInfo.username,
-        email: userInfo.email,
-        phoneNumber: userInfo.phone,
-        houseNumber: userInfo.address.number,
-        street: userInfo.address.street,
-        city: userInfo.address.city,
+        fullName: '',
+        username: '',
+        email: '',
+        phoneNumber: '',
+        address: '',
     });
 
-    const goBack = () => navigation.goBack();
-
-    const formDataRef = useRef(formData);
     useEffect(() => {
-        setFormData({
-            firstName: userInfo.name.firstname,
-            lastName: userInfo.name.lastname,
-            username: userInfo.username,
-            email: userInfo.email,
-            phoneNumber: userInfo.phone,
-            houseNumber: userInfo.address.number,
-            street: userInfo.address.street,
-            city: userInfo.address.city,
-        });
+        if (userInfo) {
+            setFormData({
+                fullName: userInfo.fullName || '',
+                username: userInfo.username || '',
+                email: userInfo.email || '',
+                phoneNumber: userInfo.phoneNumber || '',
+                address: userInfo.address || '',
+            });
+        }
     }, [userInfo]);
 
     const handleChange = (name, value) => {
@@ -41,123 +33,106 @@ const UserEditScreen = ({ navigation }) => {
             ...prevFormData,
             [name]: value,
         }));
-        console.log(formData);
-    };
-
-    useEffect(() => {
-        console.log('Updated formData:', formData);
-    }, [formData]);
-
-    const validateForm = () => {
-        const { firstName, lastName, username, email, phoneNumber, houseNumber, street, city } = formData;
-        if (!firstName || !lastName || !username || !email || !phoneNumber || !houseNumber || !street || !city) {
-            Alert.alert('Validation Error', 'All fields are required.');
-            return false;
-        }
-        return true;
     };
 
     const handleSubmit = async () => {
-        console.log(formData);
-        if (validateForm()) {
-            setLoading(true);
-            const updatedUserInfo = {
-                ...userInfo,
-                name: {
-                    firstname: formData.firstName,
-                    lastname: formData.lastName,
-                },
-                username: formData.username,
-                email: formData.email,
-                phone: formData.phoneNumber,
-                address: {
-                    number: formData.houseNumber,
-                    street: formData.street,
-                    city: formData.city,
-                },
-            };
+        setLoading(true);
+        const updatedUser = {
+            fullName: formData.fullName?.trim() || null,
+            username: formData.username?.trim() || null,
+            email: formData.email?.trim() || null,
+            phoneNumber: formData.phoneNumber?.trim() || null,
+            address: formData.address?.trim() || null,
+        };
 
-            try {
-                const response = await axios.put(`https://fakestoreapi.com/users/${userInfo.id}`, updatedUserInfo, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                setUserInfo(response.data || updatedUserInfo);
+        try {
+            const response = await updateUserInfo(userInfo.userId, updatedUser);
+            const resData = response.data;
+            if (resData.status === 200) {
+                setUserInfo(resData.userInfo || updatedUser);
                 navigation.goBack();
-            } catch (error) {
-                console.error('Error saving user: ', error);
-                Alert.alert('Error', 'Failed to save user information.');
-            } finally {
-                setLoading(false);
             }
-        } else {
-            Alert.alert('Please fill out all fields!');
+            else {
+                Alert.alert("Lỗi", resData.message || "Không thể cập nhật thông tin người dùng.");
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật người dùng:", error);
+            Alert.alert("Lỗi", "Không thể lưu thông tin người dùng.");
+        } finally {
+            setLoading(false);
         }
     };
+
+    const goBack = () => navigation.goBack();
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={{ paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }), paddingHorizontal: 20 }}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <View style={{flex:1}}>
+                {/* Header */}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flex: 1 }}>
                         <TouchableOpacity style={styles.backButton} onPress={goBack}>
                             <View style={styles.backIconWrapper}>
-                                <Icon name="chevron-back" size={22} color="#000"  />
+                                <Icon name="chevron-back" size={22} color="#000" />
                             </View>
                         </TouchableOpacity>
                     </View>
-                    <View style={{flex: 3}}>
+                    <View style={{ flex: 3 }}>
                         <Text style={{ textAlign: 'center', fontSize: 20, fontWeight: 'bold' }}>Thông tin cá nhân</Text>
                     </View>
-                    <View style={{flex: 1, alignItems: 'flex-end'}}>
+                    <View style={{ flex: 1, alignItems: 'flex-end' }}>
                         <TouchableOpacity onPress={handleSubmit}>
-                            <Text style={{ fontSize: 20, fontWeight: 'bold' }} >Lưu</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{loading ? "Đang lưu..." : "Lưu"}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={{ flexDirection: 'column', marginBottom: 10, alignItems: 'center', marginTop: 20, gap: 10 }}>
-                    <Image source={{ uri: 'https://images.immediate.co.uk/production/volatile/sites/3/2022/07/val-kilmer-batman-forever-cb74c7d.jpg?quality=90&fit=700,466' }}
-                        style={{ height: 120, width: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center' }} />
-                    <Text style={{ fontWeight: 'bold', fontSize: 25 }}>{userInfo.name.firstname + ' ' + userInfo.name.lastname}</Text>
+
+                {/* Avatar */}
+                <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 20 }}>
+                    <Image
+                        source={{ uri: 'https://images.immediate.co.uk/production/volatile/sites/3/2022/07/val-kilmer-batman-forever-cb74c7d.jpg?quality=90&fit=700,466' }}
+                        style={{ height: 120, width: 120, borderRadius: 60 }}
+                    />
+                    <Text style={{ fontWeight: 'bold', fontSize: 22, marginTop: 10 }}>{formData.fullName}</Text>
                     <Text style={{ color: '#0D6EFD', fontSize: 16 }}>Đổi ảnh đại diện</Text>
                 </View>
 
-                <Text style={styles.label}>Họ</Text>
+                {/* Form Fields */}
+                <Text style={styles.label}>Họ và tên</Text>
                 <TextInput
                     style={styles.input}
-                    value={formData.firstName}
-                    onChangeText={(value) => handleChange('firstName', value)}
-                    required
+                    value={formData.fullName}
+                    onChangeText={(value) => handleChange('fullName', value)}
                 />
-                <Text style={styles.label}>Tên</Text>
+
+                <Text style={styles.label}>Tên đăng nhập</Text>
                 <TextInput
-                    style={styles.input}
-                    value={formData.lastName}
-                    onChangeText={(value) => handleChange('lastName', value)}
-                    required
-                />
-                <Text style={styles.label}>Username:</Text>
-                <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: '#ddd' }]}
                     value={formData.username}
-                    onChangeText={(value) => handleChange('username', value)}
-                    required
+                    editable={false}
                 />
-                <Text style={styles.label}>Email:</Text>
+
+                <Text style={styles.label}>Email</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: '#ddd' }]}
                     value={formData.email}
-                    onChangeText={(value) => handleChange('email', value)}
+                    editable={false}
                     keyboardType="email-address"
-                    required
                 />
-                <Text style={styles.label}>Số điện thoại:</Text>
+
+                <Text style={styles.label}>Số điện thoại</Text>
                 <TextInput
                     style={styles.input}
                     value={formData.phoneNumber}
                     onChangeText={(value) => handleChange('phoneNumber', value)}
-                    required
+                    keyboardType="phone-pad"
+                />
+
+                <Text style={styles.label}>Địa chỉ</Text>
+                <TextInput
+                    style={styles.input}
+                    value={formData.address}
+                    onChangeText={(value) => handleChange('address', value)}
                 />
             </View>
         </TouchableWithoutFeedback>
@@ -165,17 +140,6 @@ const UserEditScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 20,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        maxWidth: 400,
-        alignSelf: 'center',
-        marginTop: 50,
-    },
-
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
@@ -184,8 +148,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     label: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontWeight: '500',
         marginBottom: 5,
     },
     backIconWrapper: {
@@ -204,6 +168,5 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
 });
-
 
 export default UserEditScreen;

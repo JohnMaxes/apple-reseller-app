@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 
 const Cart = ({navigation}) => {
     const { loggedIn } = useContext(AuthContext);
-    useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication') }, [loggedIn]) )
+    useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication', { redirectTo: 'Cart' }) }, [loggedIn]) )
     if(loggedIn) return <CartScreen/>
 }
 

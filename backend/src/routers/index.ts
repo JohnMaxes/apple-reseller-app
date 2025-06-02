@@ -1,0 +1,40 @@
+import express from 'express';
+import multer from 'multer';
+import { adminAccess } from '../middlewares/adminAccess';
+import { authentication } from '../middlewares/authentication';
+import * as sso from '../controllers/sso.controller';
+import * as product from '../controllers/product.controller';
+import * as cart from '../controllers/cart.controller';
+import * as user from '../controllers/user.controller';
+import { authOrSession } from '../middlewares/authOrSession';
+
+const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Routes for sso
+router.post('/refresh', sso.refreshAccessToken);
+router.post('/login', sso.login);
+router.post('/login/google', sso.googleLogin);
+router.post('/login/facebook', sso.facebookLogin);
+router.post('/register', sso.register);
+router.post('/forgot/request', sso.sendVerifyCode);
+router.post('/forgot/verify', sso.verifyCode);
+router.post('/forgot/reset', sso.resetPassword);
+
+// Routes for user
+router.put('/users/:userId', authentication, user.updateUserInfo);
+
+// Routes for product
+router.get('/products/:sku', product.getProductBySKU);
+router.get('/products/category/:category', product.getProductByCategory);
+router.post('/products', upload.array('images'), product.createProduct);
+router.put('/products/:sku', adminAccess, upload.array('images'), product.updateProduct);
+router.delete('/products/:sku', product.deleteProduct);
+
+// Routes for cart
+router.get('/cart', authOrSession, cart.getCart);
+router.post('/cart', authOrSession, cart.addToCart);
+router.put('/cart', authOrSession, cart.updateCartItem);
+router.delete('/cart', authOrSession, cart.deleteCartItem);
+
+export default router;

@@ -1,13 +1,31 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { sendVerifiCode } from '../services/sso';
 
 const ForgotPasswordScreen = ({ navigation }) => {
-  const [input, setInput] = useState('');
-
-  const handleSendCode = () => {
-    if (!input) return alert('Vui lòng nhập số điện thoại hoặc email');
-    navigation.navigate('OTPChallenge', { input: input });
+  const [email, setEmail] = useState('');
+  
+  const handleSendCode = async () => {
+    if (!email) {
+      Alert.alert("Lỗi", 'Vui lòng nhập số điện thoại hoặc email');
+      return;
+    }
+    try {
+      const response = await sendVerifiCode({ 
+        email: email,
+      });
+      const resData = response.data;
+      if (resData.status === 200) {
+        Alert.alert("Thành công", resData.message || "Mã xác thực đã được gửi!");
+        navigation.navigate('OTPChallenge', { email: email });
+      } else {
+        Alert.alert("Lỗi", resData.message || "Không thể gửi mã xác thực. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || "Không thể gửi mã xác thực. Vui lòng thử lại.";
+      Alert.alert("Lỗi", message);
+    }
   };
 
   const handleGoBack = () => navigation ? navigation.goBack() : null;
@@ -24,14 +42,14 @@ const ForgotPasswordScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>QUÊN MẬT KHẨU</Text>
         <Text style={styles.subtitle}>
-            Nhập số điện thoại hoặc gmail đăng ký để lấy lại mật khẩu
+            Nhập gmail đăng ký để lấy lại mật khẩu
         </Text>
         <TextInput
-            placeholder="Nhập số điện thoại hoặc gmail đăng ký"
+            placeholder="Nhập gmail đăng ký"
             placeholderTextColor="#aaa"
             style={styles.input}
-            value={input}
-            onChangeText={setInput}
+            value={email}
+            onChangeText={setEmail}
             keyboardType="default"
           />
         <TouchableOpacity style={styles.button} onPress={handleSendCode}>

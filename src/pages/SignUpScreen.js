@@ -1,19 +1,39 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Image, Platform, Alert } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomInputToggleable from '../components/CustomInputToggleable';
 import styles from '../../styles';
 import Icon from 'react-native-vector-icons/Ionicons';
-const SignUpScreen = ({ togglePage }) => {
+import { register } from '../services/sso';
+const SignUpScreen = ({ togglePage, navigation }) => {
 
     const [registUsername, setRUsername] = useState('');
     const [registEmail, setREmail] = useState('');
     const [registPassword, setRPassword] = useState('');
-    const [registPhone, setRPhone] = useState('');
     const [registConfirmPassword, setRConfirmPassword] = useState('');
 
     const processRequest = async () => {
-        togglePage();
+        if (registPassword !== registConfirmPassword) {
+            Alert.alert("Lỗi", "Mật khẩu và xác nhận mật khẩu không khớp");
+            return;
+        }
+        try {
+            const response = await register({ 
+                username: registUsername,
+                email: registEmail,
+                password: registPassword,
+            });
+            const resData = response.data;
+            if (resData.status === 200) {
+                Alert.alert("Thành công", resData.message || "Đăng ký thành công!");
+                navigation.navigate('Login');
+            } else {
+                Alert.alert("Lỗi", resData.message || "Đăng ký không thành công. Vui lòng thử lại.");
+            }
+        } catch (error) {
+            const message = error?.response?.data?.message || "Đăng ký không thành công. Vui lòng thử lại.";
+            Alert.alert("Lỗi", message);
+        }
     };
 
     return (
@@ -24,7 +44,7 @@ const SignUpScreen = ({ togglePage }) => {
             <View style={styles.header}><Text style={styles.heading}>ĐĂNG KÝ</Text></View>
             <CustomInput
                 style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
-                placeholder="Email đăng ký"
+                placeholder="Username"
                 placeholderTextColor="grey"
                 required
                 iconName="person"
@@ -33,12 +53,12 @@ const SignUpScreen = ({ togglePage }) => {
             />
             <CustomInput
                 style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
-                placeholder="Số điện thoại"
+                placeholder="Email"
                 placeholderTextColor="grey"
                 required
-                iconName="call"
-                onChangeText={setRPhone}
-                value={registPhone}
+                iconName="mail"
+                onChangeText={setREmail}
+                value={registEmail}
             />
             <CustomInputToggleable
                 style={{ paddingLeft: 20, fontSize: 16, borderRadius: 30, marginLeft: 20, marginRight: 20 }}
@@ -70,7 +90,7 @@ const SignUpScreen = ({ togglePage }) => {
                 <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
                     Bạn đã có tài khoản?{" "}
                 </Text>
-                <TouchableOpacity onPress={togglePage}>
+                <TouchableOpacity onPress={() => navigation.navigate('Login', { fromSignup: true })}>
                     <Text style={styles.toggleText}>Đăng nhập ngay!</Text>
                 </TouchableOpacity>
             </View>

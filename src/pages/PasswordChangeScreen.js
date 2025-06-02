@@ -1,17 +1,32 @@
-import { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import CustomInputToggleable from '../components/CustomInputToggleable';
+import { resetPassword } from '../services/sso';
 
-const PasswordChangeScreen = ({ navigation }) => {
+const PasswordChangeScreen = ({ route, navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const { loggedIn, setLoggedIn } = useContext(AuthContext);
-  const handleChangePassword = () => {
+  const email = route?.params?.email || '';
+  const handleChangePassword = async () => {
     if (password.length < 8) return alert('Mật khẩu phải có ít nhất 8 ký tự');
     if (password !== confirmPassword) return alert('Mật khẩu không khớp');
-    // Gọi API đổi mật khẩu ở đây
-    setLoggedIn(true);
+    try {
+      const response = await resetPassword({
+        email: email,
+        newPassword: password,
+      });
+      const resData = response.data;
+      if (resData.status === 200) {
+        Alert.alert("Thành công", resData.message || "Đổi mật khẩu thành công!");
+      } else {
+        Alert.alert("Lỗi", resData.message || "Không thể đổi mật khẩu. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      const message = error?.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại.";
+      Alert.alert("Lỗi", message);
+    }
     navigation.getParent()?.goBack();
   };
 
