@@ -10,11 +10,16 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from '../context/WishlistContext';
-
-
+import { AuthContext } from "../context/AuthContext";
 
 const ProductScreen = ({ route, navigation }) => {  
-  const availableColors = ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
+  const availableColors = [
+    { hex: "#C4AB98", title: "Vàng cát" },
+    { hex: "#C2BCB2", title: "Bạc ánh kim" },
+    { hex: "#D7D7D7", title: "Trắng" },
+    { hex: "#3C3C3D", title: "Đen" }
+  ];
+
   const availableStorageOptions = ["256GB", "512GB", "1TB"];
   const Configuration = [
     { label: 'Hệ điều hành', value: 'iOS 18' },
@@ -35,6 +40,7 @@ const ProductScreen = ({ route, navigation }) => {
   ]
   
   const { id, title, image, price, rating, ratingCount } = route.params;
+  const { loggedIn } = useContext(AuthContext);
   const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext);
   const { addToCart } = useContext(CartContext);
   const [selectedColor, setSelectedColor] = useState(availableColors[0]);
@@ -43,9 +49,9 @@ const ProductScreen = ({ route, navigation }) => {
   const [showMoreSpecs, setShowMoreSpecs] = useState(false);
 
   const isWishlisted = wishlistItems.some(element => element.title == title && element.image == image);
-
   const handleWishlist = () => {
     let item = { id, title, image, price, rating, ratingCount };
+    if(!loggedIn) navigation.navigate('Authentication');
     !isWishlisted ? wishlist(item) : unwishlist(item);
   }
 
@@ -75,13 +81,17 @@ const ProductScreen = ({ route, navigation }) => {
     </View>
   );
 
-  const handleAddToCart = () => addToCart({ 
-    id: id || title, title, image, price, 
-    color: selectedColor, 
-    storage: selectedStorage,
-    availableColors: availableColors, 
-    availableStorageOptions: availableStorageOptions,
-  });
+  const handleAddToCart = () => {
+    loggedIn ? 
+      addToCart({ 
+      id: id || title, title, image, price, 
+      color: selectedColor, 
+      storage: selectedStorage,
+      availableColors: availableColors, 
+      availableStorageOptions: availableStorageOptions,
+    }) : 
+    navigation.navigate('Authentication')
+  }
 
   const reviews = [
     {
@@ -164,7 +174,7 @@ const ProductScreen = ({ route, navigation }) => {
               onPress={handleWishlist}
             />
             <Icon name="bag-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
-              onPress={() => Alert.alert("Đã thêm sản phẩm vào giỏ hàng!")}
+              onPress={() => handleAddToCart()}
             />
             <Icon name="share-social-outline" size={30} color="#0073FF" style={{ borderColor: "#FFFFFF", borderWidth: 1, borderRadius: 50, padding: 5, backgroundColor: "#FFFFFF"}}
               onPress={() => Alert.alert("Chia sẻ sản phẩm này với bạn bè!")}
@@ -182,9 +192,8 @@ const ProductScreen = ({ route, navigation }) => {
             <View style={styles.colorContainer}>
             {availableColors.map((color, index) => (
                 <TouchableOpacity
-                key={index}
-                style={[ styles.colorCircle, { backgroundColor: color, borderWidth: selectedColor === color ? 2 : 0, borderColor: "#0073FF" } ]}
-                onPress={() => setSelectedColor(color)}
+                key={index} onPress={() => setSelectedColor(color)}
+                style={[ styles.colorCircle, { backgroundColor: color.hex, borderWidth: selectedColor.hex === color.hex ? 2 : 0, borderColor: "#0073FF" } ]}
                 />
             ))}
             </View>

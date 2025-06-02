@@ -11,6 +11,7 @@ import Checkout from './src/navigation/Checkout';
 import { WishlistProvider } from './src/context/WishlistContext';
 import { CheckoutProvider } from './src/context/CheckoutContext';
 
+import Toast from 'react-native-toast-message';
 configureReanimatedLogger({
     level: ReanimatedLogLevel.warn,
     strict: false,
@@ -24,6 +25,7 @@ const App = () => {
                     <CartProvider>
                         <WishlistProvider>
                             <MainContent/>
+                            <Toast/>
                         </WishlistProvider>
                     </CartProvider>
                 </AuthProvider>

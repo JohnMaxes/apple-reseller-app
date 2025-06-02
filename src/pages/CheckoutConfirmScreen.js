@@ -2,13 +2,9 @@ import { useContext } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
-import Toast from "react-native-toast-message";
 
-const CheckoutScreen = ({navigation}) => {
-    const { checkoutItems, selectedAddress } = useContext(CheckoutContext);
-    const { selectedPaymentMethod, setSelectedPaymentMethod } = useContext(CheckoutContext);
-    const { selectedShipVoucher, selectedOrderVoucher } = useContext(CheckoutContext);
-    const { subtotal, total } = useContext(CheckoutContext);
+const CheckoutConfirmScreen = ({ navigation }) => {
+    const { checkoutItems, selectedAddress, selectedPaymentMethod, selectedShipVoucher, selectedOrderVoucher, subtotal, total } = useContext(CheckoutContext);
 
     const paymentMethods = [
         { label: 'Thanh toán qua Ví Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
@@ -18,29 +14,18 @@ const CheckoutScreen = ({navigation}) => {
     ];
 
     const goBack = () => navigation.goBack();
-    const infoGuard = () => {
-        if(!selectedAddress || !selectedPaymentMethod) 
-            Toast.show({
-                type: 'error',
-                text1: 'Bạn chưa chọn ' + (!selectedAddress ? 'địa chỉ giao hàng.' : 'phương thức thanh toán.'),
-                text2: 'Vui lòng chọn trước khi tiếp tục!',
-                text1Style: {fontFamily: 'Inter', fontSize: 16, fontWeight: 500},
-                text2Style: {fontFamily: 'Inter', fontSize: 12,},
-                autoHide: true, avoidKeyboard: true, topOffset: 20,  
-            })
-        else navigation.navigate('CheckoutConfirmScreen');
-    }
-
+    // Find selected payment method details
+    const selectedPayment = paymentMethods.find(m => m.value === selectedPaymentMethod);
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer} keyboardShouldPersistTaps="handled">
                 <View style={styles.header}>
                     <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
                         <View style={styles.backIconWrapper}>
-                        <Icon name="chevron-back" size={22} color="#000" />
+                            <Icon name="chevron-back" size={22} color="#000" />
                         </View>
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>THANH TOÁN</Text>
+                    <Text style={styles.headerTitle}>XÁC NHẬN ĐƠN HÀNG</Text>
                     <View style={{ width: 24 }} />
                 </View>
 
@@ -62,24 +47,17 @@ const CheckoutScreen = ({navigation}) => {
 
                 {/* Địa chỉ giao hàng */}
                 <View style={styles.box}>
-                   <View style={styles.rowBetween}>
+                    <View style={styles.rowBetween}>
                         <View style={styles.leftColumn}>
                             <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
                         </View>
-                        <TouchableOpacity style={styles.addressRightColumn} onPress={() => navigation.navigate("CheckoutAddressScreen")}>
-                            { selectedAddress ? (
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.bold}>{selectedAddress.name}</Text>
-                                    <Text>{selectedAddress.phone}</Text>
-                                    <Text>{selectedAddress.address}</Text>
-                                </View>
-                            ) : (
-                                <View style={{flex: 1}}>
-                                    <Text style={styles.bold}>Hãy chọn một địa chỉ!</Text>
-                                </View>
-                            )}
-                            <Icon name="chevron-forward" size={18} color="#000" />
-                        </TouchableOpacity>
+                        <View style={styles.addressRightColumn}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.bold}>{selectedAddress.name}</Text>
+                                <Text>{selectedAddress.phone}</Text>
+                                <Text>{selectedAddress.address}</Text>
+                            </View>
+                        </View>
                     </View>
 
                     <View style={styles.divider} />
@@ -90,20 +68,7 @@ const CheckoutScreen = ({navigation}) => {
                             <Text style={styles.grayLabel}>Hình thức{"\n"}thanh toán</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                        { paymentMethods.map((method) => (
-                            <TouchableOpacity key={method.value} style={[ styles.paymentBox, selectedPaymentMethod === method.value && styles.paymentBoxSelected ]}
-                                onPress={ () => setSelectedPaymentMethod(method.value) } activeOpacity={0.8}
-                            >
-                                <Image
-                                    source={method.icon}
-                                    style={{ width: 45, height: 45, marginRight: 12 }}
-                                    resizeMode="contain"
-                                />
-                                <Text style={[ styles.paymentText, selectedPaymentMethod === method.value && { color: "#fff", fontWeight: "bold" } ]}>
-                                    {method.label}
-                                </Text>
-                            </TouchableOpacity>
-                        )) }                        
+                            <Text style={styles.bold}>{selectedPayment.label}</Text>
                         </View>
                     </View>
 
@@ -114,7 +79,7 @@ const CheckoutScreen = ({navigation}) => {
                         <View style={styles.leftColumn}>
                             <Text style={styles.grayLabel}>Mã giảm{"\n"}giá</Text>
                         </View>
-                        <TouchableOpacity style={styles.addressRightColumn} onPress={() => navigation.navigate("CheckoutVoucherScreen")}>
+                        <View style={styles.addressRightColumn}>
                             <View style={{flex: 1}}>
                                 { selectedOrderVoucher ? (
                                     <View style={{ marginBottom: 8 }}>
@@ -133,12 +98,11 @@ const CheckoutScreen = ({navigation}) => {
                                 ): null }
                                 { !selectedShipVoucher && !selectedOrderVoucher ? (
                                     <View style={{flex: 1}}>
-                                        <Text style={styles.bold}>Áp dụng voucher ở đây!</Text>
+                                        <Text style={styles.bold}>Không áp dụng voucher</Text>
                                     </View>
                                 ): null }
                             </View>
-                            <Icon name="chevron-forward" size={18} color="#000" />
-                        </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
@@ -175,8 +139,8 @@ const CheckoutScreen = ({navigation}) => {
                 </View>
 
                 {/* Nút đặt hàng */}
-                <TouchableOpacity style={styles.orderButton} onPress={() => infoGuard()}>
-                    <Text style={styles.orderButtonText}>Tiếp tục</Text>
+                <TouchableOpacity style={styles.orderButton}>
+                    <Text style={styles.orderButtonText}>Đặt hàng</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -184,6 +148,7 @@ const CheckoutScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+    // ...existing code from CheckoutScreen.js styles...
     backIconWrapper: {
         width: 36,
         height: 36,
@@ -351,4 +316,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CheckoutScreen;
+export default CheckoutConfirmScreen;

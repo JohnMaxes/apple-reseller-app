@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Button, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CartItem from "../components/CartItem";
 import { CartContext } from "../context/CartContext";
@@ -37,7 +37,7 @@ const CartScreen = () => {
             </View>
             <FlatList 
                 data={cart}
-                renderItem={({item}) => {return <CartItem title={item.title} image={item.image} price={item.price} id={item.id} quantity={item.quantity} color={item.color} storage={item.storage} availableColors={item.availableColors} availableStorageOptions={item.availableStorageOptions}/>}}
+                renderItem={({item}) => {return <CartItem uuid={item.uuid} title={item.title} image={item.image} price={item.price} id={item.id} quantity={item.quantity} color={item.color} storage={item.storage} availableColors={item.availableColors} availableStorageOptions={item.availableStorageOptions}/>}}
                 keyExtractor={(item) => (item.id + item.color + item.storage)}
                 scrollEnabled={true}
                 style={{paddingBottom: 60}}

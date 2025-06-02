@@ -3,14 +3,17 @@ import { View, Text, Dimensions, Image, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { StyleSheet } from 'react-native';
 import { WishlistContext } from "../context/WishlistContext";
+import { AuthContext } from "../context/AuthContext";
 
 const width = Dimensions.get('window').width * 0.45;
 
 const ProductCatalogPreview = ({ id, title, image, price, rating, ratingCount, navigation }) => {
+  const { loggedIn } = useContext(AuthContext)
   const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext)
   const isBookmarked = wishlistItems.some(element => element.title == title && element.image == image);
   const handleWishlist = () => {
     let item = { id, title, image, price, rating, ratingCount };
+    if(!loggedIn) return navigation.navigate('Authentication');
     !isBookmarked ? wishlist(item) : unwishlist(item);
   }
 

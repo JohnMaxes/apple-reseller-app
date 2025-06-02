@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import uuid from 'react-native-uuid'
+import Toast from "react-native-toast-message";
 
 const CartContext = createContext();
 const CartProvider = ({ children }) => {
@@ -10,6 +12,7 @@ const CartProvider = ({ children }) => {
     useEffect(() => { 
         async function cartInit() {
             try {
+                await AsyncStorage.removeItem('cart');
                 let cart_ = await AsyncStorage.getItem('cart');
                 if(cart_) setCart(JSON.parse(cart_));
                 else {
@@ -23,22 +26,30 @@ const CartProvider = ({ children }) => {
 
     useEffect(() => {
         async function saveCart() { 
-            console.log(cart);
             AsyncStorage.setItem('cart', JSON.stringify(cart)) 
             // reassignCart API here, doesn't need await
         }; 
-        saveCart() 
+        saveCart()
     }, [cart])
 
     const addToCart = ({id, title, price, image, color, storage, availableColors, availableStorageOptions }) => {
+        let newAdd = false;
         if (cart.some(element => element.id === id && element.color === color && element.storage === storage))
             setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item ))
         else {
-            let newItem = { id, title, price, image, color, storage, availableColors, availableStorageOptions, quantity: 1 };
+            let newItem = { uuid: uuid.v4(), id, title, price, image, color, storage, availableColors, availableStorageOptions, quantity: 1 };
             setCart(prevCart => [...prevCart, newItem]);
             setCartTotal(prevTotal => prevTotal + price);
-            alert('Item added to cart successfully!');
+            newAdd = true;
         }
+        Toast.show({
+            type: 'success',
+            text1: newAdd ? 'Thêm sản phẩm vào giỏ hàng thành công.' : 'Đã tăng số lượng sản phẩm lên 1 đơn vị.',
+            text2: 'Hãy qua trang giỏ hàng để chỉnh sửa thêm!',
+            text1Style: {fontFamily: 'Inter', fontSize: 14, fontWeight: 500},
+            text2Style: {fontFamily: 'Inter', fontSize: 12,},
+            autoHide: true, avoidKeyboard: true, topOffset: 20,  
+        })
     };
 
     const editCart = ({id, operation, newColor}) => {

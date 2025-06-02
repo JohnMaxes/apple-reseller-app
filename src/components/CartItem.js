@@ -3,21 +3,24 @@ import { View, Text, Image, TouchableOpacity, Modal, StyleSheet } from 'react-na
 import Icon from 'react-native-vector-icons/Ionicons';
 import { CartContext } from '../context/CartContext';
 import { CheckoutContext } from '../context/CheckoutContext';
+
+import Toast from 'react-native-toast-message';
+
 const Checkbox = ({ value, onValueChange }) => (
   <TouchableOpacity onPress={() => onValueChange(!value)} style={[styles.checkbox, { backgroundColor: value ? '#007bff' : '#fff' }]}>
     {value ? <Icon name="checkmark" size={16} color="#fff" /> : null}
   </TouchableOpacity>
 );
 
-const CartItem = ({ title, image, price, id, quantity, color, storage, availableColors, availableStorageOptions, status='inStock'}) => {
+const CartItem = ({ uuid, id, title, image, price, quantity, color, storage, availableColors, availableStorageOptions, status='inStock'}) => {
   const { checkoutItems, setCheckoutItems } = useContext(CheckoutContext);
   const { cart, setCart } = useContext(CartContext);
   const [itemQuantity, setQuantity] = useState(quantity);
   const [modalVisible, setModalVisible] = useState(false);
   const [checked, setChecked] = useState(checkoutItems.some(item => item.id === id));
 
-  const colorOptions = availableColors; // ? availableColors : ["#C4AB98", "#C2BCB2", "#D7D7D7", "#3C3C3D"];
-  const storageOptions = availableStorageOptions; // ? availableStorageOptions : ["256GB", "512GB", "1T"];
+  const colorOptions = availableColors;
+  const storageOptions = availableStorageOptions;
 
   const [selectedColor, setSelectedColor] = useState(color);
   const [selectedStorage, setSelectedStorage] = useState(storage);
@@ -31,22 +34,28 @@ const CartItem = ({ title, image, price, id, quantity, color, storage, available
   };
 
   const removeCartItem = () => {
-    setCart(cart.filter(item => !(item.id === id && item.color === selectedColor)));
+    setCart(cart.filter(item => item.uuid !== uuid));
     setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
     setModalVisible(false);
+    Toast.show({
+      type: 'success',
+      text1: 'Xóa sản phẩm khỏi giỏ hàng thành công.',
+      text1Style: {fontFamily: 'Inter', fontSize: 14, fontWeight: 500},
+      autoHide: true, avoidKeyboard: true, topOffset: 20,
+    })
   };
 
   const handleCheck = () => {
     const newChecked = !checked;
     setChecked(newChecked);
-    if (newChecked) setCheckoutItems([...checkoutItems, { title, image, price, id, quantity: itemQuantity, color: selectedColor, storage: selectedStorage }]);
-    else setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
+    if (newChecked) setCheckoutItems([...checkoutItems, { id, uuid, title, image, price, quantity: itemQuantity, color: selectedColor, memory: selectedStorage }]);
+    else setCheckoutItems(checkoutItems.filter(item => item.uuid !== uuid));
   };
 
   useEffect(() => {
-    setCart(cart.map(item => item.id === id ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
-    if (checked) setCheckoutItems(checkoutItems.map(item => item.id === id && item.color === selectedColor && item.storage === selectedStorage ?
-      { ...item, color: selectedColor, storage: selectedStorage } : item ));
+    setCart(cart.map(item => item.uuid === uuid ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
+    if (checked) setCheckoutItems(checkoutItems.map(item => item.uuid === uuid ?
+      { ...item, color: selectedColor, memory: selectedStorage } : item ));
   }, [selectedColor, selectedStorage])
 
   return (
@@ -54,7 +63,7 @@ const CartItem = ({ title, image, price, id, quantity, color, storage, available
       <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={{ fontSize: 17 ,fontWeight:'bold'}}>Bạn có chắc muốn xóa sản phẩm này?</Text>
+            <Text style={{ fontSize: 17 ,fontWeight:'bold', fontFamily: 'Inter', textAlign: 'center'}}>Xóa sản phẩm này khỏi giỏ hàng?</Text>
             <View style={styles.modalButtonsContainer}>
               <TouchableOpacity style={styles.confirmButton} onPress={removeCartItem}>
                 <Text style={styles.confirmButtonText}>Xác nhận</Text>
@@ -86,7 +95,7 @@ const CartItem = ({ title, image, price, id, quantity, color, storage, available
                 return (
                   <TouchableOpacity key={index} onPress={() => setSelectedColor(colorOption)} >
                     <View style={[styles.outerColorCircle, isSelected && { borderColor: '#0073FF', borderWidth: 2 }]}> 
-                      <View style={[styles.innerColorCircle, { backgroundColor: colorOption }, isSelected && { borderColor: '#fff', borderWidth: 2 }]} />
+                      <View style={[styles.innerColorCircle, { backgroundColor: colorOption.hex }, isSelected && { borderColor: '#fff', borderWidth: 2 }]} />
                     </View>
                   </TouchableOpacity>
                 );
@@ -271,6 +280,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     margin: 30,
+    marginHorizontal: 50,
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10
@@ -281,23 +291,27 @@ const styles = StyleSheet.create({
     marginTop: 15
   },
   confirmButton: {
+    width: 100,
     backgroundColor: '#e53935',
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 8
   },
   confirmButtonText: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   cancelButton: {
+    width: 100,
     backgroundColor: '#ccc',
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 8
   },
   cancelButtonText: {
-    color: '#333'
+    color: '#333',
+    textAlign: 'center',
   },
   deleteButton: {
     position: 'absolute',

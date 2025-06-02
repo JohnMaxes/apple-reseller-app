@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { View, Text, TextInput, Switch, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { CheckoutContext } from '../context/CheckoutContext';
@@ -14,6 +14,17 @@ const CheckoutAddressEditScreen = ({ navigation, route }) => {
   const [newIsDefault, setNewIsDefault] = useState(isDefault);
 
   const handleSave = () => {
+    const nameRegExp = /^[a-zA-ZÀ-ỹà-ỹ\s]{2,}$/u.test(newName);
+    const phoneRegExp = /^0\d{9}$/.test(newPhone);
+    const addressRegExp = /^[\wÀ-ỹà-ỹ\s,.-]{5,}$/u.test(newAddress);
+    if(!nameRegExp || !phoneRegExp || !addressRegExp) return Toast.show({
+        type: 'error',
+        text1: 'Trường ' + (!nameRegExp ? 'TÊN' : !phoneRegExp ? 'SỐ ĐIỆN THOẠI' : 'ĐỊA CHỈ NHẬN HÀNG') + ' chưa hợp lệ!',
+        text2: 'Vui lòng điền thông tin hợp lệ trước khi tiếp tục!',
+        text1Style: {fontFamily: 'Inter', fontSize: 16, fontWeight: 500},
+        text2Style: {fontFamily: 'Inter', fontSize: 12,},
+        autoHide: true, avoidKeyboard: true, topOffset: 20,  
+    })
     const updatedAddress = { id: id, name: newName, phone: newPhone, address: newAddress, isDefault: newIsDefault };
     setAddresses(prev => prev.map(item => item.id === id ? updatedAddress
       : (newIsDefault ? { ...item, isDefault: false } : item) )
@@ -45,7 +56,7 @@ const CheckoutAddressEditScreen = ({ navigation, route }) => {
         <TextInput style={styles.input} placeholder="Thủ Đức, HCM" value={newAddress} onChangeText={setNewAddress} />
 
         <Text style={styles.label}>Ghi chú cho shipper</Text>
-        <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={note} onChangeText={setNote}/>
+        <TextInput style={styles.input} placeholder="Né giờ ngủ trưa giúp em!" value={newNote} onChangeText={setNewNote}/>
       </View>
 
       <View style={styles.switchContainer}>
