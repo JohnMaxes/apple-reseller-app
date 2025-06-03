@@ -5,7 +5,7 @@ import ProfileScreen from "../pages/ProfileScreen";
 import { AuthContext } from "../context/AuthContext";
 import WishListScreen from "../pages/WishlistScreen";
 import ProfileEditScreen from "../pages/ProfileEditScreen";
-import ProfileOrdersScreen from "../pages/ProfileOrdersScreen";
+import Orders from "./Orders";
 
 const ProfileStack = createStackNavigator();
 const Profile = ({navigation}) => {
@@ -16,7 +16,7 @@ const Profile = ({navigation}) => {
             <ProfileStack.Screen name="ProfileScreen" component={ProfileScreen}/>
             <ProfileStack.Screen name="ProfileEdit" component={ProfileEditScreen}/>
             <ProfileStack.Screen name="WishlistScreen" component={WishListScreen}/>
-            <ProfileStack.Screen name="ProfileOrdersScreen" component={ProfileOrdersScreen}/>
+            <ProfileStack.Screen name="Orders" component={Orders}/>
         </ProfileStack.Navigator>
     )
 }
