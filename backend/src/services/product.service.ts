@@ -43,11 +43,11 @@ export const getProductBySKU = async (sku: string) => {
   };
 };
 
-export const getProductByCategory = async (category: string) => {
+export const getProductsByName = async (productName: string) => {
   const { Product, ProductImage } = await db.connect();
-  const products = await Product.findAll({
+  const product = await Product.findAll({
     where: {
-      category: category
+      productName: productName,
     },
     include: [
       {
@@ -57,17 +57,86 @@ export const getProductByCategory = async (category: string) => {
       },
     ],
   });
+  if (!product) {
+    return {
+      status: 404,
+      message: 'Product not found!',
+    };
+  }
+  return {
+    status: 200,
+    data: product,
+  };
+}
+
+export const getProductsByCategory = async (category: string) => {
+  const { Product, ProductImage } = await db.connect();
+  const products = await Product.findAll({
+    where: {
+      category: category
+    },
+    include: [
+      {
+        model: ProductImage,
+        as: 'images',
+        attributes: ['imageUrl'], // chỉ lấy trường imageUrl
+        where: { imageDefault: 1 },
+        required: false,
+      },
+    ],
+  });
   if (!products || products.length === 0) {
     return {
       status: 404,
       message: 'No products found in this category!',
     };
   }
+  // Lọc trùng theo tên sản phẩm, chỉ giữ sản phẩm đầu tiên cho mỗi tên
+  const uniqueProductsMap = new Map();
+  for (const product of products) {
+    if (!uniqueProductsMap.has(product.productName)) {
+      uniqueProductsMap.set(product.productName, product);
+    }
+  }
+  const uniqueProducts = Array.from(uniqueProductsMap.values());
   return {
     status: 200,
-    data: products,
+    data: uniqueProducts,
   };
 }
+
+export const getAllProducts = async () => {
+  const { Product, ProductImage } = await db.connect();
+  const products = await Product.findAll({
+    include: [
+      {
+        model: ProductImage,
+        as: 'images',
+        attributes: ['imageUrl'], // chỉ lấy trường imageUrl
+        where: { imageDefault: 1 },
+        required: false,
+      },
+    ],
+  });
+  if (!products || products.length === 0) {
+    return {
+      status: 404,
+      message: 'No products found!',
+    };
+  }
+  // Lọc trùng theo tên sản phẩm, chỉ giữ sản phẩm đầu tiên cho mỗi tên
+  const uniqueProductsMap = new Map();
+  for (const product of products) {
+    if (!uniqueProductsMap.has(product.productName)) {
+      uniqueProductsMap.set(product.productName, product);
+    }
+  }
+  const uniqueProducts = Array.from(uniqueProductsMap.values());
+  return {
+    status: 200,
+    data: uniqueProducts,
+  };
+};
 
 export const createProduct = async (productjson: any) => {
   const { Product, ProductImage } = await db.connect();

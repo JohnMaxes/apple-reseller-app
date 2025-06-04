@@ -17,7 +17,7 @@ const ProductCatalogPreview = ({ id, title, image, price, rating, ratingCount, n
     !isBookmarked ? wishlist(item) : unwishlist(item);
   }
 
-  const navigateToItem = () => navigation.navigate('ProductScreen', { title, image, price, rating, ratingCount });
+  const navigateToItem = () => navigation.navigate('ProductScreen', { productName: title });
   const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') }
 
   return (

@@ -15,10 +15,37 @@ export const getProductBySKU = async (req: Request, res: Response) => {
   }
 };
 
-export const getProductByCategory = async (req: Request, res: Response) => {
+export const getProductsByName = async (req: Request, res: Response) => {
+  try {
+    const { productName } = req.params;
+    const product = await productService.getProductsByName(productName);
+    res.json(product);
+  } catch (error: any) {
+    console.log(error);
+    res.send({
+      status: error.code || 400,
+      message: error.message,
+    });
+  }
+};
+
+export const getProductsByCategory = async (req: Request, res: Response) => {
   try {
     const { category } = req.params;
-    const products = await productService.getProductByCategory(category);
+    const products = await productService.getProductsByCategory(category);
+    res.json(products);
+  } catch (error: any) {
+    console.log(error);
+    res.send({
+      status: error.code || 400,
+      message: error.message,
+    });
+  }
+};
+
+export const getAllProducts = async (req: Request, res: Response) => {
+  try {
+    const products = await productService.getAllProducts();
     res.json(products);
   } catch (error: any) {
     console.log(error);

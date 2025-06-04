@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Dimensions } from "react-native";
 import ProductCatalogPreview from "../components/ProductCatalogPreview";
-import axios from "axios";
 import Icon from "react-native-vector-icons/Ionicons";
+import { getAllProducts } from "../services/product";
 
 const AllProductScreen = ({ navigation }) => {
     const [products, setProducts] = useState([]);
@@ -15,11 +15,18 @@ const AllProductScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get("https://fakestoreapi.com/products");
-                setProducts(response.data);
+                const response = await getAllProducts();
+                if (response.data && response.data.status === 200) {
+                    setProducts(response.data.data); // Lấy mảng sản phẩm từ backend
+                } else {
+                    setProducts([]);
+                }
+            } catch (error) {
+                console.error(error);
+                setProducts([]);
+            } finally {
+                setLoading(false);
             }
-            catch (error) { console.error(error); } 
-            finally { setLoading(false); }
         };
         fetchProducts();
     }, []);
@@ -55,58 +62,62 @@ const AllProductScreen = ({ navigation }) => {
         );
     };
 
-    if (loading) return
+    if (loading) return (
         <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#007bff" />
         </View>
-        
+    );
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10, paddingHorizontal: 20 }}>
-                <View style={{ flex: 1 }}>
-                    <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
-                        <View style={styles.backIconWrapper}>
-                            <Icon name="chevron-back" size={22} color="#000" />
-                        </View>
-                    </TouchableOpacity>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+            <View style={styles.container}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10, paddingHorizontal: 20 }}>
+                    <View style={{ flex: 1 }}>
+                        <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+                            <View style={styles.backIconWrapper}>
+                                <Icon name="chevron-back" size={22} color="#000" />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ flex: 3 }}>
+                        <Text style={{ fontSize: 25, fontFamily: 'Inter', fontWeight: "bold", textAlign: "center"}}>TẤT CẢ SẢN PHẨM</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                    </View>
                 </View>
-                <View style={{ flex: 3 }}>
-                    <Text style={{ fontSize: 25, fontFamily: 'Inter', fontWeight: "bold", textAlign: "center"}}>TẤT CẢ SẢN PHẨM</Text>
+                <View style={styles.searchContainer}>
+                    <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon}/>
+                    <TextInput
+                        placeholder="Tìm sản phẩm..."
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        style={styles.searchBar}
+                    />
                 </View>
-                <View style={{ flex: 1 }}>
-                </View>
-            </View>
-            <View style={styles.searchContainer}>
-                <Icon name="search-outline" size={20} color="#888" style={styles.searchIcon}/>
-                <TextInput
-                    placeholder="Tìm sản phẩm..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    style={styles.searchBar}
+                <ScrollView horizontal contentContainerStyle={{paddingHorizontal: 20}} showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
+                    {["Filter", ...filterOptions].map(renderFilterButton)}
+                </ScrollView>
+                <FlatList
+                    data={products.filter((item) =>
+                        item.productName?.toLowerCase().includes(searchQuery.toLowerCase())
+                    )}
+                    renderItem={({ item }) => (
+                        <ProductCatalogPreview
+                            title={item.productName}
+                            image={item.images && item.images[0]?.imageUrl}
+                            price={item.price}
+                            description={item.description}
+                            rating={item.rating || 0}
+                            ratingCount={item.ratingCount || 0}
+                            navigation={navigation}
+                            id={item.sku}
+                        />
+                    )}
+                    keyExtractor={(item) => item.sku}
+                    numColumns={2}
+                    contentContainerStyle={{ alignItems: 'flex-start', paddingHorizontal: 20, paddingBottom: 90 }}
                 />
             </View>
-            <ScrollView horizontal contentContainerStyle={{paddingHorizontal: 20}} showsHorizontalScrollIndicator={false} style={styles.filterContainer}>
-                {["Filter", ...filterOptions].map(renderFilterButton)}
-            </ScrollView>
-            <FlatList
-                data={products.filter((item) =>item.title.toLowerCase().includes(searchQuery.toLowerCase()))}
-                renderItem={({ item }) => (
-                    <ProductCatalogPreview
-                        title={item.title}
-                        image={item.image}
-                        price={item.price}
-                        description={item.description}
-                        rating={item.rating?.rate || 0}
-                        ratingCount={item.rating?.count || 0}
-                        navigation={navigation}
-                        id={item.id}
-                    />
-                )}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                contentContainerStyle={{ alignItems: 'center', paddingBottom: 90 }}            
-            />
         </KeyboardAvoidingView>
     );
 };
@@ -128,6 +139,7 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     container: {
+        flex: 1,
         backgroundColor: "#f9f9f9",
         paddingTop: Platform.select({ ios: 70, android: 50, default: 40 }), 
     },

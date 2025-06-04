@@ -26,7 +26,9 @@ router.put('/users/:userId', authentication, user.updateUserInfo);
 
 // Routes for product
 router.get('/products/:sku', product.getProductBySKU);
-router.get('/products/category/:category', product.getProductByCategory);
+router.get('/products/detail/:productName', product.getProductsByName);
+router.get('/products/category/:category', product.getProductsByCategory);
+router.get('/products', product.getAllProducts);
 router.post('/products', upload.array('images'), product.createProduct);
 router.put('/products/:sku', adminAccess, upload.array('images'), product.updateProduct);
 router.delete('/products/:sku', product.deleteProduct);
