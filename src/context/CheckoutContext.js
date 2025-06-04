@@ -62,10 +62,12 @@ const CheckoutProvider = ({children}) => {
       checkoutItems.forEach(item => tempTotal += item.price);
       setSubtotal(tempTotal);
       setTotal(tempTotal + ship);
+      AsyncStorage.setItem('checkoutItems', checkoutItems);
     }
     else {
       setSubtotal(0);
       setTotal(0);
+      AsyncStorage.removeItem('checkoutItems', checkoutItems);
     } 
     console.log('checkoutItems hook');
   }, [checkoutItems]);

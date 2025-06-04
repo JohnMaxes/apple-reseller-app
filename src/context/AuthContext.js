@@ -46,10 +46,11 @@ const AuthProvider = ({ children }) => {
         AsyncStorage.removeItem('cart');
         AsyncStorage.removeItem('wishlistItems')
         AsyncStorage.removeItem('checkoutItems');
+        AsyncStorage.removeItem('addresses');
         AsyncStorage.removeItem('token');
-        setToken(null); 
-        setId(null); 
-        setUserInfo(null); 
+        setToken(null);
+        setId(null);
+        setUserInfo(null);
         setLoggedIn(false);
     };
 

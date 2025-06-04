@@ -39,7 +39,10 @@ const App = () => {
                 <AuthProvider>
                     <CartProvider>
                         <WishlistProvider>
-                            <MainContent showOnboarding={showOnboarding} setShowOnboarding={setShowOnboarding} />
+                            <MainContent 
+                            showOnboarding={showOnboarding} 
+                            setShowOnboarding={setShowOnboarding} 
+                            />
                             <Toast />
                         </WishlistProvider>
                     </CartProvider>

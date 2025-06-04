@@ -6,17 +6,18 @@ import { AuthContext } from "../context/AuthContext";
 const ProfileScreen = ({navigation}) => {
     const { logOut, userInfo } = useContext(AuthContext);
     const [loading, setLoading] = useState(false);
-    if (!userInfo) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Không có thông tin người dùng.</Text>
-            </View>
-        );
-    }
+    if (!userInfo) return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Không có thông tin người dùng.</Text>
+        </View>
+    );
+    
     const avatar = userInfo.avatar || 'https://images.immediate.co.uk/production/volatile/sites/3/2022/07/val-kilmer-batman-forever-cb74c7d.jpg?quality=90&fit=700,466';
     const fullName = userInfo.fullName || '';
+
     const handleProfileEdit = () => navigation.navigate('ProfileEdit');
     const handleWishlist = () => navigation.navigate('WishlistScreen');
+    const handleOrders = () => navigation.navigate('ProfileOrdersScreen');
     const handleLogout = () => { navigation.navigate('Home'); logOut() }
     if (loading) return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -31,17 +32,17 @@ const ProfileScreen = ({navigation}) => {
                 style={{height: 100, width: 100, borderRadius: 50, marginTop: 130}}/>
                 <Text style={{fontWeight:'bold', fontSize: 25, paddingLeft: 10}}>{fullName}</Text>
             </View>
-            <TouchableOpacity style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]} onPress={handleProfileEdit}>
+            <TouchableOpacity onPress={handleProfileEdit} style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
                 <Icon name='person-outline' color='black' size={25} />
                 <Text style={{fontWeight:'500', fontSize: 18, flex: 1}}>Thông tin cá nhân</Text>
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
             </TouchableOpacity>
             <View style={styles.divider} />
-            <View style={[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
+            <TouchableOpacity onPress={handleOrders} style={[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
                 <Icon name='settings-outline' color='black' size={26} />
-                <Text style={{fontWeight:'500', fontSize: 18, flex: 1}}>Cài đặt</Text>
+                <Text style={{fontWeight:'500', fontSize: 18, flex: 1}}>Đơn hàng</Text>
                 <Icon name='chevron-forward-outline' color='black' size={20}/>
-            </View>
+            </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity onPress={handleWishlist} style = {[styles.UserRow, {flexDirection:'row', alignItems:'center', marginBottom: 10, gap: 10, paddingHorizontal: 30}]}>
                 <Icon name='bookmark-outline' color='black' size={26} />
