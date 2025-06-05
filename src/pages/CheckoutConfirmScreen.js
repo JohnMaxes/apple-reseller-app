@@ -1,11 +1,13 @@
-import { useContext } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from "react-native";
+import { useContext, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
+import Toast from "react-native-toast-message";
 
 const CheckoutConfirmScreen = ({ navigation }) => {
     const {
         checkoutItems,
+        setCheckoutItems,
         selectedAddress,
         selectedPaymentMethod,
         selectedShipVoucher,
@@ -24,8 +26,37 @@ const CheckoutConfirmScreen = ({ navigation }) => {
         { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash' },
     ];
 
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
     const selectedPayment = paymentMethods.find(m => m.value === selectedPaymentMethod);
     const goBack = () => navigation.goBack();
+
+    const checkout = () => {
+        let successful = true;
+        let payload = {
+
+        }
+        // API calls
+        setCheckoutLoading(true);
+        setTimeout(() => {
+            if(!successful) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Xin vui lòng thử lại sau.',
+                    text1Style: {fontFamily: 'Inter', fontSize: 16, color: 'red', fontWeight: 700}
+                })
+            }
+            else {
+                // clear checkoutItems, checked cart items and checkedItems, then
+                navigation.navigate('CheckoutFinalScreen');
+                Toast.show({
+                    type: 'success',
+                    text1: 'Quý khách đã đặt hàng thành công!',
+                    text1Style: {fontFamily: 'Inter', fontSize: 16, color: 'green', fontWeight: 700}
+                })
+            }
+            setCheckoutLoading(false)
+        }, 2000)         
+    }
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
@@ -144,8 +175,12 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                 </View>
 
                 {/* Nút đặt hàng */}
-                <TouchableOpacity style={styles.orderButton}>
-                    <Text style={styles.orderButtonText}>Đặt hàng</Text>
+                <TouchableOpacity style={styles.orderButton} onPress={checkout} disabled={checkoutLoading}>
+                    {checkoutLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        <Text style={styles.orderButtonText}>Đặt hàng</Text>
+                    )}
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>

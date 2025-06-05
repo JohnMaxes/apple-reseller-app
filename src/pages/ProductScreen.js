@@ -94,6 +94,9 @@ const ProductScreen = ({ route, navigation }) => {
 
   // Lấy sản phẩm tương ứng với selectedStorage và selectedColor
   const selectedProduct = products.find(p => p.storage === selectedStorage && p.color === selectedColor?.color);
+  useEffect(() => {
+    if(selectedProduct) console.log(selectedProduct.sku)
+  , [selectedProduct]});
 
   // Lấy hình ảnh sản phẩm tương ứng
   const imageUrls = Array.isArray(selectedProduct?.images)
@@ -152,7 +155,7 @@ const ProductScreen = ({ route, navigation }) => {
     }
     if (!selectedProduct) return;
     addToCart({
-      id, title, image: mainImageUrl,
+      id, title, image: mainImageUrl, sku: sku,
       price, color: selectedColor.color,
       storage: selectedStorage,
       availableColors: availableColors,

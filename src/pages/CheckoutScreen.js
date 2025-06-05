@@ -65,7 +65,7 @@ const CheckoutScreen = ({ navigation }) => {
                         <View key={p.uuid || `${p.title}-${p.color.title}-${p.memory}-${index}`} style={styles.productItem}>
                             <Image source={{ uri: p.image }} style={styles.productImage} />
                             <View style={styles.productDetails}>
-                                <Text style={styles.productName}>{p.title} {p.color.title} {p.memory}</Text>
+                                <Text style={styles.productName}>{p.title} {p.color} {p.storage}</Text>
                                 <Text style={styles.productPrice}>{p.price.toLocaleString("vi-VN")}đ</Text>
                                 <Text style={styles.productQuantity}>x{p.quantity}</Text>
                             </View>
