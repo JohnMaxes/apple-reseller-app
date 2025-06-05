@@ -27,7 +27,7 @@ const AuthProvider = ({ children }) => {
         init()
     }, []);
 
-    const login = async (email, password) => {
+    const base_login = async (email, password) => {
         if (!email || !password) return Toast.show({
             type: 'error',
             text1: 'Vui lòng điền đầy đủ thông tin!',
@@ -36,6 +36,7 @@ const AuthProvider = ({ children }) => {
         })
         else try {
             const response = await axios.post('https://fakestoreapi.com/auth/login', { username: email, password: password })
+            setToken(response.data.token);
             setId(jwtDecode(response.data.token).sub)
             setLoggedIn(true);
         }
@@ -59,7 +60,7 @@ const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ loggedIn, setLoggedIn, token, setToken, id, login, logOut, userInfo, setUserInfo }}>
+        <AuthContext.Provider value={{ loggedIn, setLoggedIn, token, setToken, id, base_login, logOut, userInfo, setUserInfo }}>
             {children}
         </AuthContext.Provider>
     );

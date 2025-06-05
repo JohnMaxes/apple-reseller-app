@@ -39,13 +39,13 @@ const LoginScreen = ({ navigation, route }) => {
                     navigation.navigate('BottomTab', {
                         screen: redirectTo || 'User',
                         params: {
-                            screen: 'UserView',
+                            screen: 'ProfileScreen',
                         },
                     });
                 }, 0);
             } else {
                 setLoading(false);
-                Alert.alert("Lỗi", resData.message || "Đăng nhập không thành công. Vui lòng thử lại.");
+                Alert.alert("Lỗi", resData.message + 123 || "Đăng nhập không thành công. Vui lòng thử lại.");
             }
         } catch (error) {
             setLoading(false);
