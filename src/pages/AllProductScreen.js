@@ -4,6 +4,12 @@ import ProductCatalogPreview from "../components/ProductCatalogPreview";
 import Icon from "react-native-vector-icons/Ionicons";
 import { getAllProducts } from "../services/product";
 
+const padProductsForGrid = (products, numColumns = 2) => {
+  const padded = [...products];
+  if (padded.length % numColumns !== 0) padded.push({ empty: true });
+  return padded;
+};
+
 const AllProductScreen = ({ navigation }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,7 +23,8 @@ const AllProductScreen = ({ navigation }) => {
             try {
                 const response = await getAllProducts();
                 if (response.data && response.data.status === 200) {
-                    setProducts(response.data.data); // Lấy mảng sản phẩm từ backend
+                    const newProducts = padProductsForGrid(response.data.data, 2);
+                    setProducts(newProducts); // Lấy mảng sản phẩm từ backend
                 } else {
                     setProducts([]);
                 }
@@ -98,24 +105,35 @@ const AllProductScreen = ({ navigation }) => {
                     {["Filter", ...filterOptions].map(renderFilterButton)}
                 </ScrollView>
                 <FlatList
-                    data={products.filter((item) =>
-                        item.productName?.toLowerCase().includes(searchQuery.toLowerCase())
-                    )}
-                    renderItem={({ item }) => (
-                        <ProductCatalogPreview
-                            title={item.productName}
-                            image={item.images && item.images[0]?.imageUrl}
-                            price={item.price}
-                            description={item.description}
-                            rating={item.rating || 0}
-                            ratingCount={item.ratingCount || 0}
-                            navigation={navigation}
-                            id={item.sku}
+                    data={products}
+                    renderItem={({ item }) => {
+                    if (item.empty) {
+                        return (
+                        <View style={{
+                            width: Dimensions.get('window').width / 2 - 32,
+                            height: 215, marginHorizontal: 10,
+                            backgroundColor: 'transparent'
+                            }}
                         />
-                    )}
-                    keyExtractor={(item) => item.sku}
+                        );
+                    }
+                    return (
+                        <ProductCatalogPreview
+                        title={item.productName}
+                        image={item.images && item.images[0]?.imageUrl}
+                        price={item.price}
+                        description={item.description}
+                        rating={item.rating || 0}
+                        ratingCount={item.ratingCount || 0}
+                        navigation={navigation}
+                        id={item.sku}
+                        />
+                    );
+                    }}
+                    keyExtractor={(item, idx) => item.sku ? item.sku : `empty-${idx}`}
                     numColumns={2}
-                    contentContainerStyle={{ alignItems: 'flex-start', paddingHorizontal: 20, paddingBottom: 90 }}
+                    columnWrapperStyle={{ justifyContent: 'center' }}
+                    contentContainerStyle={{paddingBottom: 90}}
                 />
             </View>
         </KeyboardAvoidingView>

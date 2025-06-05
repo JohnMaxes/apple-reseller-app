@@ -12,7 +12,6 @@ import { CartContext } from "../context/CartContext";
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from "../context/AuthContext";
 import { getProductsByName } from "../services/product";
-import { red } from "react-native-reanimated/lib/typescript/Colors";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -31,8 +30,10 @@ const ProductScreen = ({ route, navigation }) => {
   const { addToCart } = useContext(CartContext);
 
   const handleStorageSelect = (storage) => {
-    setSelectedStorage(storage);
-    setSelectedColor(null); // Reset màu khi đổi bộ nhớ
+    if(storage !== selectedStorage) {
+      setSelectedStorage(storage);
+      setSelectedColor(null); // Reset màu khi đổi bộ nhớ
+    }
   };
 
   const handleColorSelect = (color) => {
@@ -88,9 +89,7 @@ const ProductScreen = ({ route, navigation }) => {
       setSelectedColor(prev => {
         return availableColors.some(c => c.color === prev?.color) ? prev : availableColors[0];
       });
-    } else {
-      setSelectedColor(null);
-    }
+    } else setSelectedColor(null);
   }, [selectedStorage, products]);
 
   // Lấy sản phẩm tương ứng với selectedStorage và selectedColor
@@ -151,16 +150,12 @@ const ProductScreen = ({ route, navigation }) => {
       return;
     }
     if (!selectedProduct) return;
-
     addToCart({
-      id,
-      title,
-      image: mainImageUrl,
-      price,
-      color: selectedColor.color,
+      id, title, image: mainImageUrl,
+      price, color: selectedColor.color,
       storage: selectedStorage,
-      availableColors,
-      availableStorageOptions,
+      availableColors: availableColors,
+      availableStorageOptions: availableStorageOptions,
     });
   };
 
@@ -187,20 +182,22 @@ const ProductScreen = ({ route, navigation }) => {
 
   const renderSpecs = () => (
     <View style={styles.specsContainer}>
-      <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15 }}>Cấu hình và bộ nhớ</Text>
-      {Configuration.map((item, index) => (
-        <View key={index} style={styles.specItem}>
-          <Text style={[styles.specLabel, { fontFamily: 'Inter', marginLeft: 20, fontSize: 14, fontWeight: '700' }]}>{item.label}</Text>
-          <Text style={[styles.specValue, { textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: '400' }]}>{item.value}</Text>
-        </View>
-      ))}
+      <>
+        <Text style={{ fontWeight: 'bold', fontSize: 18, marginTop: 20, marginBottom: 15 }}>Cấu hình và bộ nhớ</Text>
+        {Configuration.map((item, index) => (
+          <View key={index} style={styles.specItem}>
+              <Text style={[styles.specLabel, {fontFamily: 'Inter', marginLeft: 20, fontSize: 14, fontWeight: 700}]}>{item.label}</Text>
+              <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
+          </View>
+        ))}
+      </>
       {showMoreSpecs && (
         <>
-          <Text style={{ fontFamily: 'Inter', fontWeight: 'bold', fontSize: 16, marginTop: 20, marginBottom: 15 }}>Camera và Màn hình</Text>
+          <Text style={{ fontFamily: 'Inter', fontWeight: 'bold', fontSize: 18, marginTop: 20, marginBottom: 15 }}>Camera và Màn hình</Text>
           {Camera.map((item, index) => (
             <View key={index} style={styles.specItem}>
-              <Text style={[styles.specLabel, { marginLeft: 20, fontSize: 14, fontWeight: '700' }]}>{item.label}</Text>
-              <Text style={[styles.specValue, { textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: '400' }]}>{item.value}</Text>
+                <Text style={[styles.specLabel, {fontFamily: 'Inter', marginLeft: 20, fontSize: 14, fontWeight: 700}]}>{item.label}</Text>
+                <Text style={[styles.specValue, {textAlign: 'left', marginLeft: 10, fontSize: 14, fontWeight: 400}]}>{item.value}</Text>
             </View>
           ))}
         </>
@@ -229,24 +226,25 @@ const ProductScreen = ({ route, navigation }) => {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{paddingBottom: 30}}>
       <LinearGradient
-        colors={['#243A66', '#112238']}
+        colors={['#003C80', '#0073FF']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>Màn hình sản phẩm</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{flex: 1}}>
+          <Icon name="chevron-back" size={22} color="white" style={{marginLeft: 20}}/>        
+        </TouchableOpacity>
+        <View style={{flex: 5}}><Text style={styles.headerTitle}>Màn hình sản phẩm</Text></View>
+        <View style={{flex: 1}}></View>
       </LinearGradient>
 
       <View style={styles.productInfoContainer}>
         {/* Hiển thị các hình ảnh của products với color và storage được chọn */}
         <View style={{ marginVertical: 10, alignItems: 'center' }}>
           {imageUrls.length > 0 ? (
-            <ScrollView
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
+            <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={(event) => {
                 const index = Math.round(
                   event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width
@@ -257,20 +255,17 @@ const ProductScreen = ({ route, navigation }) => {
               contentContainerStyle={{ alignItems: 'center' }}
             >
               {imageUrls.map((url, index) => (
-                <View
-                  key={index}
-                  style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}
-                >
-                  <Image
-                    source={{ uri: url }}
+                <View key={index} style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
+                  <Image source={{ uri: url }} resizeMode="contain"
                     style={{ width: 250, height: 250, borderRadius: 10 }}
-                    resizeMode="contain"
                   />
                 </View>
               ))}
             </ScrollView>
           ) : (
-            <Text>Không có ảnh sản phẩm</Text>
+            <View style={{ height: 250, alignContent: 'center', justifyContent: 'center'}}>
+              <Icon name="alert-circle-outline" size={40}/>
+            </View>
           )}
         </View>
         <Text style={styles.productTitle}>{title}</Text>
@@ -306,8 +301,7 @@ const ProductScreen = ({ route, navigation }) => {
         <Text style={{ fontWeight: '700', fontSize: 16, marginBottom: 2 }}>Tùy chọn bộ nhớ:</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: 10 }}>
           {availableStorageOptions.map((storage) => (
-            <TouchableOpacity
-              key={storage}
+            <TouchableOpacity key={storage}
               onPress={() => handleStorageSelect(storage)}
               style={{
                 padding: 10,
@@ -323,34 +317,38 @@ const ProductScreen = ({ route, navigation }) => {
         </View>
 
         {/* Tabs Specs / Reviews */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            onPress={() => setActiveTab('specs')}
-            style={[styles.tabButton, activeTab === 'specs' && styles.activeTab]}
-          >
-            <Text style={[styles.tabText, activeTab === 'specs' && styles.activeTabText]}>Thông số</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setActiveTab('reviews')}
-            style={[styles.tabButton, activeTab === 'reviews' && styles.activeTab]}
-          >
-            <Text style={[styles.tabText, activeTab === 'reviews' && styles.activeTabText]}>Đánh giá</Text>
-          </TouchableOpacity>
+        <View style={styles.tabsContainer}>
+          <View style={[styles.tabElement, { backgroundColor: activeTab == 'specs' ? '#e0ecfc' : 'transparent', borderWidth: activeTab == 'specs' ? 1 : 0 }]}>
+            <TouchableOpacity style={{flex: 1, justifyContent: 'center'}} onPress={() => setActiveTab('specs')}>
+              <Text style={[ styles.tabText, activeTab === 'specs' && { color: "#0171E3", fontWeight: "bold" } ]} >
+                Thông số kỹ thuật
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.tabElement, { backgroundColor: activeTab == 'reviews' ? '#e0ecfc' : 'transparent', borderWidth: activeTab == 'reviews' ? 1 : 0  }]}>
+            <TouchableOpacity style={{flex: 1, justifyContent: 'center'}} onPress={() => setActiveTab('reviews')}>
+              <Text style={[ styles.tabText, activeTab === 'reviews' && { color: "#0171E3", fontWeight: "bold" } ]} >
+                Bài đánh giá
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
+        <View style={[styles.infoBox, styles.shadowBox]}> 
         {activeTab === 'specs' ? renderSpecs() : renderReviews()}
+        </View>
 
         <View style={styles.actionsRow}>
           <TouchableOpacity onPress={handleWishlist} style={styles.wishlistButton}>
             <Icon
-              name={isWishlisted ? 'heart' : 'heart-outline'}
+              name={isWishlisted ? "bookmark" : "bookmark-outline"}
               size={30}
-              color={isWishlisted ? '#FF1E38' : '#444'}
+              color={isWishlisted ? "#007bff" : "#000"}
             />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={handleAddToCart} style={styles.buyButton}>
-            <Text style={styles.buyButtonText}>Thêm vào giỏ</Text>
+            <Text style={styles.buyButtonText}>Thêm vào giỏ hàng</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -359,8 +357,9 @@ const ProductScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9F9F9' },
+  container: { flex: 1, backgroundColor: '#F9F9F9', paddingBottom: 200 },
   header: {
+    flexDirection: 'row',
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
@@ -370,6 +369,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: '700',
+    textAlign: 'center'
   },
   productInfoContainer: {
     padding: 20,
@@ -429,47 +429,58 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#0073FF',
   },
-  tabContainer: {
-    flexDirection: 'row',
-    marginTop: 30,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+  tabsContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    height: 50,
+    borderRadius: 25,
+    alignItems: "center",
+    overflow: 'hidden'
   },
-  tabButton: {
+  tabElement: {
     flex: 1,
-    paddingVertical: 12,
     alignItems: 'center',
-  },
-  activeTab: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#0073FF',
+    borderRadius: 22,
+    margin: 3,
+    borderColor: '#0073FF', 
   },
   tabText: {
-    fontWeight: '600',
-    fontSize: 16,
-    color: '#777',
+    textAlign: 'center',
+    fontSize: 18,
+    color: "#666",
   },
   activeTabText: {
     color: '#0073FF',
   },
   specsContainer: {
     paddingTop: 15,
+    marginBottom: 20,
   },
   specItem: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingVertical: 10,
   },
   specLabel: {
-    fontWeight: '700',
-    width: 150,
+    fontFamily: 'Inter',
+    fontWeight: 700,
+    color: '#444',
+    flex: 1,
   },
   specValue: {
+    fontWeight: 500,
+    fontFamily: 'Inter',
     flex: 1,
+    textAlign: 'right',
+    color: '#666',
   },
   buyButton: {
     flex: 1,
-    backgroundColor: '#FF4D6D',
+    backgroundColor: '#0073FF',
     borderRadius: 8,
     paddingVertical: 15,
     marginLeft: 15,
@@ -559,7 +570,20 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     fontSize: 20,
-  },  
+  },
+  infoBox: {
+    paddingHorizontal: 15, 
+    marginTop: 10, 
+    backgroundColor: 'white', 
+    borderRadius: 8,
+  },
+  shadowBox: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 2,
+  },
 });
 
 export default ProductScreen;

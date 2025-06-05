@@ -10,11 +10,11 @@ const width = Dimensions.get('window').width * 0.45;
 const ProductCatalogPreview = ({ id, title, image, price, rating, ratingCount, navigation }) => {
   const { loggedIn } = useContext(AuthContext)
   const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext)
-  const isBookmarked = wishlistItems.some(element => element.title == title && element.image == image);
+  const isWishlisted = wishlistItems.some(element => element.title == title && element.image == image);
   const handleWishlist = () => {
     let item = { id, title, image, price, rating, ratingCount };
     if(!loggedIn) return navigation.navigate('Authentication');
-    !isBookmarked ? wishlist(item) : unwishlist(item);
+    !isWishlisted ? wishlist(item) : unwishlist(item);
   }
 
   const navigateToItem = () => navigation.navigate('ProductScreen', { productName: title });
@@ -24,7 +24,7 @@ const ProductCatalogPreview = ({ id, title, image, price, rating, ratingCount, n
     <TouchableOpacity activeOpacity={1} onPress={navigateToItem}style={styles.container}>
       <View style={styles.card}>
         <TouchableOpacity style={styles.bookmarkIcon} onPress={handleWishlist}>
-          <Icon size={24} name={isBookmarked ? "bookmark" : "bookmark-outline"} color={isBookmarked ? "#007bff" : "#000"}/>
+          <Icon size={24} name={isWishlisted ? "bookmark" : "bookmark-outline"} color={isWishlisted ? "#007bff" : "#000"}/>
         </TouchableOpacity>
         <Image source={{ uri: image }} style={styles.image}/>
         <View style={styles.titleContainer}>
