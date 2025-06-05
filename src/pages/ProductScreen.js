@@ -107,6 +107,7 @@ const ProductScreen = ({ route, navigation }) => {
   }, [selectedStorage, selectedColor]);
 
   // Lấy thông tin hiển thị
+  const id = selectedProduct?.id || null;
   const title = selectedProduct?.productName || "";
   const price = selectedProduct?.price || "";
   const rating = selectedProduct?.rating || 0;
