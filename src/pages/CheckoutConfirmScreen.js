@@ -4,23 +4,35 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
 
 const CheckoutConfirmScreen = ({ navigation }) => {
-    const { checkoutItems, selectedAddress, selectedPaymentMethod, selectedShipVoucher, selectedOrderVoucher, subtotal, total } = useContext(CheckoutContext);
+    const {
+        checkoutItems,
+        selectedAddress,
+        selectedPaymentMethod,
+        selectedShipVoucher,
+        selectedOrderVoucher,
+        subtotal,
+        total,
+        getTotalDiscount
+    } = useContext(CheckoutContext);
+
+    const { orderDiscount, shippingDiscount } = getTotalDiscount();
 
     const paymentMethods = [
         { label: 'Thanh toán qua Ví Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
         { label: 'Thanh toán qua ngân hàng', icon: require('../assets/icons/banking-icon.png'), value: 'eBanking' },
-        { label: 'Thanh toán qua Apple Pay', icon: require('../assets/icons/applepay-icon.png'), value: 'ApplePay'},
-        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash'},
+        { label: 'Thanh toán qua Apple Pay', icon: require('../assets/icons/applepay-icon.png'), value: 'ApplePay' },
+        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash' },
     ];
 
-    const goBack = () => navigation.goBack();
-    // Find selected payment method details
     const selectedPayment = paymentMethods.find(m => m.value === selectedPaymentMethod);
+    const goBack = () => navigation.goBack();
+
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer} keyboardShouldPersistTaps="handled">
+                {/* Header */}
                 <View style={styles.header}>
-                    <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+                    <TouchableOpacity style={{ zIndex: 10 }} onPress={goBack}>
                         <View style={styles.backIconWrapper}>
                             <Icon name="chevron-back" size={22} color="#000" />
                         </View>
@@ -31,12 +43,12 @@ const CheckoutConfirmScreen = ({ navigation }) => {
 
                 {/* Sản phẩm */}
                 <View style={styles.box}>
-                    {checkoutItems.map((p) => (
-                        <View key={p.uuid} style={styles.productItem}>
+                    {checkoutItems.map((p, index) => (
+                        <View key={p.uuid || `${p.title}-${p.color.title}-${p.memory}-${index}`} style={styles.productItem}>
                             <Image source={{ uri: p.image }} style={styles.productImage} />
                             <View style={styles.productDetails}>
                                 <Text style={styles.productName}>{p.title} {p.color.title} {p.memory}</Text>
-                                <Text style={styles.productPrice}>{p.price.toLocaleString()}đ</Text>
+                                <Text style={styles.productPrice}>{p.price.toLocaleString("vi-VN")}đ</Text>
                                 <Text style={styles.productQuantity}>x{p.quantity}</Text>
                             </View>
                         </View>
@@ -45,17 +57,18 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                     <Text style={styles.deliveryType}>Giao hàng tiêu chuẩn</Text>
                 </View>
 
-                {/* Địa chỉ giao hàng */}
+                {/* Địa chỉ giao hàng và thanh toán */}
                 <View style={styles.box}>
+                    {/* Địa chỉ */}
                     <View style={styles.rowBetween}>
                         <View style={styles.leftColumn}>
                             <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
                         </View>
                         <View style={styles.addressRightColumn}>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.bold}>{selectedAddress.name}</Text>
-                                <Text>{selectedAddress.phone}</Text>
-                                <Text>{selectedAddress.address}</Text>
+                                <Text style={styles.bold}>{selectedAddress.fullName}</Text>
+                                <Text>{selectedAddress.phoneNumber}</Text>
+                                <Text>{selectedAddress.shippingAddress}</Text>
                             </View>
                         </View>
                     </View>
@@ -68,7 +81,7 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                             <Text style={styles.grayLabel}>Hình thức{"\n"}thanh toán</Text>
                         </View>
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.bold}>{selectedPayment.label}</Text>
+                            <Text style={styles.bold}>{selectedPayment?.label}</Text>
                         </View>
                     </View>
 
@@ -80,27 +93,22 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                             <Text style={styles.grayLabel}>Mã giảm{"\n"}giá</Text>
                         </View>
                         <View style={styles.addressRightColumn}>
-                            <View style={{flex: 1}}>
-                                { selectedOrderVoucher ? (
+                            <View style={{ flex: 1 }}>
+                                {selectedOrderVoucher && orderDiscount > 0 && (
                                     <View style={{ marginBottom: 8 }}>
-                                        <Text style={styles.bold}>{selectedOrderVoucher.title}</Text>
-                                        <Text style={styles.discountBlue}>Đã giảm { 
-                                            selectedOrderVoucher.type == 'static' ? selectedOrderVoucher.value :
-                                            selectedOrderVoucher.value * subtotal
-                                        }đ</Text>
+                                        <Text style={styles.bold}>{selectedOrderVoucher.code}</Text>
+                                        <Text style={styles.discountBlue}>Đã giảm {orderDiscount.toLocaleString("vi-VN")}đ</Text>
                                     </View>
-                                ) : null }
-                                { selectedShipVoucher ? (
+                                )}
+                                {selectedShipVoucher && shippingDiscount > 0 && (
                                     <View style={{ marginBottom: 8 }}>
-                                        <Text style={styles.bold}>{selectedShipVoucher.title}</Text>
-                                        <Text style={styles.discountBlue}>Đã giảm {selectedShipVoucher.value * 50}đ</Text>
+                                        <Text style={styles.bold}>{selectedShipVoucher.code}</Text>
+                                        <Text style={styles.discountBlue}>Đã giảm {shippingDiscount.toLocaleString("vi-VN")}đ</Text>
                                     </View>
-                                ): null }
-                                { !selectedShipVoucher && !selectedOrderVoucher ? (
-                                    <View style={{flex: 1}}>
-                                        <Text style={styles.bold}>Không áp dụng voucher</Text>
-                                    </View>
-                                ): null }
+                                )}
+                                {!selectedOrderVoucher && !selectedShipVoucher && (
+                                    <Text style={styles.bold}>Không áp dụng voucher</Text>
+                                )}
                             </View>
                         </View>
                     </View>
@@ -111,30 +119,27 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                     <Text style={styles.summaryTitle}>Chi tiết thanh toán</Text>
                     <View style={styles.summaryLine}>
                         <Text>Tổng tiền sản phẩm:</Text>
-                        <Text>{subtotal}</Text>
+                        <Text>{subtotal.toLocaleString("vi-VN")}đ</Text>
                     </View>
                     <View style={styles.summaryLine}>
                         <Text>Tổng phí vận chuyển:</Text>
                         <Text>50.000đ</Text>
                     </View>
-                    { selectedOrderVoucher ? (
+                    {orderDiscount > 0 && (
                         <View style={styles.summaryLine}>
                             <Text>Giảm từ mã giảm giá:</Text>
-                            <Text style={styles.discountBlue}>-{ 
-                                selectedOrderVoucher.type == 'static' ? selectedOrderVoucher.value :
-                                selectedOrderVoucher.value * subtotal
-                            }đ</Text>
+                            <Text style={styles.discountBlue}>-{orderDiscount.toLocaleString("vi-VN")}đ</Text>
                         </View>
-                    ) : null }
-                    { selectedShipVoucher ? (
+                    )}
+                    {shippingDiscount > 0 && (
                         <View style={styles.summaryLine}>
                             <Text>Giảm phí vận chuyển:</Text>
-                            <Text style={styles.discountBlue}>-{selectedShipVoucher.value * 50}đ</Text>
+                            <Text style={styles.discountBlue}>-{shippingDiscount.toLocaleString("vi-VN")}đ</Text>
                         </View>
-                    ) : null }
+                    )}
                     <View style={styles.summaryLine}>
                         <Text style={styles.bold}>Tổng thanh toán:</Text>
-                        <Text style={[styles.bold]}>{total}đ</Text>
+                        <Text style={styles.bold}>{total.toLocaleString("vi-VN")}đ</Text>
                     </View>
                 </View>
 

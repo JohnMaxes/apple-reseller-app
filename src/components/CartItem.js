@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity, Modal, StyleSheet } from 'react-na
 import Icon from 'react-native-vector-icons/Ionicons';
 import { CartContext } from '../context/CartContext';
 import { CheckoutContext } from '../context/CheckoutContext';
-
 import Toast from 'react-native-toast-message';
 
 const Checkbox = ({ value, onValueChange }) => (
@@ -12,58 +11,100 @@ const Checkbox = ({ value, onValueChange }) => (
   </TouchableOpacity>
 );
 
-const CartItem = ({ uuid, id, title, image, price, quantity, color, storage, availableColors, availableStorageOptions, status='inStock'}) => {
+const CartItem = ({
+  sku,
+  title,
+  image,
+  price,
+  quantity,
+  color,
+  storage,
+  status = 'inStock'
+}) => {
   const { checkoutItems, setCheckoutItems } = useContext(CheckoutContext);
   const { cart, setCart } = useContext(CartContext);
   const [itemQuantity, setQuantity] = useState(quantity);
   const [modalVisible, setModalVisible] = useState(false);
-  const [checked, setChecked] = useState(checkoutItems.some(item => item.id === id));
-
-  const colorOptions = availableColors;
-  const storageOptions = availableStorageOptions;
+  const [checked, setChecked] = useState(
+    checkoutItems.some(item => item.sku === sku && item.color === color && item.storage === storage)
+  );
 
   const [selectedColor, setSelectedColor] = useState(color);
   const [selectedStorage, setSelectedStorage] = useState(storage);
+  const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') };
 
+  // Thay đổi số lượng
   const handleChangeQuantity = (operation) => {
     if (operation === '-' && itemQuantity === 1) return setModalVisible(true);
     const newQuantity = operation === '+' ? itemQuantity + 1 : itemQuantity - 1;
     setQuantity(newQuantity);
-    setCart(cart.map(item => item.id === id && item.color === selectedColor && item.storage === selectedStorage ? 
-      { ...item, quantity: newQuantity } : item));
+    setCart(cart.map(item =>
+      item.sku === sku && item.color === selectedColor && item.storage === selectedStorage
+        ? { ...item, quantity: newQuantity }
+        : item
+    ));
   };
 
+  // Xóa sản phẩm khỏi giỏ hàng
   const removeCartItem = () => {
-    setCart(cart.filter(item => item.uuid !== uuid));
-    setCheckoutItems(checkoutItems.filter(item => !(item.id === id && item.color === selectedColor && item.storage === selectedStorage)));
+    setCart(cart.filter(item => !(item.sku === sku && item.color === selectedColor && item.storage === selectedStorage)));
+    setCheckoutItems(checkoutItems.filter(item => !(item.sku === sku && item.color === selectedColor && item.storage === selectedStorage)));
     setModalVisible(false);
     Toast.show({
       type: 'success',
       text1: 'Xóa sản phẩm khỏi giỏ hàng thành công.',
-      text1Style: {fontFamily: 'Inter', fontSize: 14, fontWeight: 500},
+      text1Style: { fontFamily: 'Inter', fontSize: 14, fontWeight: 500 },
       autoHide: true, avoidKeyboard: true, topOffset: 20,
-    })
+    });
   };
 
+  // Chọn/bỏ chọn sản phẩm để thanh toán
   const handleCheck = () => {
     const newChecked = !checked;
     setChecked(newChecked);
-    if (newChecked) setCheckoutItems([...checkoutItems, { id, uuid, title, image, price, quantity: itemQuantity, color: selectedColor, memory: selectedStorage }]);
-    else setCheckoutItems(checkoutItems.filter(item => item.uuid !== uuid));
+    if (newChecked) {
+      setCheckoutItems([
+        ...checkoutItems,
+        {
+          sku,
+          title,
+          image,
+          price,
+          quantity: itemQuantity,
+          color: selectedColor,
+          storage: selectedStorage
+        }
+      ]);
+    } else {
+      setCheckoutItems(
+        checkoutItems.filter(item => !(item.sku === sku && item.color === selectedColor && item.storage === selectedStorage))
+      );
+    }
   };
 
+  // Cập nhật cart và checkoutItems khi đổi màu hoặc bộ nhớ
   useEffect(() => {
-    setCart(cart.map(item => item.uuid === uuid ? { ...item, color: selectedColor, memory: selectedStorage } : item ));
-    if (checked) setCheckoutItems(checkoutItems.map(item => item.uuid === uuid ?
-      { ...item, color: selectedColor, memory: selectedStorage } : item ));
-  }, [selectedColor, selectedStorage])
+    setCart(cart.map(item =>
+      item.sku === sku
+        ? { ...item, color: selectedColor, storage: selectedStorage }
+        : item
+    ));
+    if (checked) {
+      setCheckoutItems(checkoutItems.map(item =>
+        item.sku === sku
+          ? { ...item, color: selectedColor, storage: selectedStorage }
+          : item
+      ));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedColor, selectedStorage]);
 
   return (
     <>
       <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={{ fontSize: 17 ,fontWeight:'bold', fontFamily: 'Inter', textAlign: 'center'}}>Xóa sản phẩm này khỏi giỏ hàng?</Text>
+            <Text style={{ fontSize: 17, fontWeight: 'bold', fontFamily: 'Inter', textAlign: 'center' }}>Xóa sản phẩm này khỏi giỏ hàng?</Text>
             <View style={styles.modalButtonsContainer}>
               <TouchableOpacity style={styles.confirmButton} onPress={removeCartItem}>
                 <Text style={styles.confirmButtonText}>Xác nhận</Text>
@@ -85,34 +126,13 @@ const CartItem = ({ uuid, id, title, image, price, quantity, color, storage, ava
           <Checkbox onValueChange={handleCheck} value={checked} />
           <Image source={{ uri: image }} style={styles.productImage} />
           <View style={styles.itemInfo}>
-            <Text numberOfLines={2} style={styles.itemTitle}>{title}</Text>
-            <Text style={styles.itemPrice}>{price}đ</Text>
+            <Text numberOfLines={2} style={styles.itemTitle}>{title} {selectedStorage}</Text>
+            <Text style={styles.itemPrice}>{formatPrice(price)}đ</Text>
             <Text style={styles.discountNote}>Chưa áp dụng ưu đãi</Text>
-
             <View style={styles.colorOptions}>
-              {colorOptions.map((colorOption, index) => {
-                const isSelected = selectedColor === colorOption;
-                return (
-                  <TouchableOpacity key={index} onPress={() => setSelectedColor(colorOption)} >
-                    <View style={[styles.outerColorCircle, isSelected && { borderColor: '#0073FF', borderWidth: 2 }]}> 
-                      <View style={[styles.innerColorCircle, { backgroundColor: colorOption.hex }, isSelected && { borderColor: '#fff', borderWidth: 2 }]} />
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
+              <Text style={{ fontSize: 14, fontWeight: 'bold'}}>Màu sắc:  </Text>
+              <Text style={{ fontSize: 14, marginRight: 10 }}>{selectedColor}</Text>
             </View>
-
-            <View style={styles.storageOptions}>
-              {storageOptions.map((option, index) => {
-                const isSelected = selectedStorage === option;
-                return (
-                  <TouchableOpacity key={index} style={[styles.storageButton, isSelected ? styles.storageButtonSelected : styles.storageButtonUnselected]} onPress={() => setSelectedStorage(option)} >
-                    <Text style={[styles.storageText, isSelected && styles.storageTextSelected]}>{option}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
             <View style={styles.quantityControl}>
               <TouchableOpacity onPress={() => handleChangeQuantity('-')}>
                 <Text style={styles.quantityBtn}>–</Text>
@@ -122,16 +142,19 @@ const CartItem = ({ uuid, id, title, image, price, quantity, color, storage, ava
                 <Text style={styles.quantityBtn}>+</Text>
               </TouchableOpacity>
             </View>
-
-            <Text style={styles.totalPrice}>Tổng: {price * itemQuantity}đ</Text>
-            <Text style={[styles.stockStatus, { color: status === 'inStock' ? 'green' : 'red' }]}>Tình trạng: {status === 'inStock' ? 'Còn hàng' : 'Tạm hết hàng'}</Text>
+            <View style={styles.colorOptions}>
+              <Text style={{ fontSize: 14, fontWeight: 'bold' }}>Tổng:  </Text>
+              <Text style={styles.totalPrice}>{formatPrice(price * itemQuantity)}đ</Text>
+            </View>
+            <Text style={[styles.stockStatus, { color: status === 'inStock' ? 'green' : 'red' }]}>
+              Tình trạng: {status === 'inStock' ? 'Còn hàng' : 'Tạm hết hàng'}
+            </Text>
           </View>
         </View>
       </View>
     </>
   );
 };
-
 
 export default CartItem;
 
@@ -174,9 +197,16 @@ const styles = StyleSheet.create({
     width: '90%'
   },
   itemPrice: {
-    color: '#333',
+    color: '#2364DE',
     marginTop: 2,
-    fontSize:16
+    fontSize: 14,
+    fontWeight: 'bold'
+  },
+  totalPrice: {
+    color: '#2364DE',
+    marginTop: 2,
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   discountNote: {
     fontSize: 12,

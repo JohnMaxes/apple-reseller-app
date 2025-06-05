@@ -1,17 +1,60 @@
-import { useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Checkbox from '../components/Checkbox';
 import { CheckoutContext } from '../context/CheckoutContext';
+import { getAllShippingAddresses } from '../services/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CheckoutAddressScreen = ({navigation}) => {
-  const { addresses } = useContext(CheckoutContext);
+const CheckoutAddressScreen = ({ navigation }) => {
   const { selectedAddress, setSelectedAddress } = useContext(CheckoutContext);
+  const [addresses, setAddresses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSelect = (id) => setSelectedAddress(addresses.find(item => item.id === id));
-  const handleEdit = (item) => navigation.navigate('CheckoutAddressEditScreen', { 
-    id: item.id, name: item.name, phone: item.phone, address: item.address, isDefault: item.isDefault ? true: false,
-  })
+  // Lấy accessToken từ AsyncStorage và gọi API lấy địa chỉ
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      setLoading(true);
+      try {
+        const token = await AsyncStorage.getItem('accessToken');
+        if (!token) {
+          console.warn('No access token found');
+          setLoading(false);
+          return;
+        }
+
+        const response = await getAllShippingAddresses(token);
+        if (response.status === 200 && response.data) {
+          const data = response.data.data || [];
+          setAddresses(data);
+          // Nếu chưa có địa chỉ được chọn thì chọn mặc định (nếu có)
+          if (!selectedAddress) {
+            const defaultAddress = data.find(addr => addr.isDefault) || data[0];
+            if (defaultAddress) setSelectedAddress(defaultAddress);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load addresses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
+
+  const handleSelect = (id) => {
+    const addr = addresses.find(item => item.id === id);
+    if (addr) setSelectedAddress(addr);
+  };
+
+  const handleEdit = (item) => navigation.navigate('CheckoutAddressEditScreen', {
+    id: item.id,
+    name: item.fullName,
+    phone: item.phoneNumber,
+    address: item.shippingAddress,
+    isDefault: item.isDefault ? true : false,
+  });
 
   const goBack = () => navigation.goBack();
   const handleAddAddress = () => navigation.navigate('CheckoutAddressAddScreen');
@@ -20,23 +63,26 @@ const CheckoutAddressScreen = ({navigation}) => {
     <TouchableOpacity style={styles.card} onPress={() => handleSelect(item.id)}>
       <View style={styles.row}>
         <View style={{ marginRight: 10, justifyContent: 'center' }}>
-          <Checkbox value={selectedAddress ? item.id === selectedAddress.id : item.isDefault} onValueChange={() => handleSelect(item.id)}/>
+          <Checkbox
+            value={selectedAddress ? item.id === selectedAddress.id : item.isDefault}
+            onValueChange={() => handleSelect(item.id)}
+          />
         </View>
         <View style={styles.info}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.phone}>{item.phone}</Text>
-          <Text style={styles.address}>{item.address}</Text>
+          <Text style={styles.name}>{item.fullName}</Text>
+          <Text style={styles.phone}>{item.phoneNumber}</Text>
+          <Text style={styles.address}>{item.shippingAddress}</Text>
         </View>
         <View style={{ flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           {item.isDefault ? (
-            <View style={[styles.defaultLabel, {flex: 1}]}>
-              <Text style={[styles.defaultText, {alignSelf: 'flex-end'}]}>Mặc định</Text>
+            <View style={[styles.defaultLabel, { flex: 1 }]}>
+              <Text style={[styles.defaultText, { alignSelf: 'flex-end' }]}>Mặc định</Text>
             </View>
           ) : (
-            <View style={[styles.defaultLabelEmpty, {flex: 1}]}/>
+            <View style={[styles.defaultLabelEmpty, { flex: 1 }]} />
           )}
-          <View style={{flex: 6, marginVertical: 10}}/>
-          <TouchableOpacity style={{flex: 1}} onPress={() => handleEdit(item)}>
+          <View style={{ flex: 6, marginVertical: 10 }} />
+          <TouchableOpacity style={{ flex: 1 }} onPress={() => handleEdit(item)}>
             <Text style={styles.editText}>Sửa</Text>
           </TouchableOpacity>
         </View>
@@ -47,7 +93,7 @@ const CheckoutAddressScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={{zIndex: 10}} onPress={goBack}>
+        <TouchableOpacity style={{ zIndex: 10 }} onPress={goBack}>
           <View style={styles.backIconWrapper}>
             <Icon name="chevron-back" size={22} color="#000" />
           </View>
@@ -56,20 +102,28 @@ const CheckoutAddressScreen = ({navigation}) => {
         <View style={{ width: 24 }} />
       </View>
 
-
       <Text style={styles.sectionTitle}>Địa chỉ giao hàng</Text>
 
-      <FlatList
-        data={addresses}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        style={{backgroundColor: '#f7f7f7'}}
-        ListFooterComponent={
-          <TouchableOpacity style={styles.addBox} onPress={handleAddAddress}>
-            <Icon name="add" size={30} color="#000" />
-          </TouchableOpacity>
-        }
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />
+      ) : (
+        <FlatList
+          data={addresses}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          style={{ backgroundColor: '#f7f7f7' }}
+          ListFooterComponent={
+            <TouchableOpacity style={styles.addBox} onPress={handleAddAddress}>
+              <Icon name="add" size={30} color="#000" />
+            </TouchableOpacity>
+          }
+          ListEmptyComponent={
+            <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
+              Bạn chưa có địa chỉ giao hàng nào.
+            </Text>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -90,10 +144,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   headerTitle: {
-    fontSize: 25, 
-    fontFamily: 'Inter', 
-    fontWeight: "bold", 
-    textAlign: "center"
+    fontSize: 25,
+    fontFamily: 'Inter',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   sectionTitle: {
     fontSize: 15,

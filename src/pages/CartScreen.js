@@ -37,8 +37,21 @@ const CartScreen = () => {
             </View>
             <FlatList 
                 data={cart}
-                renderItem={({item}) => {return <CartItem uuid={item.uuid} title={item.title} image={item.image} price={item.price} id={item.id} quantity={item.quantity} color={item.color} storage={item.storage} availableColors={item.availableColors} availableStorageOptions={item.availableStorageOptions}/>}}
-                keyExtractor={(item) => (item.id + item.color + item.storage)}
+                renderItem={({item}) => {
+                    // Chỉ hiển thị đúng sản phẩm với storage và color đã chọn
+                    return (
+                        <CartItem
+                            sku={item.sku}
+                            title={item.title}
+                            image={item.image}
+                            price={item.price}
+                            quantity={item.quantity}
+                            color={item.color}
+                            storage={item.storage}
+                        />
+                    );
+                }}
+                keyExtractor={(item) => (item.sku + item.color + item.storage)}
                 scrollEnabled={true}
                 style={{paddingBottom: 60}}
                 contentContainerStyle={{paddingBottom: 100}}

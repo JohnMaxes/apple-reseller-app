@@ -1,37 +1,63 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const order_vouchers = [
-  { id: 1, title: "VOUCHER Giảm 15%", type: 'ratio', value: 0.15 },
-  { id: 2, title: "VOUCHER Giảm 20%", type: 'ratio', value: 0.2 },
-  { id: 3, title: "VOUCHER Giảm 500K", type: 'static', value: 50 },
-  { id: 4, title: "VOUCHER Giảm 30%", type: 'ratio', value: 0.3 },
-];
-
-const ship_vouchers = [
-  { id: 1, title: "FREESHIP 30/04", value: 1 },
-]
-
 const CheckoutContext = createContext();
+
 const CheckoutProvider = ({children}) => {
   const [isInit, setIsInit] = useState(false);
 
   const [checkoutItems, setCheckoutItems] = useState([]);
   const [addresses, setAddresses] = useState(null);
-  const [selectedAddress, setSelectedAddress] = useState(addresses !== null ? addresses.find(address => address.isDefault) : null);
-
-  const [shipVouchers, setShipVouchers] = useState(ship_vouchers);
-  const [selectedShipVoucher, setSelectedShipVoucher] = useState(null);
-
-  const [orderVouchers, setOrderVouchers] = useState(order_vouchers);
-  const [selectedOrderVoucher, setSelectedOrderVoucher] = useState(null);
-
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
-  const ship = 50;
+  const [shipVouchers, setShipVouchers] = useState([]);
+  const [orderVouchers, setOrderVouchers] = useState([]);
+  const [selectedShipVoucher, setSelectedShipVoucher] = useState(null);
+  const [selectedOrderVoucher, setSelectedOrderVoucher] = useState(null);
+
+  const ship = 100000; // Giả sử phí vận chuyển là 50.000đ
   const [subtotal, setSubtotal] = useState(0);
   const [total, setTotal] = useState(0);
+
+  const getTotalDiscount = () => {
+    let orderDiscount = 0;
+    let shippingDiscount = 0;
+
+    // Giảm phí vận chuyển
+    if (selectedShipVoucher) {
+      const discount = parseFloat(selectedShipVoucher.discountValue);
+      const max = parseFloat(selectedShipVoucher.maxDiscountValue || Infinity);
+
+      if (selectedShipVoucher.discountType === 'percent') {
+        shippingDiscount = Math.min((ship * discount), max);
+      } else if (selectedShipVoucher.discountType === 'fixed') {
+        shippingDiscount = discount;
+      }
+
+      if (shippingDiscount > ship) shippingDiscount = ship;
+    }
+
+    // Giảm từ voucher đơn hàng
+    if (selectedOrderVoucher) {
+      const discount = parseFloat(selectedOrderVoucher.discountValue);
+      const max = parseFloat(selectedOrderVoucher.maxDiscountValue || Infinity);
+
+      if (selectedOrderVoucher.discountType === 'percent') {
+        orderDiscount = Math.min((subtotal * discount), max);
+      } else if (selectedOrderVoucher.discountType === 'fixed') {
+        orderDiscount = discount;
+      }
+
+      if (orderDiscount > subtotal) orderDiscount = subtotal;
+    }
+
+    return {
+      orderDiscount: Math.round(orderDiscount),
+      shippingDiscount: Math.round(shippingDiscount),
+      totalDiscount: Math.round(orderDiscount + shippingDiscount),
+    };
+  };
 
   useEffect(() => {
       async function init() {
@@ -62,7 +88,7 @@ const CheckoutProvider = ({children}) => {
       checkoutItems.forEach(item => tempTotal += item.price);
       setSubtotal(tempTotal);
       setTotal(tempTotal + ship);
-      AsyncStorage.setItem('checkoutItems', checkoutItems);
+      AsyncStorage.setItem('checkoutItems', JSON.stringify(checkoutItems));
     }
     else {
       setSubtotal(0);
@@ -73,23 +99,15 @@ const CheckoutProvider = ({children}) => {
   }, [checkoutItems]);
 
   useEffect(() => {
-    if(isInit) {
-      console.log('vouchers hook');
-      if(!selectedShipVoucher && !selectedOrderVoucher) return setTotal(Math.round((subtotal + ship) * 100) / 100);
-      let newShip = ship, deduction = 0;
-      if(selectedShipVoucher) newShip = Math.round((newShip * (1 - selectedShipVoucher.value)) * 100) / 100;
-      if(selectedOrderVoucher) {
-        if(selectedOrderVoucher.type == 'ratio') deduction = Math.round((subtotal * selectedOrderVoucher.value) * 100) / 100;
-        if(selectedOrderVoucher.type == 'static') deduction = Math.round(selectedOrderVoucher.value * 100) / 100;
-      }
-      setTotal(Math.round((subtotal + newShip - deduction) * 100) / 100);
-    }
-  }, [selectedShipVoucher, selectedOrderVoucher])
-  
-  const checkout = async () => {
-    // checkout API call
-  }
-  
+    if (!isInit) return;
+
+    console.log('vouchers hook');
+
+    const { orderDiscount, shippingDiscount } = getTotalDiscount();
+    const newTotal = Math.max(0, Math.round((subtotal + ship - shippingDiscount - orderDiscount) * 100) / 100);
+    setTotal(newTotal);
+  }, [selectedShipVoucher, selectedOrderVoucher, subtotal]);
+
   return (
     <CheckoutContext.Provider value={{ 
       checkoutItems, setCheckoutItems, 
@@ -100,7 +118,8 @@ const CheckoutProvider = ({children}) => {
       selectedShipVoucher, setSelectedShipVoucher,
       selectedOrderVoucher, setSelectedOrderVoucher,
       selectedPaymentMethod, setSelectedPaymentMethod,
-      subtotal, total
+      subtotal, total,
+      getTotalDiscount
     }}>
       {children}
     </CheckoutContext.Provider>

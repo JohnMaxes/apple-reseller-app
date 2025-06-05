@@ -1,22 +1,72 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platform } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
+import { getAllVouchers } from "../services/voucher";
 
 const CheckoutVoucherScreen = ({ navigation }) => {
-  const { shipVouchers, orderVouchers } = useContext(CheckoutContext);
-  const { selectedShipVoucher, setSelectedShipVoucher } = useContext(CheckoutContext);
-  const { selectedOrderVoucher, setSelectedOrderVoucher } = useContext(CheckoutContext);
-  const handleViewTerms = () =>  alert('Điều kiện sử dụng... Coming soon hehe');
-  const goBack = () => navigation.goBack();
+  const {
+    shipVouchers, setShipVouchers,
+    orderVouchers, setOrderVouchers,
+    selectedShipVoucher, setSelectedShipVoucher,
+    selectedOrderVoucher, setSelectedOrderVoucher
+  } = useContext(CheckoutContext);
+
+  const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const response = await getAllVouchers();
+        const allVouchers = response.data;
+        const shipping = allVouchers.filter(v => v.voucherType === "shipping");
+        const product = allVouchers.filter(v => v.voucherType === "product");
+        setShipVouchers(shipping);
+        setOrderVouchers(product);
+      } catch (err) {
+        console.error("Failed to load vouchers", err);
+        setShipVouchers([]);
+        setOrderVouchers([]);
+      }
+    };
+
+    fetchVouchers();
+  }, []); 
+
   const toggleShipVoucher = (voucher) => {
-    if(selectedShipVoucher) selectedShipVoucher.id === voucher.id ? setSelectedShipVoucher(null) : setSelectedShipVoucher(voucher);
-    else setSelectedShipVoucher(voucher);
-  }
+    if (selectedShipVoucher && selectedShipVoucher.id === voucher.id) {
+      setSelectedShipVoucher(null);
+    } else {
+      setSelectedShipVoucher(voucher);
+    }
+  };
+
   const toggleOrderVoucher = (voucher) => {
-    if(selectedOrderVoucher) selectedOrderVoucher.id === voucher.id ? setSelectedOrderVoucher(null) : setSelectedOrderVoucher(voucher)
-    else setSelectedOrderVoucher(voucher);
-  }
+    if (selectedOrderVoucher && selectedOrderVoucher.id === voucher.id) {
+      setSelectedOrderVoucher(null);
+    } else {
+      setSelectedOrderVoucher(voucher);
+    }
+  };
+
+  // Format date từ chuỗi ISO sang định dạng dd/mm/yyyy
+  const formatDate = (isoDateStr) => {
+    const date = new Date(isoDateStr);
+    if (isNaN(date)) return 'Không xác định';
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
+  
+  const goBack = () => navigation.goBack();
+
+  const handleViewTerms = () => {
+    alert('Điều kiện sử dụng... Coming soon hehe');
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -48,10 +98,10 @@ const CheckoutVoucherScreen = ({ navigation }) => {
 
           <View style={styles.voucherTextContainer}>
             <Text style={[ styles.voucherTitle, (selectedShipVoucher ? selectedShipVoucher.id === voucher.id : null) && styles.voucherTitleBold ]}>
-              {voucher.title}
+              {voucher.code}
             </Text>
             <Text style={styles.voucherExpiry}>
-              Hạn sử dụng {voucher.expiry}
+              Hạn sử dụng {formatDate(voucher.endDate)}
             </Text>
             <TouchableOpacity onPress={handleViewTerms} style={{width: '50%'}}>
               <Text style={styles.link}>Xem điều kiện sử dụng</Text>
@@ -73,10 +123,10 @@ const CheckoutVoucherScreen = ({ navigation }) => {
 
           <View style={styles.voucherTextContainer}>
             <Text style={[ styles.voucherTitle, (selectedOrderVoucher ? selectedOrderVoucher.id === voucher.id : null) && styles.voucherTitleBold ]}>
-              {voucher.title}
+              {voucher.code}
             </Text>
             <Text style={styles.voucherExpiry}>
-              Hạn sử dụng {voucher.expiry}
+              Hạn sử dụng {formatDate(voucher.endDate)}
             </Text>
             <TouchableOpacity onPress={handleViewTerms}>
               <Text style={styles.link}>Xem điều kiện sử dụng</Text>

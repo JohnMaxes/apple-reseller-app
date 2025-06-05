@@ -32,12 +32,17 @@ const CartProvider = ({ children }) => {
         saveCart()
     }, [cart])
 
-    const addToCart = ({id, title, price, image, color, storage, availableColors, availableStorageOptions }) => {
+    const addToCart = ({sku, title, price, image, color, storage }) => {
         let newAdd = false;
-        if (cart.some(element => element.id === id && element.color === color && element.storage === storage))
-            setCart(prev => prev.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item ))
-        else {
-            let newItem = { uuid: uuid.v4(), id, title, price, image, color, storage, availableColors, availableStorageOptions, quantity: 1 };
+        // Sử dụng sku + color + storage để định danh duy nhất sản phẩm trong giỏ
+        if (cart.some(element => element.sku === sku && element.color === color && element.storage === storage)) {
+            setCart(prev => prev.map(item =>
+                item.sku === sku && item.color === color && item.storage === storage
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            ));
+        } else {
+            let newItem = { sku, title, price, image, color, storage, quantity: 1 };
             setCart(prevCart => [...prevCart, newItem]);
             setCartTotal(prevTotal => prevTotal + price);
             newAdd = true;

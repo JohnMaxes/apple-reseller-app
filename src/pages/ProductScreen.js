@@ -12,7 +12,6 @@ import { CartContext } from "../context/CartContext";
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from "../context/AuthContext";
 import { getProductsByName } from "../services/product";
-import { red } from "react-native-reanimated/lib/typescript/Colors";
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -112,7 +111,7 @@ const ProductScreen = ({ route, navigation }) => {
   const price = selectedProduct?.price || "";
   const rating = selectedProduct?.rating || 0;
   const ratingCount = selectedProduct?.ratingCount || 0;
-  const id = selectedProduct?.id || null;
+  const sku = selectedProduct?.sku || null;
   const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') };
 
   // Các dữ liệu cấu hình, camera giữ nguyên như cũ
@@ -141,7 +140,7 @@ const ProductScreen = ({ route, navigation }) => {
       navigation.navigate('Authentication');
       return;
     }
-    let item = { id, title, image: mainImageUrl, price, rating, ratingCount };
+    let item = { sku, title, image: mainImageUrl, price, rating, ratingCount };
     !isWishlisted ? wishlist(item) : unwishlist(item);
   };
 
@@ -153,14 +152,12 @@ const ProductScreen = ({ route, navigation }) => {
     if (!selectedProduct) return;
 
     addToCart({
-      id,
+      sku,
       title,
       image: mainImageUrl,
       price,
-      color: selectedColor.color,
-      storage: selectedStorage,
-      availableColors,
-      availableStorageOptions,
+      color: selectedColor.color, // chỉ truyền color
+      storage: selectedStorage,    // chỉ truyền storage
     });
   };
 
