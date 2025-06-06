@@ -98,7 +98,7 @@ const CartItem = ({ uuid, title, color, storage, price, quantity, products, stat
     if (newChecked) {
       setCheckoutItems([
         ...checkoutItems,
-        { uuid, sku, title, image: mainImageUrl, price, quantity: itemQuantity, color: selectedColor, storage: selectedStorage }
+        { uuid: uuid, sku: sku, title: title, image: mainImageUrl, price: newPrice, quantity: itemQuantity, color: selectedColor.color, storage: selectedStorage }
       ]);
     } else {
       setCheckoutItems(

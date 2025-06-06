@@ -8,12 +8,9 @@ const CheckoutScreen = ({ navigation }) => {
     const {
         checkoutItems,
         selectedAddress,
-        selectedPaymentMethod,
-        setSelectedPaymentMethod,
-        selectedShipVoucher,
-        selectedOrderVoucher,
-        subtotal,
-        total,
+        selectedPaymentMethod,setSelectedPaymentMethod,
+        selectedShipVoucher, selectedOrderVoucher,
+        subtotal, total,
         getTotalDiscount
     } = useContext(CheckoutContext);
 
