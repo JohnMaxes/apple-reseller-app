@@ -16,7 +16,7 @@ const CheckoutProvider = ({children}) => {
   const [selectedShipVoucher, setSelectedShipVoucher] = useState(null);
   const [selectedOrderVoucher, setSelectedOrderVoucher] = useState(null);
 
-  const ship = 100000; // Giả sử phí vận chuyển là 50.000đ
+  const ship = 100000; // Giả sử phí vận chuyển là 100.000đ
   const [subtotal, setSubtotal] = useState(0);
   const [total, setTotal] = useState(0);
 

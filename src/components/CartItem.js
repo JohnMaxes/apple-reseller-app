@@ -32,9 +32,11 @@ const CartItem = ({ uuid, title, color, storage, price, quantity, products, stat
   };
 
   const handleStorageSelect = (storage) => {
-    if(storage !== selectedStorage) {
+    if (storage !== selectedStorage) {
       setSelectedStorage(storage);
-      setSelectedColor(null); // Reset màu khi đổi bộ nhớ
+      // Find the first color for the new storage
+      const newColors = colorMap[storage] || [];
+      setSelectedColor(newColors[0] || null);
     }
   };
   const handleColorSelect = (color) => {
@@ -110,11 +112,11 @@ const CartItem = ({ uuid, title, color, storage, price, quantity, products, stat
   // Cập nhật cart và checkoutItems khi đổi màu hoặc bộ nhớ
   useEffect(() => {
     setCart(cart.map(item =>
-      item.uuid === uuid ? { ...item, color: selectedColor, storage: selectedStorage } : item
+      item.uuid === uuid ? { ...item, color: selectedColor.color, storage: selectedStorage } : item
     ));
     if (checked) {
       setCheckoutItems(checkoutItems.map(item =>
-        item.uuid === uuid ? { ...item, color: selectedColor, storage: selectedStorage } : item
+        item.uuid === uuid ? { ...item, color: selectedColor.color, storage: selectedStorage, image: mainImageUrl } : item
       ));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

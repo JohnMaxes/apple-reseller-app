@@ -158,7 +158,7 @@ const CheckoutScreen = ({ navigation }) => {
                     </View>
                     <View style={styles.summaryLine}>
                         <Text>Tổng phí vận chuyển:</Text>
-                        <Text>50.000đ</Text>
+                        <Text>100.000đ</Text>
                     </View>
                     {orderDiscount > 0 && (
                         <View style={styles.summaryLine}>
