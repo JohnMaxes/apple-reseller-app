@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, KeyboardAv
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
 import Toast from "react-native-toast-message";
+import { createOrder } from "../services/order";
 
 const CheckoutConfirmScreen = ({ navigation }) => {
     const {
@@ -33,9 +34,9 @@ const CheckoutConfirmScreen = ({ navigation }) => {
     const checkout = () => {
         let successful = true;
         let payload = {
-
+            
         }
-        // API calls
+        
         setCheckoutLoading(true);
         setTimeout(() => {
             if(!successful) {
@@ -57,6 +58,8 @@ const CheckoutConfirmScreen = ({ navigation }) => {
             setCheckoutLoading(false)
         }, 2000)         
     }
+
+
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>

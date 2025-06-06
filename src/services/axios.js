@@ -6,6 +6,7 @@ const handleRefreshToken = async (refreshToken) => {
   const response = await axios.post(`${BASE_URL}/api/refresh`, {
     refreshToken,
   });
+  console.log({BASE_URL});
   if (response.status === 200) {
     const { accessToken } = response.data;
     AsyncStorage.setItem('accessToken', accessToken);
