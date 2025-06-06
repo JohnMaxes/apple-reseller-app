@@ -7,7 +7,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CheckoutAddressAddScreen = ({ navigation }) => {
-  const { setAddresses } = useContext(CheckoutContext);
+  const { addresses, setAddresses } = useContext(CheckoutContext);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [newAddress, setNewAddress] = useState('');
@@ -34,6 +34,7 @@ const CheckoutAddressAddScreen = ({ navigation }) => {
 
     try {
       const token = await AsyncStorage.getItem('accessToken');
+      console.log(addresses);
       if (!token) {
         return Toast.show({
           type: 'error',
@@ -43,7 +44,6 @@ const CheckoutAddressAddScreen = ({ navigation }) => {
           topOffset: 20,
         });
       }
-
       const payload = {
         fullName: name,
         shippingAddress: newAddress,
@@ -51,7 +51,6 @@ const CheckoutAddressAddScreen = ({ navigation }) => {
         note: note,
         isDefault: isDefault,
       };
-
       const response = await createShippingAddress(token, payload);
       console.log('Add address response:', response);
       if (response.status === 200) {
@@ -64,7 +63,6 @@ const CheckoutAddressAddScreen = ({ navigation }) => {
           note,
           isDefault,
         };
-
         setAddresses((prev) => {
           if (!prev) return [newAddressObj];
           if (isDefault) {

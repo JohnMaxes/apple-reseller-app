@@ -40,7 +40,7 @@ const createCategoryScreen = (category, cover_url, accessory_url) => ({ navigati
         fetchProducts();
     }, [category]);
     if (loading) return <LoadingScreen/>;
-    return <CategoriesRender products={products} navigation={navigation} cover_url={cover_url} accessory_url={accessory_url} />;
+    return <CategoriesRender category={category} products={products} navigation={navigation} cover_url={cover_url} accessory_url={accessory_url} />;
 };
 
 const iPhone_cover = 'https://www.cnet.com/a/img/resize/bde1b8ca1b9373b61bbf9d3e113a81ac76297b51/hub/2024/09/13/0df30744-a33f-4c6e-b58c-a90d7a914089/apple-iphone-16-2815.jpg?auto=webp&height=500';
@@ -59,7 +59,7 @@ const padProductsForGrid = (products, numColumns = 2) => {
   return padded;
 };
 
-const CategoriesRender = ({ navigation, products, cover_url, accessory_url }) => {
+const CategoriesRender = ({ category, navigation, products, cover_url, accessory_url }) => {
   const displayProducts = padProductsForGrid(products.slice(0, 4), 2);
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 90 }} showsVerticalScrollIndicator={false}>
@@ -76,7 +76,7 @@ const CategoriesRender = ({ navigation, products, cover_url, accessory_url }) =>
         <View style={{flex: 1}}>
           <Text style={{ flex: 5, fontSize: 21, fontWeight: 'bold', fontFamily: 'Inter' }}>Tất cả sản phẩm</Text>
         </View>
-        <TouchableOpacity style={{flex: 1, alignItems: 'flex-end'}}>
+        <TouchableOpacity onPress={() => navigation.navigate('AllProduct', { category: category })} style={{flex: 1, alignItems: 'flex-end'}}>
           <Text style={{ flex: 5, fontSize: 17, fontWeight: 600, fontFamily: 'Inter', color: '#2364DE' }}>Xem tất cả</Text>
         </TouchableOpacity>
       </View>

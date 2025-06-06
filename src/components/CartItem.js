@@ -76,7 +76,7 @@ const CartItem = ({ uuid, title, color, storage, price, quantity, products, stat
   
   const mainImageUrl = imageUrls.length > 0 ? imageUrls[0] : undefined;
   const newPrice = selectedProduct?.price || price;
-  const id = selectedProduct?.id || null;
+  const productId = selectedProduct?.productId || null;
   const sku = selectedProduct?.sku || null;
   const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') };
   
@@ -100,7 +100,7 @@ const CartItem = ({ uuid, title, color, storage, price, quantity, products, stat
     if (newChecked) {
       setCheckoutItems([
         ...checkoutItems,
-        { uuid: uuid, sku: sku, title: title, image: mainImageUrl, price: newPrice, quantity: itemQuantity, color: selectedColor.color, storage: selectedStorage }
+        { uuid: uuid, productId: productId, sku: sku, title: title, image: mainImageUrl, price: newPrice, quantity: itemQuantity, color: selectedColor.color, storage: selectedStorage }
       ]);
     } else {
       setCheckoutItems(

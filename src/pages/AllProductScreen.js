@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Dimensions } from "react-native";
 import ProductCatalogPreview from "../components/ProductCatalogPreview";
 import Icon from "react-native-vector-icons/Ionicons";
-import { getAllProducts } from "../services/product";
+import { getAllProducts, getProductsByCategory } from "../services/product";
 
 const padProductsForGrid = (products, numColumns = 2) => {
   const padded = [...products];
@@ -10,7 +10,8 @@ const padProductsForGrid = (products, numColumns = 2) => {
   return padded;
 };
 
-const AllProductScreen = ({ navigation }) => {
+const AllProductScreen = ({ navigation, route }) => {
+    const { category } = route.params;
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +22,7 @@ const AllProductScreen = ({ navigation }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await getAllProducts();
+                const response = category ? await getProductsByCategory(category) : await getAllProducts();
                 if (response.data && response.data.status === 200) {
                     const newProducts = padProductsForGrid(response.data.data, 2);
                     setProducts(newProducts); // Lấy mảng sản phẩm từ backend
@@ -105,7 +106,7 @@ const AllProductScreen = ({ navigation }) => {
                     {["Filter", ...filterOptions].map(renderFilterButton)}
                 </ScrollView>
                 <FlatList
-                    data={products}
+                    data={ products.filter(item => item.productName.toLowerCase().includes( searchQuery.toLowerCase() )) }
                     renderItem={({ item }) => {
                     if (item.empty) {
                         return (

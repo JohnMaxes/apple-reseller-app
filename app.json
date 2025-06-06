@@ -28,6 +28,12 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "7216f267-2c85-4a25-88a4-5933b3662ddc"
+      }
+    },
+    "owner": "johnmaxes"
   }
 }

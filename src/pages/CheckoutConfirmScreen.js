@@ -4,6 +4,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
 import Toast from "react-native-toast-message";
 import { createOrder } from "../services/order";
+import { AuthContext } from "../context/AuthContext";
+import { CartContext } from "../context/CartContext";
 
 const CheckoutConfirmScreen = ({ navigation }) => {
     const {
@@ -17,14 +19,15 @@ const CheckoutConfirmScreen = ({ navigation }) => {
         total,
         getTotalDiscount
     } = useContext(CheckoutContext);
-
+    const { token } = useContext(AuthContext);
+    const { setCart } = useContext(CartContext);
     const { orderDiscount, shippingDiscount } = getTotalDiscount();
 
     const paymentMethods = [
         { label: 'Thanh toán qua Ví Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
         { label: 'Thanh toán qua ngân hàng', icon: require('../assets/icons/banking-icon.png'), value: 'eBanking' },
         { label: 'Thanh toán qua Apple Pay', icon: require('../assets/icons/applepay-icon.png'), value: 'ApplePay' },
-        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash' },
+        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'COD' },
     ];
 
     const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -36,12 +39,9 @@ const CheckoutConfirmScreen = ({ navigation }) => {
             Toast.show({ type: 'error', text1: 'Vui lòng chọn địa chỉ và phương thức thanh toán!' });
             return;
         }
-
         setCheckoutLoading(true);
-
         // Chuẩn bị payload
         const payload = {
-            userId: selectedAddress.userId, // hoặc lấy từ context đăng nhập
             totalAmount: total,
             paymentMethod: selectedPaymentMethod,
             paymentStatus: "pending", // hoặc "unpaid" tùy logic
@@ -55,12 +55,14 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                 price: item.price,
             })),
         };
-
+        console.log(payload);
         try {
-            const res = await createOrder(payload);
+            const res = await createOrder(payload, token);
             if (res.data && res.data.status === 201) {
                 // Xử lý sau khi đặt hàng thành công
+                setCart(prev => prev.filter(cartItem => !checkoutItems.some(item => item.uuid === cartItem.uuid)));
                 setCheckoutItems([]);
+                setCart
                 navigation.navigate('CheckoutFinalScreen');
                 Toast.show({
                     type: 'success',
@@ -71,6 +73,7 @@ const CheckoutConfirmScreen = ({ navigation }) => {
                 throw new Error(res.data.message || 'Đặt hàng thất bại');
             }
         } catch (error) {
+            console.log(error);
             Toast.show({
                 type: 'error',
                 text1: 'Xin vui lòng thử lại sau.',

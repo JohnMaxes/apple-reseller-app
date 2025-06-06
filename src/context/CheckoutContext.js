@@ -7,7 +7,7 @@ const CheckoutProvider = ({children}) => {
   const [isInit, setIsInit] = useState(false);
 
   const [checkoutItems, setCheckoutItems] = useState([]);
-  const [addresses, setAddresses] = useState(null);
+  const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
