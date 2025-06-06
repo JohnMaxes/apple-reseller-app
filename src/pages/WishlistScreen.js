@@ -18,16 +18,8 @@ const WishListScreen = ({ navigation }) => {
     return num.toLocaleString("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " ₫";
   };
 
-  const handleAddToCart = (item) => {
-    addToCart({ ...item });
-    navigation.navigate('BottomTab', { screen: 'Cart' });  
-  }
-
   const handleNavigateToProducts = (item) =>
-    navigation.navigate('Categories', {
-      screen: 'ProductScreen',
-      params: { id: item.id, title: item.title, image: item.image, price: item.price }
-    });
+    navigation.navigate('WishlistProductScreen', { productName: item.title });
 
   if (loading) return (
     <View style={styles.loadingContainer}>
@@ -64,7 +56,7 @@ const WishListScreen = ({ navigation }) => {
               <View style={styles.itemInfo}>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.price}>{formatPrice(item.price)}</Text>
-                <TouchableOpacity onPress={() => handleAddToCart(item)}>
+                <TouchableOpacity onPress={() => handleNavigateToProducts(item)}>
                   <Text style={styles.addToCart}>Thêm vào giỏ hàng</Text>
                 </TouchableOpacity>
               </View>
