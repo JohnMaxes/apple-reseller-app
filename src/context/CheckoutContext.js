@@ -93,7 +93,7 @@ const CheckoutProvider = ({children}) => {
     else {
       setSubtotal(0);
       setTotal(0);
-      AsyncStorage.removeItem('checkoutItems', checkoutItems);
+      AsyncStorage.removeItem('checkoutItems');
     } 
     console.log('checkoutItems hook');
   }, [checkoutItems]);
