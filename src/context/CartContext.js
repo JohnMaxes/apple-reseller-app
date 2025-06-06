@@ -32,17 +32,17 @@ const CartProvider = ({ children }) => {
         saveCart()
     }, [cart])
 
-    const addToCart = ({sku, title, price, image, color, storage }) => {
+    const addToCart = ({ title, storage, color, price, products }) => {
         let newAdd = false;
-        // Sử dụng sku + color + storage để định danh duy nhất sản phẩm trong giỏ
-        if (cart.some(element => element.sku === sku && element.color === color && element.storage === storage)) {
+        // Sử dụng uuid để định danh duy nhất sản phẩm trong giỏ
+        if (cart.some(element => element.title === title && element.color === color && element.storage === storage)) {
             setCart(prev => prev.map(item =>
-                item.sku === sku && item.color === color && item.storage === storage
+                item.title === title && item.color === color && item.storage === storage
                     ? { ...item, quantity: item.quantity + 1 }
                     : item
             ));
         } else {
-            let newItem = { sku, title, price, image, color, storage, quantity: 1 };
+            let newItem = { uuid: uuid.v4(), title, color, storage, price, products: products, quantity: 1  };
             setCart(prevCart => [...prevCart, newItem]);
             setCartTotal(prevTotal => prevTotal + price);
             newAdd = true;
@@ -57,18 +57,12 @@ const CartProvider = ({ children }) => {
         })
     };
 
-    const editCart = ({id, operation, newColor}) => {
-        if (operation == 'color') setCart((prev) => prev.map(item => item.id === id ? {...item, color: newColor } : item ));
-        if (operation == 'x' || (operation == '-' && itemQuantity == 1)) setCart((prevCart) => ( prevCart.filter(item => item.id !== id)) );
-        else setCart((prev) => prev.map(item => item.id === id ? { ...item, quantity: operation == '+' ? item.quantity + 1 : item.quantity - -1 } : item ));
-    }
-
     const clearCart = () => {
         
     }
 
     return (
-        <CartContext.Provider value={{ cart, setCart, cartTotal, checkedItems, setCheckedItems, addToCart, editCart }}>
+        <CartContext.Provider value={{ cart, setCart, cartTotal, checkedItems, setCheckedItems, addToCart }}>
             {children}
         </CartContext.Provider>
     );

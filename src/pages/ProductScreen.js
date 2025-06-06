@@ -38,9 +38,7 @@ const ProductScreen = ({ route, navigation }) => {
 
   const handleColorSelect = (color) => {
     const colorObj = availableColors.find(c => c.color === color);
-    if (colorObj) {
-      setSelectedColor(colorObj);
-    }
+    if (colorObj) setSelectedColor(colorObj);
   };
 
   useEffect(() => {
@@ -67,7 +65,6 @@ const ProductScreen = ({ route, navigation }) => {
 
   // Danh sách tất cả bộ nhớ có trong sản phẩm
   const availableStorageOptions = [...new Set(products.map(p => p.storage))];
-
   // Nhóm các tùy chọn màu theo từng bộ nhớ (có cả color và colorBackground)
   const colorMap = useMemo(() => {
     return products.reduce((map, product) => {
@@ -94,9 +91,6 @@ const ProductScreen = ({ route, navigation }) => {
 
   // Lấy sản phẩm tương ứng với selectedStorage và selectedColor
   const selectedProduct = products.find(p => p.storage === selectedStorage && p.color === selectedColor?.color);
-  useEffect(() => {
-    if(selectedProduct) console.log(selectedProduct.sku)
-  , [selectedProduct]});
 
   // Lấy hình ảnh sản phẩm tương ứng
   const imageUrls = Array.isArray(selectedProduct?.images)
@@ -155,11 +149,11 @@ const ProductScreen = ({ route, navigation }) => {
     }
     if (!selectedProduct) return;
     addToCart({
-      id, title, image: mainImageUrl, sku: sku,
-      price, color: selectedColor.color,
+      title: title,
       storage: selectedStorage,
-      availableColors: availableColors,
-      availableStorageOptions: availableStorageOptions,
+      color: selectedColor.color,
+      price: price,
+      products: products,
     });
   };
 
