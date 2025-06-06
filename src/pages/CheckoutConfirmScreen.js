@@ -31,32 +31,53 @@ const CheckoutConfirmScreen = ({ navigation }) => {
     const selectedPayment = paymentMethods.find(m => m.value === selectedPaymentMethod);
     const goBack = () => navigation.goBack();
 
-    const checkout = () => {
-        let successful = true;
-        let payload = {
-            
+    const checkout = async () => {
+        if (!selectedAddress || !selectedPaymentMethod) {
+            Toast.show({ type: 'error', text1: 'Vui lòng chọn địa chỉ và phương thức thanh toán!' });
+            return;
         }
-        
+
         setCheckoutLoading(true);
-        setTimeout(() => {
-            if(!successful) {
-                Toast.show({
-                    type: 'error',
-                    text1: 'Xin vui lòng thử lại sau.',
-                    text1Style: {fontFamily: 'Inter', fontSize: 16, color: 'red', fontWeight: 700}
-                })
-            }
-            else {
-                // clear checkoutItems, checked cart items and checkedItems, then
+
+        // Chuẩn bị payload
+        const payload = {
+            userId: selectedAddress.userId, // hoặc lấy từ context đăng nhập
+            totalAmount: total,
+            paymentMethod: selectedPaymentMethod,
+            paymentStatus: "pending", // hoặc "unpaid" tùy logic
+            orderStatus: "pending",   // hoặc "processing" tùy logic
+            shippingAddress: selectedAddress.shippingAddress,
+            trackingNumber: null,
+            items: checkoutItems.map(item => ({
+                productId: item.productId, // đảm bảo có trường này
+                sku: item.sku,
+                quantity: item.quantity,
+                price: item.price,
+            })),
+        };
+
+        try {
+            const res = await createOrder(payload);
+            if (res.data && res.data.status === 201) {
+                // Xử lý sau khi đặt hàng thành công
+                setCheckoutItems([]);
                 navigation.navigate('CheckoutFinalScreen');
                 Toast.show({
                     type: 'success',
                     text1: 'Quý khách đã đặt hàng thành công!',
-                    text1Style: {fontFamily: 'Inter', fontSize: 16, color: 'green', fontWeight: 700}
-                })
+                    text1Style: { fontFamily: 'Inter', fontSize: 16, color: 'green', fontWeight: 700 }
+                });
+            } else {
+                throw new Error(res.data.message || 'Đặt hàng thất bại');
             }
-            setCheckoutLoading(false)
-        }, 2000)         
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Xin vui lòng thử lại sau.',
+                text1Style: { fontFamily: 'Inter', fontSize: 16, color: 'red', fontWeight: 700 }
+            });
+        }
+        setCheckoutLoading(false);
     }
 
 

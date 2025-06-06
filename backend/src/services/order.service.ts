@@ -47,11 +47,8 @@ export const createOrder = async (orderJson: any) => {
       await OrderItem.create({
         orderId: newOrder.orderId,
         productId: item.productId,
-        sku: item.sku,
         quantity: item.quantity,
         price: item.price,
-        color: item.color,
-        storage: item.storage,
       });
     }
 
