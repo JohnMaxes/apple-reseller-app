@@ -134,10 +134,7 @@ const ProductScreen = ({ route, navigation }) => {
   const isWishlisted = wishlistItems.some(element => element.title === title && element.image === mainImageUrl);
 
   const handleWishlist = () => {
-    if (!loggedIn) {
-      navigation.navigate('Authentication');
-      return;
-    }
+    if (!loggedIn) return navigation.navigate('Authentication');
     let item = { sku, title, image: mainImageUrl, price, rating, ratingCount };
     !isWishlisted ? wishlist(item) : unwishlist(item);
   };

@@ -10,13 +10,11 @@ import { Keyboard } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { login } from '../services/sso';
 
-const LoginScreen = ({ navigation, route }) => {
+const LoginScreen = ({ navigation, togglePage }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const { setLoggedIn, setUserInfo } = useContext(AuthContext);
-    const redirectTo = route?.params?.redirectTo;
-    const fromSignup = route?.params?.fromSignup;
     
     const onLoginPress = async () => {
         setLoading(true);
@@ -34,15 +32,6 @@ const LoginScreen = ({ navigation, route }) => {
                 setLoading(false);
                 // Thoát modal đăng nhập
                 navigation.goBack();
-                // Chờ goBack hoàn tất trước khi điều hướng
-                setTimeout(() => {
-                    navigation.navigate('BottomTab', {
-                        screen: redirectTo || 'User',
-                        params: {
-                            screen: 'ProfileScreen',
-                        },
-                    });
-                }, 0);
             } else {
                 setLoading(false);
                 Alert.alert("Lỗi", resData.message + 123 || "Đăng nhập không thành công. Vui lòng thử lại.");
@@ -91,7 +80,7 @@ const LoginScreen = ({ navigation, route }) => {
                 <TouchableOpacity style={[styles.button, { backgroundColor: '#000000', borderRadius: 30 }]} onPress={onLoginPress}>
                     <Text style={[styles.buttonText, { fontSize: 20, fontWeight: 'bold' }]}>{loading ? <ActivityIndicator size="small" color="white" /> : 'Đăng nhập'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={{ color: "#0171E3", alignItems: "center", marginTop: 20 }}>
+                <TouchableOpacity onPress={togglePage} style={{ color: "#0171E3", alignItems: "center", marginTop: 20 }}>
                     <Text style={{ color: "#0171E3", fontSize: 16 }}>Đăng ký</Text>
                 </TouchableOpacity>
 

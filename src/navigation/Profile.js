@@ -10,7 +10,7 @@ import Orders from "./Orders";
 const ProfileStack = createStackNavigator();
 const Profile = ({navigation}) => {
     const { loggedIn } = useContext(AuthContext);
-    useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication', { redirectTo: 'Profile' }) }, [loggedIn]) )
+    useFocusEffect( useCallback(() => { if( !loggedIn ) navigation.navigate('Authentication') }, [loggedIn]) )
     if(loggedIn) return (
         <ProfileStack.Navigator initialRouteName="ProfileScreen" screenOptions={{ headerShown: false }}>
             <ProfileStack.Screen name="ProfileScreen" component={ProfileScreen}/>

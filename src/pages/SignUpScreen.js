@@ -5,7 +5,7 @@ import CustomInputToggleable from '../components/CustomInputToggleable';
 import styles from '../../styles';
 import { register } from '../services/sso';
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpScreen = ({ navigation, togglePage }) => {
 
     const [registUsername, setRUsername] = useState('');
     const [registEmail, setREmail] = useState('');
@@ -14,8 +14,7 @@ const SignUpScreen = ({ navigation }) => {
 
     const processRequest = async () => {
         if (registPassword !== registConfirmPassword) {
-            Alert.alert("Lỗi", "Mật khẩu và xác nhận mật khẩu không khớp");
-            return;
+            return Alert.alert("Lỗi", "Mật khẩu và xác nhận mật khẩu không khớp");
         }
         try {
             const response = await register({ 
@@ -26,7 +25,7 @@ const SignUpScreen = ({ navigation }) => {
             const resData = response.data;
             if (resData.status === 200) {
                 Alert.alert("Thành công", resData.message || "Đăng ký thành công!");
-                navigation.navigate('Login');
+                togglePage();
             } else {
                 Alert.alert("Lỗi", resData.message || "Đăng ký không thành công. Vui lòng thử lại.");
             }
