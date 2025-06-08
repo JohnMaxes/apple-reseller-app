@@ -109,9 +109,9 @@ const AllProductScreen = ({ navigation, route }) => {
                 <FlatList
                     data={
                         padProductsForGrid(products.filter( item =>
-                        item.productName &&
-                        item.productName.toLowerCase().includes(searchQuery.toLowerCase())
-                    ), 2)
+                            item.productName &&
+                            item.productName.toLowerCase().includes(searchQuery.toLowerCase())
+                        ), 2)
                     }
                     renderItem={({ item }) => {
                     if (item.empty) {
@@ -139,8 +139,10 @@ const AllProductScreen = ({ navigation, route }) => {
                     }}
                     keyExtractor={(item, idx) => item.sku ? item.sku : `empty-${idx}`}
                     numColumns={2}
+                    style={{ height: 700 }}
                     columnWrapperStyle={{ justifyContent: 'center' }}
                     contentContainerStyle={{paddingBottom: 90}}
+                    showsVerticalScrollIndicator={false}
                 />
             </View>
         </KeyboardAvoidingView>

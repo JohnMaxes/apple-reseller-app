@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { View, Text, Dimensions, Image, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { StyleSheet } from 'react-native';
 
 const width = Dimensions.get('window').width * 0.45;
-const PreviousProductPreview = ({ title, image, description, price, rating, ratingCount, navigation, id }) => {
-  const navigateToItem = () => navigation.navigate('ProductScreen', { title, image, description, price, rating, ratingCount });
+const PreviousProductPreview = ({ id, title, image, price, navigation }) => {
+  const navigateToItem = () => navigation.navigate('ProductScreen', { productName: title });
   const formatPrice = (price) => { return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') };
 
   return (

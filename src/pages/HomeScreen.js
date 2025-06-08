@@ -3,6 +3,8 @@ import { View, Text, ActivityIndicator, Image, FlatList, ScrollView, Platform } 
 import axios from "axios";
 import NewsPreview from "../components/NewsPreview";
 import PreviousProductPreview from "../components/PreviousProductPreview";
+
+
 const HomeScreen = ({navigation}) => {
     const [loading, setLoading] = useState(true);
     const [newArrivals, setNewArrivals] = useState([]);

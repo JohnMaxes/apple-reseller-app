@@ -7,12 +7,12 @@ import { AuthContext } from "../context/AuthContext";
 
 const width = Dimensions.get('window').width * 0.45;
 
-const ProductCatalogPreview = ({ id, title, image, price, rating, ratingCount, navigation }) => {
+const ProductCatalogPreview = ({ id, title, image, price, navigation }) => {
   const { loggedIn } = useContext(AuthContext)
   const { wishlistItems, wishlist, unwishlist } = useContext(WishlistContext)
   const isWishlisted = wishlistItems.some(element => element.title == title && element.image == image);
   const handleWishlist = () => {
-    let item = { id, title, image, price, rating, ratingCount };
+    let item = { id, title, image, price };
     if(!loggedIn) return navigation.navigate('Authentication');
     !isWishlisted ? wishlist(item) : unwishlist(item);
   }

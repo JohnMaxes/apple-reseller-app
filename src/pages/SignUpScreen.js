@@ -5,7 +5,7 @@ import CustomInputToggleable from '../components/CustomInputToggleable';
 import styles from '../../styles';
 import { register } from '../services/sso';
 
-const SignUpScreen = ({ navigation, togglePage }) => {
+const SignUpScreen = ({ togglePage }) => {
 
     const [registUsername, setRUsername] = useState('');
     const [registEmail, setREmail] = useState('');
@@ -89,7 +89,7 @@ const SignUpScreen = ({ navigation, togglePage }) => {
                 <Text style={[styles.toggleText, { fontWeight: "normal", color: "black" }]}>
                     Bạn đã có tài khoản?{" "}
                 </Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Login', { fromSignup: true })}>
+                <TouchableOpacity onPress={() => togglePage()}>
                     <Text style={styles.toggleText}>Đăng nhập ngay!</Text>
                 </TouchableOpacity>
             </View>

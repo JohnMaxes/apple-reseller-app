@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { FlatList, ScrollView, View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
-import axios from "axios";
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import ProductCatalogPreview from "../components/ProductCatalogPreview";
 import LoadingScreen from "./LoadingScreen";
@@ -50,7 +49,7 @@ const accessory = 'https://www.apple.com/v/iphone/home/cb/images/overview/essent
 
 const CategoriesIphone = createCategoryScreen('iPhone', iPhone_cover, accessory);
 const CategoriesIpad = createCategoryScreen('iPad', iPad_cover, accessory);
-const CategoriesMac = createCategoryScreen('Mac', Mac_cover, accessory);
+const CategoriesMac = createCategoryScreen('Macbook', Mac_cover, accessory);
 // const CategoriesAirpod = createCategoryScreen('airpod', airpod_cover, accessory);
 
 const padProductsForGrid = (products, numColumns = 2) => {

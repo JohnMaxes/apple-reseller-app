@@ -19,7 +19,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
     const goBack = () => navigation.goBack();
 
     // Calculate subtotal
-    const subtotal = (order.items || []).reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+    const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     // Shipping fee (mocked as 50,000đ)
     const shippingFee = 50000;
@@ -61,18 +61,17 @@ const OrderDetailScreen = ({ navigation, route }) => {
 
                 {/* Sản phẩm */}
                 <View style={styles.box}>
-                    {(order.items || []).map((p, idx) => (
-                        <View key={idx} style={styles.productItem}>
+                    {order.items.map((p) => (
+                        <View key={p.orderItemId} style={styles.productItem}>
                             <Image source={{ uri: p.imageUrl }} style={styles.productImage} />
                             <View style={styles.productDetails}>
                                 <Text style={styles.productName}>{p.productName} {p.color} {p.storage}</Text>
-                                <Text style={styles.productPrice}>{(p.price || 0).toLocaleString()}đ</Text>
+                                <Text style={styles.productPrice}>{p.price.toLocaleString()}đ</Text>
                                 <Text style={styles.productQuantity}>x{p.quantity}</Text>
                             </View>
                         </View>
                     ))}
-                    {/* Ngày đặt hàng không có trong API, có thể bỏ hoặc mock */}
-                    {/* <Text style={styles.deliveryDate}>Ngày đặt hàng: {order.orderDate}</Text> */}
+                    <Text style={styles.deliveryDate}>Ngày đặt hàng: {order.orderDate}</Text>
                     <Text style={styles.deliveryType}>{order.orderStatus}</Text>
                 </View>
 
@@ -84,10 +83,25 @@ const OrderDetailScreen = ({ navigation, route }) => {
                         </View>
                         <View style={styles.addressRightColumn}>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.bold}>Người nhận</Text>
-                                <Text>---</Text>
+                                <Text style={styles.bold}>{order.fullName ? order.fullName : 'mock'}</Text>
+                                <Text>{order.phoneNumber ? order.phoneNumber : 'mock'}</Text>
                                 <Text>{order.shippingAddress}</Text>
                             </View>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Thanh toán */}
+                <View style={styles.box}>
+                    <View style={styles.rowBetween}>
+                        <View style={styles.leftColumn}>
+                            <Text style={styles.grayLabel}>Hình thức{"\n"}thanh toán</Text>
+                        </View>
+                        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={selectedPayment.icon} style={{ width: 40, height: 40, marginRight: 12 }} resizeMode="contain" />
+                            <Text style={styles.paymentText}>
+                                {selectedPayment.label}
+                            </Text>
                         </View>
                     </View>
                 </View>

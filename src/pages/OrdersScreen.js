@@ -17,7 +17,7 @@ const OrdersScreen = ({navigation}) => {
                 } catch (error) {
                     console.error(error);
                 } finally {
-                    setLoading(false);
+                    setTimeout(() => setLoading(false), 300)
                 }
             };
             fetchOrders();
