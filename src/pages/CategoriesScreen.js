@@ -50,7 +50,7 @@ const accessory = 'https://www.apple.com/v/iphone/home/cb/images/overview/essent
 
 const CategoriesIphone = createCategoryScreen('iPhone', iPhone_cover, accessory);
 const CategoriesIpad = createCategoryScreen('iPad', iPad_cover, accessory);
-const CategoriesMac = createCategoryScreen('MacBook', Mac_cover, accessory);
+const CategoriesMac = createCategoryScreen('Mac', Mac_cover, accessory);
 // const CategoriesAirpod = createCategoryScreen('airpod', airpod_cover, accessory);
 
 const padProductsForGrid = (products, numColumns = 2) => {

@@ -10,7 +10,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
         { label: 'Thanh toán qua Ví Momo', icon: require('../assets/icons/momo-icon.png'), value: 'Momo' },
         { label: 'Thanh toán qua ngân hàng', icon: require('../assets/icons/banking-icon.png'), value: 'eBanking' },
         { label: 'Thanh toán qua Apple Pay', icon: require('../assets/icons/applepay-icon.png'), value: 'ApplePay'},
-        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'Cash'},
+        { label: 'Thanh toán khi nhận hàng', icon: require('../assets/icons/cash-icon.png'), value: 'COD'},
     ];
 
     // If order has a paymentMethod, find its label, else fallback
@@ -19,7 +19,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
     const goBack = () => navigation.goBack();
 
     // Calculate subtotal
-    const subtotal = order.orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = (order.items || []).reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
 
     // Shipping fee (mocked as 50,000đ)
     const shippingFee = 50000;
@@ -61,37 +61,36 @@ const OrderDetailScreen = ({ navigation, route }) => {
 
                 {/* Sản phẩm */}
                 <View style={styles.box}>
-                    {order.orderItems.map((p) => (
-                        <View key={p.orderItemId} style={styles.productItem}>
-                            <Image source={{ uri: p.image }} style={styles.productImage} />
+                    {(order.items || []).map((p, idx) => (
+                        <View key={idx} style={styles.productItem}>
+                            <Image source={{ uri: p.imageUrl }} style={styles.productImage} />
                             <View style={styles.productDetails}>
-                                <Text style={styles.productName}>{p.title} {p.color} {p.memory}</Text>
-                                <Text style={styles.productPrice}>{p.price.toLocaleString()}đ</Text>
+                                <Text style={styles.productName}>{p.productName} {p.color} {p.storage}</Text>
+                                <Text style={styles.productPrice}>{(p.price || 0).toLocaleString()}đ</Text>
                                 <Text style={styles.productQuantity}>x{p.quantity}</Text>
                             </View>
                         </View>
                     ))}
-                    <Text style={styles.deliveryDate}>Ngày đặt hàng: {order.orderDate}</Text>
+                    {/* Ngày đặt hàng không có trong API, có thể bỏ hoặc mock */}
+                    {/* <Text style={styles.deliveryDate}>Ngày đặt hàng: {order.orderDate}</Text> */}
                     <Text style={styles.deliveryType}>{order.orderStatus}</Text>
                 </View>
 
                 {/* Địa chỉ giao hàng */}
-                {order.address && (
-                    <View style={styles.box}>
-                        <View style={styles.rowBetween}>
-                            <View style={styles.leftColumn}>
-                                <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
-                            </View>
-                            <View style={styles.addressRightColumn}>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.bold}>{order.address.name}</Text>
-                                    <Text>{order.address.phone}</Text>
-                                    <Text>{order.address.address}</Text>
-                                </View>
+                <View style={styles.box}>
+                    <View style={styles.rowBetween}>
+                        <View style={styles.leftColumn}>
+                            <Text style={styles.grayLabel}>Địa chỉ{"\n"}giao hàng</Text>
+                        </View>
+                        <View style={styles.addressRightColumn}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.bold}>Người nhận</Text>
+                                <Text>---</Text>
+                                <Text>{order.shippingAddress}</Text>
                             </View>
                         </View>
                     </View>
-                )}
+                </View>
 
                 {/* Mã giảm giá */}
                 <View style={styles.box}>

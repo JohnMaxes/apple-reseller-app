@@ -22,9 +22,10 @@ const AllProductScreen = ({ navigation, route }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = category ? await getProductsByCategory(category) : await getAllProducts();
+                const response = category !== '' ? await getProductsByCategory(category) : await getAllProducts();
                 if (response.data && response.data.status === 200) {
                     const newProducts = padProductsForGrid(response.data.data, 2);
+                    console.log(newProducts);
                     setProducts(newProducts); // Lấy mảng sản phẩm từ backend
                 } else {
                     setProducts([]);
@@ -106,7 +107,12 @@ const AllProductScreen = ({ navigation, route }) => {
                     {["Filter", ...filterOptions].map(renderFilterButton)}
                 </ScrollView>
                 <FlatList
-                    data={ products.filter(item => item.productName.toLowerCase().includes( searchQuery.toLowerCase() )) }
+                    data={
+                        padProductsForGrid(products.filter( item =>
+                        item.productName &&
+                        item.productName.toLowerCase().includes(searchQuery.toLowerCase())
+                    ), 2)
+                    }
                     renderItem={({ item }) => {
                     if (item.empty) {
                         return (

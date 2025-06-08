@@ -61,12 +61,14 @@ const CheckoutProvider = ({children}) => {
 
   useEffect(() => {
       async function init() {
+        /*
         let onDeviceAddress = await AsyncStorage.getItem('addresses', () => {});
         if(onDeviceAddress) setAddresses(JSON.parse(onDeviceAddress));
         else {
           // init address fetch to fill out addresses
         }
         // init voucher fetch to fill out ship and order vouchers (can be merged into one)
+        */
         setIsInit(true);
         console.log('context mount');
       }
@@ -76,7 +78,8 @@ const CheckoutProvider = ({children}) => {
   useEffect(() => {
     if(isInit) {
       // API to update addreses
-      setSelectedAddress(addresses.find(address => address.isDefault));
+      let newSelected = addresses.find(address => address.isDefault);
+      setSelectedAddress(newSelected ? newSelected : null);
     }
     addresses ? AsyncStorage.setItem('addresses', JSON.stringify(addresses)) 
     : AsyncStorage.removeItem('addresses');

@@ -99,7 +99,7 @@ export const login = async (username: string, password: string) => {
     user.userId + ``, 
     user.username + ``, 
     config.SECRET_KEY + ``,
-    5 * 60,
+    5 * 60 * 60,
   );
   const refreshToken = generateRefreshToken(
     user.userId + ``,

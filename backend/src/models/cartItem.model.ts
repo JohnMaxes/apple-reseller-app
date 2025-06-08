@@ -1,4 +1,3 @@
-import e from 'express';
 import { Model, Sequelize, DataTypes } from 'sequelize';
 
 class CartItemEntity extends Model {

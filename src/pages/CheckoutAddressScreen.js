@@ -4,25 +4,39 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Checkbox from '../components/Checkbox';
 import { CheckoutContext } from '../context/CheckoutContext';
 import { getAllShippingAddresses } from '../services/user';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 const CheckoutAddressScreen = ({ navigation }) => {
+  const { token } = useContext(AuthContext)
   const { selectedAddress, setSelectedAddress } = useContext(CheckoutContext);
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const fetchAddresses = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllShippingAddresses(token);
+      if (response.status === 200 && response.data) {
+        const data = response.data.data || [];
+        setAddresses(data);
+        // Nếu chưa có địa chỉ được chọn thì chọn mặc định (nếu có)
+        if (!selectedAddress) {
+          const defaultAddress = data.find(addr => addr.isDefault) || data[0];
+          if (defaultAddress) setSelectedAddress(defaultAddress);
+        }
+      }
+    } 
+    catch (error) { console.error('Failed to load addresses:', error) } 
+    finally { setLoading(false) }
+  };
+
   // Lấy accessToken từ AsyncStorage và gọi API lấy địa chỉ
+  /*
   useEffect(() => {
-    const fetchAddresses = async () => {
+    const initFetch = async () => {
       setLoading(true);
       try {
-        const token = await AsyncStorage.getItem('accessToken');
-        if (!token) {
-          console.warn('No access token found');
-          setLoading(false);
-          return;
-        }
-
         const response = await getAllShippingAddresses(token);
         if (response.status === 200 && response.data) {
           const data = response.data.data || [];
@@ -42,6 +56,14 @@ const CheckoutAddressScreen = ({ navigation }) => {
 
     fetchAddresses();
   }, []);
+  */
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchAddresses()
+      console.log(addresses)
+    }, [])
+  );
 
   const handleSelect = (id) => {
     const addr = addresses.find(item => item.id === id);
@@ -116,11 +138,6 @@ const CheckoutAddressScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.addBox} onPress={handleAddAddress}>
               <Icon name="add" size={30} color="#000" />
             </TouchableOpacity>
-          }
-          ListEmptyComponent={
-            <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
-              Bạn chưa có địa chỉ giao hàng nào.
-            </Text>
           }
         />
       )}

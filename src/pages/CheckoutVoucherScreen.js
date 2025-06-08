@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Platfo
 import Icon from "react-native-vector-icons/Ionicons";
 import { CheckoutContext } from "../context/CheckoutContext";
 import { getAllVouchers } from "../services/voucher";
+import LoadingScreen from "./LoadingScreen";
 
 const CheckoutVoucherScreen = ({ navigation }) => {
   const {
@@ -13,10 +14,12 @@ const CheckoutVoucherScreen = ({ navigation }) => {
   } = useContext(CheckoutContext);
 
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
+        setLoading(true);
         const response = await getAllVouchers();
         const allVouchers = response.data;
         const shipping = allVouchers.filter(v => v.voucherType === "shipping");
@@ -27,15 +30,16 @@ const CheckoutVoucherScreen = ({ navigation }) => {
         console.error("Failed to load vouchers", err);
         setShipVouchers([]);
         setOrderVouchers([]);
+      } finally {
+        setLoading(false)
       }
     };
-
     fetchVouchers();
   }, []); 
 
   const toggleShipVoucher = (voucher) => {
     if (selectedShipVoucher && selectedShipVoucher.id === voucher.id) {
-      setSelectedShipVoucher(null);
+      setSelectedShipVoucher(null); 
     } else {
       setSelectedShipVoucher(voucher);
     }
@@ -67,7 +71,6 @@ const CheckoutVoucherScreen = ({ navigation }) => {
   const handleViewTerms = () => {
     alert('Điều kiện sử dụng... Coming soon hehe');
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -76,7 +79,7 @@ const CheckoutVoucherScreen = ({ navigation }) => {
               <Icon name="chevron-back" size={22} color="#000" />
             </View>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>THANH TOÁN</Text>
+          <Text style={styles.headerTitle}>CÁC VOUCHER</Text>
           <View style={{ width: 24 }} />
       </View>
 
@@ -85,59 +88,64 @@ const CheckoutVoucherScreen = ({ navigation }) => {
         <TextInput placeholder="Tìm mã giảm giá" style={styles.searchInput} placeholderTextColor="#888"/>
       </View>
 
-      <Text style={styles.suggestedText}>Voucher ship:</Text>
+      { loading &&  (
+        <View style={{ flex: 1, justifyContent: 'center', minHeight: 300 }}>
+          <LoadingScreen/>
+        </View>
+      ) }
+      { !loading && (
+        <>
+          <Text style={styles.suggestedText}>Voucher ship:</Text>
+          {shipVouchers.map((voucher) => (
+            <TouchableOpacity key={voucher.id} style={[ styles.voucherItem, (selectedShipVoucher ? selectedShipVoucher.id === voucher.id : null) && styles.voucherSelected ]} 
+              onPress={() => toggleShipVoucher(voucher)}
+            >
+              <View style={styles.voucherIconContainer}>
+                <Text style={styles.voucherEmoji}>🎟️</Text>
+              </View>
 
-      {/* Danh sách ship voucher */}
-      { shipVouchers.map((voucher) => (
-        <TouchableOpacity key={voucher.id} style={[ styles.voucherItem, (selectedShipVoucher ? selectedShipVoucher.id === voucher.id : null) && styles.voucherSelected ]} 
-          onPress={() => toggleShipVoucher(voucher)}
-        >
-          <View style={styles.voucherIconContainer}>
-            <Text style={styles.voucherEmoji}>🎟️</Text>
-          </View>
-
-          <View style={styles.voucherTextContainer}>
-            <Text style={[ styles.voucherTitle, (selectedShipVoucher ? selectedShipVoucher.id === voucher.id : null) && styles.voucherTitleBold ]}>
-              {voucher.code}
-            </Text>
-            <Text style={styles.voucherExpiry}>
-              Hạn sử dụng {formatDate(voucher.endDate)}
-            </Text>
-            <TouchableOpacity onPress={handleViewTerms} style={{width: '50%'}}>
-              <Text style={styles.link}>Xem điều kiện sử dụng</Text>
+              <View style={styles.voucherTextContainer}>
+                <Text style={[ styles.voucherTitle, (selectedShipVoucher ? selectedShipVoucher.id === voucher.id : null) && styles.voucherTitleBold ]}>
+                  {voucher.code}
+                </Text>
+                <Text style={styles.voucherExpiry}>
+                  Hạn sử dụng {formatDate(voucher.endDate)}
+                </Text>
+                <TouchableOpacity onPress={handleViewTerms} style={{width: '50%'}}>
+                  <Text style={styles.link}>Xem điều kiện sử dụng</Text>
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      ))}
+          ))}
 
-      <Text style={styles.suggestedText}>Voucher đơn hàng:</Text>
+          <Text style={styles.suggestedText}>Voucher đơn hàng:</Text>
+          {orderVouchers.map((voucher) => (
+            <TouchableOpacity key={voucher.id} style={[ styles.voucherItem, (selectedOrderVoucher ? selectedOrderVoucher.id === voucher.id : null) && styles.voucherSelected ]}
+              onPress={() => toggleOrderVoucher(voucher)}
+            >
+              <View style={styles.voucherIconContainer}>
+                <Text style={styles.voucherEmoji}>🎟️</Text>
+              </View>
 
-      {/* Danh sách order voucher */}
-      { orderVouchers.map((voucher) => (
-        <TouchableOpacity key={voucher.id} style={[ styles.voucherItem, (selectedOrderVoucher ? selectedOrderVoucher.id === voucher.id : null) && styles.voucherSelected ]}
-          onPress={() => toggleOrderVoucher(voucher)}
-        >
-          <View style={styles.voucherIconContainer}>
-            <Text style={styles.voucherEmoji}>🎟️</Text>
-          </View>
-
-          <View style={styles.voucherTextContainer}>
-            <Text style={[ styles.voucherTitle, (selectedOrderVoucher ? selectedOrderVoucher.id === voucher.id : null) && styles.voucherTitleBold ]}>
-              {voucher.code}
-            </Text>
-            <Text style={styles.voucherExpiry}>
-              Hạn sử dụng {formatDate(voucher.endDate)}
-            </Text>
-            <TouchableOpacity onPress={handleViewTerms}>
-              <Text style={styles.link}>Xem điều kiện sử dụng</Text>
+              <View style={styles.voucherTextContainer}>
+                <Text style={[ styles.voucherTitle, (selectedOrderVoucher ? selectedOrderVoucher.id === voucher.id : null) && styles.voucherTitleBold ]}>
+                  {voucher.code}
+                </Text>
+                <Text style={styles.voucherExpiry}>
+                  Hạn sử dụng {formatDate(voucher.endDate)}
+                </Text>
+                <TouchableOpacity onPress={handleViewTerms}>
+                  <Text style={styles.link}>Xem điều kiện sử dụng</Text>
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      ))}
+          ))}
 
-      <TouchableOpacity style={styles.doneButton} onPress={goBack}>
-        <Text style={styles.doneButtonText}>Xong</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.doneButton} onPress={goBack}>
+            <Text style={styles.doneButtonText}>Xong</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </ScrollView>
   );
 };

@@ -7,3 +7,11 @@ export const createOrder = async (orderData, accessToken) => {
     }
   });
 };
+
+export const getOrders = async (accessToken) => {
+  return axiosInstance.get(`/api/orders`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+}

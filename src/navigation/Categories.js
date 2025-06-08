@@ -21,7 +21,7 @@ const Categories = ({navigation}) => {
                             <Text style={{ fontSize: 25, fontFamily: 'Inter', fontWeight: "bold", textAlign: "center"}}>SẢN PHẨM</Text>
                         </View>
                         <View style={{ flex: 1, alignItems: "flex-end" }}>
-                        <TouchableOpacity onPress={() => navigation.navigate('AllProduct')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('AllProduct', { category: '' })}>
                             <Icon name="search" size={25} color="black" style={{ marginRight: 20 }}/>
                         </TouchableOpacity>
                         </View>

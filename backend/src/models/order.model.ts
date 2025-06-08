@@ -4,9 +4,9 @@ class OrderEntity extends Model {
   declare orderId: number;
   declare userId: number;
   declare totalAmount: number;
-  declare paymentMethod: string;
-  declare paymentStatus: string;
-  declare orderStatus: string;
+  declare paymentMethod: 'COD' | 'Credit Card' | 'Momo' | 'ZaloPay' | 'Bank Transfer';
+  declare paymentStatus: 'Pending' | 'Completed' | 'Failed';
+  declare orderStatus: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
   declare shippingAddress: string;
   declare trackingNumber: string | null;
   declare createdAt: Date;
@@ -33,17 +33,17 @@ function Order(sequelize: Sequelize) {
         field: 'total_amount',
       },
       paymentMethod: {
-        type: DataTypes.STRING(50),
+        type: DataTypes.ENUM('COD', 'Credit Card', 'Momo', 'ZaloPay', 'Bank Transfer'),
         allowNull: false,
         field: 'payment_method',
       },
       paymentStatus: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.ENUM('Pending', 'Completed', 'Failed'),
         allowNull: false,
         field: 'payment_status',
       },
       orderStatus: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled'),
         allowNull: false,
         field: 'order_status',
       },

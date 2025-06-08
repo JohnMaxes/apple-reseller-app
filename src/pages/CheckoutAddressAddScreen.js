@@ -51,8 +51,8 @@ const CheckoutAddressAddScreen = ({ navigation }) => {
         note: note,
         isDefault: isDefault,
       };
+      console.log(payload);
       const response = await createShippingAddress(token, payload);
-      console.log('Add address response:', response);
       if (response.status === 200) {
         const serverData = response.data || {};
         const newAddressObj = {
@@ -63,6 +63,7 @@ const CheckoutAddressAddScreen = ({ navigation }) => {
           note,
           isDefault,
         };
+
         setAddresses((prev) => {
           if (!prev) return [newAddressObj];
           if (isDefault) {
