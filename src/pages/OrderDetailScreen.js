@@ -44,7 +44,8 @@ const OrderDetailScreen = ({ navigation, route }) => {
     }
 
     // Calculate total
-    const total = subtotal + shippingFee - orderVoucherDiscount - shipVoucherDiscount;
+    // const total = subtotal + shippingFee - orderVoucherDiscount - shipVoucherDiscount;
+    const total = order.totalAmount;
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
@@ -62,7 +63,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
                 {/* Sản phẩm */}
                 <View style={styles.box}>
                     {order.items.map((p) => (
-                        <View key={p.orderItemId} style={styles.productItem}>
+                        <View key={p.imageUrl} style={styles.productItem}>
                             <Image source={{ uri: p.imageUrl }} style={styles.productImage} />
                             <View style={styles.productDetails}>
                                 <Text style={styles.productName}>{p.productName} {p.color} {p.storage}</Text>
@@ -114,23 +115,17 @@ const OrderDetailScreen = ({ navigation, route }) => {
                         </View>
                         <View style={styles.addressRightColumn}>
                             <View style={{flex: 1}}>
-                                { order.orderOrderVoucher ? (
+                                { order.productVoucherCode ? (
                                     <View style={{ marginBottom: 8 }}>
-                                        <Text style={styles.bold}>{orderVoucherTitle}</Text>
-                                        <Text style={styles.discountBlue}>
-                                            Đã giảm {orderVoucherDiscount.toLocaleString()}đ
-                                        </Text>
+                                        <Text style={styles.bold}>{order.productVoucherCode}</Text>
                                     </View>
                                 ) : null }
-                                { order.orderShipVoucher ? (
+                                { order.shippingVoucherCode ? (
                                     <View style={{ marginBottom: 8 }}>
-                                        <Text style={styles.bold}>{shipVoucherTitle}</Text>
-                                        <Text style={styles.discountBlue}>
-                                            Đã giảm {shipVoucherDiscount.toLocaleString()}đ
-                                        </Text>
+                                        <Text style={styles.bold}>{order.shippingVoucherCode}</Text>
                                     </View>
                                 ): null }
-                                { !order.orderShipVoucher && !order.orderOrderVoucher ? (
+                                { !order.productVoucherCode && !order.shippingVoucherCode ? (
                                     <View style={{flex: 1}}>
                                         <Text style={styles.bold}>Không áp dụng voucher</Text>
                                     </View>
@@ -151,6 +146,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
                         <Text>Tổng phí vận chuyển:</Text>
                         <Text>{shippingFee.toLocaleString()}đ</Text>
                     </View>
+                    {/*}
                     { orderVoucherDiscount > 0 ? (
                         <View style={styles.summaryLine}>
                             <Text>Giảm từ mã giảm giá:</Text>
@@ -163,9 +159,16 @@ const OrderDetailScreen = ({ navigation, route }) => {
                             <Text style={styles.discountBlue}>-{shipVoucherDiscount.toLocaleString()}đ</Text>
                         </View>
                     ) : null }
+                    {*/}
+                    { total !== subtotal ? (
+                        <View style={styles.summaryLine}>
+                            <Text>Đã giảm :</Text>
+                            <Text style={styles.discountBlue}>-{Math.round((total - subtotal) * 100) / 100}đ</Text>
+                        </View>
+                    ) : (null)}
                     <View style={styles.summaryLine}>
                         <Text style={styles.bold}>Tổng thanh toán:</Text>
-                        <Text style={[styles.bold]}>{total.toLocaleString()}đ</Text>
+                        <Text style={[styles.bold]}>{total}đ</Text>
                     </View>
                 </View>
 

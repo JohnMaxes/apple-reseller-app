@@ -45,7 +45,8 @@ export const createOrder = async (orderJson: any, accessToken: string) => {
       fullName: orderJson.fullName,
       phoneNumber: orderJson.phoneNumber,
       totalAmount: orderJson.totalAmount,
-      voucherCode: orderJson.voucherCode || null, // Voucher code có thể là null
+      productVoucherCode: orderJson.orderVoucher || null,
+      shippingVoucherCode: orderJson.shipVoucher || null,
       paymentMethod: orderJson.paymentMethod,
       paymentStatus: orderJson.paymentStatus,
       orderStatus: orderJson.orderStatus,
@@ -98,7 +99,7 @@ export const createOrder = async (orderJson: any, accessToken: string) => {
 };
 
 export const getOrderByUserId = async (accessToken: string) => {
-  const { Order, OrderItem, Product, ProductImage } = await db.connect();
+  const { Order, OrderItem, Product, ProductImage, Voucher } = await db.connect();
   if (!accessToken) {
     return {
       status: 401,
@@ -134,9 +135,11 @@ export const getOrderByUserId = async (accessToken: string) => {
               ]
             }
           ]
-        }
+        },
       ]
     });
+
+    console.log(orders[0]);
 
     const formattedOrders: any = (orders as any).map((order: any) => ({
       ...order.toJSON(),

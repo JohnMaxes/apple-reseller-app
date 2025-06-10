@@ -46,7 +46,11 @@ const CheckoutConfirmScreen = ({ navigation }) => {
             paymentMethod: selectedPaymentMethod,
             paymentStatus: "pending", // hoặc "unpaid" tùy logic
             orderStatus: "pending",   // hoặc "processing" tùy logic
+            fullName: selectedAddress.fullName,
+            phoneNumber: selectedAddress.phoneNumber,
             shippingAddress: selectedAddress.shippingAddress,
+            orderVoucher: selectedOrderVoucher ? selectedOrderVoucher.code : null,
+            shipVoucher: selectedShipVoucher ? selectedShipVoucher.code : null,
             trackingNumber: null,
             items: checkoutItems.map(item => ({
                 productId: item.productId, // đảm bảo có trường này
