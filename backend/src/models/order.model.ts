@@ -3,7 +3,11 @@ import { Model, Sequelize, DataTypes } from 'sequelize';
 class OrderEntity extends Model {
   declare orderId: number;
   declare userId: number;
+  declare fullName: string;
+  declare phoneNumber: string;
   declare totalAmount: number;
+  declare productVoucherCode: string | null;
+  declare shippingVoucherCode: string | null;
   declare paymentMethod: 'COD' | 'Credit Card' | 'Momo' | 'ZaloPay' | 'Bank Transfer';
   declare paymentStatus: 'Pending' | 'Completed' | 'Failed';
   declare orderStatus: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
@@ -27,10 +31,30 @@ function Order(sequelize: Sequelize) {
         allowNull: false,
         field: 'user_id',
       },
+      fullName: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        field: 'full_name',
+      },
+      phoneNumber: {
+        type: DataTypes.STRING(15),
+        allowNull: false,
+        field: 'phone_number',
+      },
       totalAmount: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
         field: 'total_amount',
+      },
+      productVoucherCode: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        field: 'product_voucher_code',
+      },
+      shippingVoucherCode: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        field: 'shipping_voucher_code',
       },
       paymentMethod: {
         type: DataTypes.ENUM('COD', 'Credit Card', 'Momo', 'ZaloPay', 'Bank Transfer'),

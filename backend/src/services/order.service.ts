@@ -42,7 +42,10 @@ export const createOrder = async (orderJson: any, accessToken: string) => {
     // Tạo order mới
     const newOrder = await Order.create({
       userId: userId,
+      fullName: orderJson.fullName,
+      phoneNumber: orderJson.phoneNumber,
       totalAmount: orderJson.totalAmount,
+      voucherCode: orderJson.voucherCode || null, // Voucher code có thể là null
       paymentMethod: orderJson.paymentMethod,
       paymentStatus: orderJson.paymentStatus,
       orderStatus: orderJson.orderStatus,
